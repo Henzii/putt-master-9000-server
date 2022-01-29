@@ -12,17 +12,21 @@ export const getGame = async (id: ID) => {
         }
     }) as Document & Game;
 }
-export const getGames = async (populateUsers = false) => {
+export const getGames = async (userId: ID, populateUsers = false) => {
 
     if (populateUsers) {
-        return await GameModel.find({}).populate({
+        return await GameModel.find({
+            scorecards: {
+                user: userId
+            }
+        }).populate({
             path: 'scorecards',
             populate: {
                 path: 'user'
             }
         }) as (Document & Game)[]
     } else {
-        return await GameModel.find({}) as (Document & Game)[];
+        return await GameModel.find({ scorecards: { user: userId }}) as (Document & Game)[];
     }
 
 }
@@ -41,10 +45,16 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     console.log(game);
     return game;
 }
-export const createGame = async (layoutId: ID) => {
+export const createGame = async (courseId: ID, layoutId: ID) => {
     try {
-        const course = await CourseModel.findOne({ "layouts.id": layoutId }) as unknown as Document & Course;
+        const course = await CourseModel.findById(courseId) as Document & Course;
+        if (!course) {
+            throw new Error('Course not found!!')
+        }
         const layout = course.layouts.find(l => l.id === layoutId)
+        if (!layout) {
+            throw new Error('Layout not found!!')
+        }
         const newGame = new GameModel({
             date: new Date(),
             layout: layout?.name,

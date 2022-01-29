@@ -27,8 +27,8 @@ export const mutations = {
         },
         
         // Game mutations
-        createGame: (_root: unknown, args: { layoutId: ID }) => {
-            return gameService.createGame(args.layoutId);
+        createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
+            return gameService.createGame(args.courseId, args.layoutId);
         },
         addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }) => {
             return await gameService.addPlayersToGame(args.gameId, args.playerIds)

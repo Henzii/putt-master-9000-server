@@ -53,7 +53,7 @@ export const typeDefs = gql`
         addCourse(name: String!): ID!
         addLayout(courseId: ID!, layout: NewLayout!): ID!
 
-        createGame(layoutId: ID!): ID!
+        createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
 
