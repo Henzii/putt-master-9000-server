@@ -1,7 +1,7 @@
 import { Game, ID, Course } from "../types";
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
-import { Document, Mongoose } from "mongoose";
+import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import mongoose from 'mongoose';
 

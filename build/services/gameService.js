@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setScore = exports.createGame = exports.addPlayersToGame = exports.getGames = exports.getGame = void 0;
 const Game_1 = __importDefault(require("../models/Game"));
 const Course_1 = __importDefault(require("../models/Course"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const getGame = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield Game_1.default.findById(id).populate({
         path: 'scorecards',
@@ -25,11 +26,10 @@ const getGame = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getGame = getGame;
 const getGames = (userId, populateUsers = false) => __awaiter(void 0, void 0, void 0, function* () {
+    const uId = new mongoose_1.default.Types.ObjectId(userId);
     if (populateUsers) {
         return yield Game_1.default.find({
-            scorecards: {
-                user: userId
-            }
+            'scorecards.user': userId
         }).populate({
             path: 'scorecards',
             populate: {
@@ -38,7 +38,11 @@ const getGames = (userId, populateUsers = false) => __awaiter(void 0, void 0, vo
         });
     }
     else {
-        return yield Game_1.default.find({ scorecards: { user: userId } });
+        const games = yield Game_1.default.find({
+            'scorecards.user': userId
+        });
+        console.log(games);
+        return games;
     }
 });
 exports.getGames = getGames;
