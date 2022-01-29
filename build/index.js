@@ -19,4 +19,4 @@ mongoose_1.default.connect(process.env.MONGO_URI, {
         '║ Error when connecting to MongoDb! ║\n' +
         '╚═══════════════════════════════════╝\n', error.message, '\n\n');
 });
-index_1.server.listen().then(({ url }) => console.log('Serveri ' + url));
+index_1.server.listen(process.env.PORT || 8080).then(({ url }) => console.log('Serveri ' + url));

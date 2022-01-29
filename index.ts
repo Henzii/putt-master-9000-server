@@ -20,4 +20,4 @@ mongoose.connect(process.env.MONGO_URI as string, {
     );
 })
 
-server.listen().then(({url}) => console.log('Serveri ' + url))
+server.listen(process.env.PORT || 8080).then(({url}) => console.log('Serveri ' + url))
