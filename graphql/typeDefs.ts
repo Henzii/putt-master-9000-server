@@ -16,18 +16,22 @@ export const typeDefs = gql`
     type User {
         id: ID!
         name: String!
+        email: String
         friends: [User!]
     }
     type Game {
         id: ID!
-        layout: Layout!
+        course: String!
+        layout: String!
+        holes: Int!
+        pars: [Int!]
         date: String!
         scorecards: [Scorecard!]!
+        isOpen: Boolean
     }
     type Scorecard {
-        id: ID!
-        user: User!
-        scores: [Int!]
+        user: User
+        scores: [Int]
     }
     input NewLayout {
         name: String!
@@ -35,19 +39,26 @@ export const typeDefs = gql`
         holes: Int!
     }
     type Query {
-        getMe: User
-        getCourses(name: String, id: Int): [Course]
+        getCourses(name: String, courseId: ID): [Course]
 
         getGame(gameId: ID!): Game
         getGames: [Game]
         ping: String
+
+        getMe: User
+        getUsers: [User]!
     }
 
     type Mutation {
-        login(user: String!, password: String!): String!
         addCourse(name: String!): ID!
         addLayout(courseId: ID!, layout: NewLayout!): ID!
 
         createGame(layoutId: ID!): ID!
+        addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
+        setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
+
+        createUser(name: String!, password: String!, email: String): ID
+        login(user: String!, password: String!): String!
+        addFriend(friendId: ID, friendName: String): Boolean
     }
 `;

@@ -5,7 +5,7 @@ export type Course = {
 }
 
 export type Layout = {
-    id: number | string,
+    id?: number | string,
     name: string,
     holes: number,
     pars: number[]
@@ -29,7 +29,13 @@ export type Scorecard = {
 export type User = {
     id: string | number,
     name: string,
-    friends: User[]
+    passwordHash: string,
+    friends: (ID | User)[]
 }
+export type SafeUser = Pick<User, 'id' | 'name'>
 
 export type ID = string | number
+
+export type ContextWithUser = {
+    user: SafeUser
+}

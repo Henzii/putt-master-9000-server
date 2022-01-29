@@ -3,7 +3,14 @@ import { typeDefs } from "./typeDefs";
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { Layout, Course } from "../types";
+import { Layout, SafeUser, Scorecard, User } from "../types";
+import { Document } from "mongoose";
+import jwt from 'jsonwebtoken';
+
+import permissions from "./permissions";
+import { GraphQLSchema } from "graphql";
+import { applyMiddleware } from "graphql-middleware";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 
 const resolvers = {
     ...queries,
@@ -11,12 +18,44 @@ const resolvers = {
 
     Layout: {
         par: (root: Layout) => {
-            return root.pars.reduce((p, c) => (p+c), 0);
+            return root.pars.reduce((p, c) => (p + c), 0);
         },
     },
+    User: {
+        friends: async (root: Document & User) => {
+            await root.populate('friends');
+            return root.friends;
+        }
+    },
 }
+
+const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions)
 
 export const server = new ApolloServer({
     typeDefs,
     resolvers,
+    schema,
+    context: ({ req }: { req: ContextRequest }) => {
+        const token = (req.headers?.authorization)?.slice(7)
+        if (token && process.env.TOKEN_KEY) {
+            try {
+                const decode = jwt.verify(token, process.env.TOKEN_KEY) as SafeUser;
+                return {
+                    user: {
+                        id: decode.id,
+                        name: decode.name,
+                    }
+                }
+            } catch (e) {
+                return null;
+            }
+        }
+    }
 })
+
+type ContextRequest = {
+    headers?: {
+        authorization?: string
+    }
+}
+

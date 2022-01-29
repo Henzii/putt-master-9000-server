@@ -1,55 +1,26 @@
+import { Document } from "mongoose";
+import mongoose from 'mongoose';
+import CourseModel from "../models/Course";
 import { Course, Layout, NewLayoutArgs } from "../types"
 
-export function getCourses() {
-    return courses;
-}
-export function addCourse(name: string) {
-    const id = Math.floor(Math.random() * 9999);
-    courses.push({
-        name,
-        id,
-        layouts: []
-    })
-    return id;
-}
-
-export function addLayout(courseId: number | string, layout: NewLayoutArgs) {
-    const id = Math.floor(Math.random() * 9999);
-    const kurssi = courses.find(c => c.id == courseId)
-    if (!kurssi) return null;
-    kurssi.layouts.push({ ...layout, id })
-    return id;
-}
-const courses: Course[] = [
-    {
-        name: 'Malminiitty',
-        id: 1,
-        layouts: [
-            {
-                name: 'Main',
-                holes: 9,
-                id: 3,
-                pars: [3, 3, 3, 3, 3, 3, 3, 3, 3]
-            },
-            {
-                name: '2x Malmari',
-                holes: 18,
-                id: 4,
-                pars: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
-            }
-        ]
-    },
-    {
-        name: 'Siltamäki',
-        id: 2,
-        layouts: [
-            {
-                name: 'Main',
-                holes: 18,
-                id: 5,
-                pars: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2]
-            }
-        ]
+export async function getCourses({name, courseId}: { name?: string, courseId?: string }) {
+    if (courseId) return  [ await CourseModel.findById(courseId)];
+    else if (name) {
+        return await CourseModel.find({ name: { $regex: '.*' + name + '.*' }})
     }
-]
-
+    return await CourseModel.find({})
+}
+export async function addCourse(name: string) {
+    const newCourse = new CourseModel({
+        name,
+        layouts: [],
+    });
+    await newCourse.save();
+    return newCourse.id;
+}
+export async function addLayout(courseId: number | string, layout: NewLayoutArgs) {
+    const course = await CourseModel.findById(courseId) as Document & Course
+    course.layouts.push(layout);
+    await course.save();
+    return course.layouts[course.layouts.length-1].id;
+}

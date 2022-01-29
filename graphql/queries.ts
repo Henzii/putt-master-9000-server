@@ -1,46 +1,33 @@
 import { getCourses } from "../services/courseService";
-import { getGames } from "../services/gameService";
-import { Course } from "../types";
+import { getGames, getGame } from "../services/gameService";
+import { ContextWithUser, Course, ID } from "../types";
 
-const courses = getCourses();
+import userService from "../services/userService";
 
 export const queries = {
     Query: {
-        getCourses: (_root: unknown, args: getCoursesArgs) => {
-            if (args.id) {
-                return [courses.find(c => c.id === args.id)]
-            }
-            if (args.name) {
-                return [courses.find(c => c.name.includes(args.name))]
-            }
-            return courses;
+        getCourses: async (_root: unknown, args: getCoursesArgs) => {
+            return await getCourses(args);
         },
-        getMe: () => {
-            return {
-                name: 'Kovakoodi',
-                id: 'KK1',
-                friends: [
-                    {
-                        name: 'Kova kakkonen',
-                        id: 'KK2',
-                        friends: []
-                    },
-                    {
-                        name: 'Numero kolme',
-                        id: 'KK3',
-                        friends: []
-                    }
-                ]
-            }
+        getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
+            return await userService.getUser(undefined, context.user?.id)
         },
-        getGames: () => {
-            return getGames();
+        getGames: async (r: unknown, r2: unknown, r3: unknown, r4: any) => {
+            // Jos kyselyssä kysytään user:ia -> parametriksi true -> user populoidaan.
+            return await getGames(r4.fieldNodes[0].selectionSet.loc.source.body.includes('user {'))
         },
-        ping: (): String => 'pong!'
-    }
+        getGame: async(_root: unknown, args: { gameId: ID}) => {
+            if (!args.gameId) throw new Error('Not enough parameters')
+            return await getGame(args.gameId)
+        },
+        ping: (): String => 'pong!',
+        getUsers: async () => {
+            return await userService.getUsers();
+        },
+      }
 }
 
 type getCoursesArgs = {
     name: string,
-    id: number | string
+    courseId: string
 }
