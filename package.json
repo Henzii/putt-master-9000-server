@@ -4,7 +4,6 @@
   "description": "putt-master-9000-backend",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
     "start": "node ./build/index.js",
     "tsc": "tsc",
     "dev": "ts-node-dev index.ts"
