@@ -1,8 +1,9 @@
 import { Game, ID, Course } from "../types";
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
-import { Document } from "mongoose";
+import { Document, Mongoose } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
+import mongoose from 'mongoose';
 
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id).populate({
@@ -13,12 +14,10 @@ export const getGame = async (id: ID) => {
     }) as Document & Game;
 }
 export const getGames = async (userId: ID, populateUsers = false) => {
-
+    const uId = new mongoose.Types.ObjectId(userId);
     if (populateUsers) {
         return await GameModel.find({
-            scorecards: {
-                user: userId
-            }
+           'scorecards.user': userId
         }).populate({
             path: 'scorecards',
             populate: {
@@ -26,7 +25,11 @@ export const getGames = async (userId: ID, populateUsers = false) => {
             }
         }) as (Document & Game)[]
     } else {
-        return await GameModel.find({ scorecards: { user: userId }}) as (Document & Game)[];
+        const games = await GameModel.find({ 
+            'scorecards.user': userId
+        }) as (Document & Game)[];
+        console.log(games)
+        return games;
     }
 
 }
