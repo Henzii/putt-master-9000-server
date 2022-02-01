@@ -16,6 +16,8 @@ export type NewLayoutArgs = Omit<Layout, "id">
 export type Game = {
     id: string | number,
     date: Date,
+    pars: number[],
+    par: number,
     layout: Layout | ID,
     scorecards: Scorecard[]
 }

@@ -1,20 +1,21 @@
 import { ID, User } from "../types";
 import Users from '../models/User';
 import { Document } from "mongoose";
+import jwt from 'jsonwebtoken';
 
 const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
     if (users.length === 0) return [];
     return users;
 }
-const addUser = async (name: string, passwordHash: string, email?: string): Promise<ID> => {
+const addUser = async (name: string, passwordHash: string, email?: string): Promise<User> => {
     const newUser = new Users({
         name,
         passwordHash,
         email
-    })
+    }) as Document & User;
     await newUser.save();
-    return newUser.id;
+    return newUser;
 }
 const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => {
 

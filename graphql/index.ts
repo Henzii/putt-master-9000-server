@@ -3,7 +3,7 @@ import { typeDefs } from "./typeDefs";
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { Layout, SafeUser, Scorecard, User } from "../types";
+import { Game, Layout, SafeUser, Scorecard, User } from "../types";
 import { Document } from "mongoose";
 import jwt from 'jsonwebtoken';
 
@@ -27,6 +27,19 @@ const resolvers = {
             return root.friends;
         }
     },
+    Game: {
+        par: (root: Game) => {
+            return root.pars.reduce((p, c) => (p + c), 0);
+        }
+    },
+    Scorecard: {
+        total: (root: Scorecard) => {
+            return root.scores.reduce((p,c) => {
+                if (!isNaN(c)) return p+c;
+                return p;
+            }, 0)
+        }
+    }
 }
 
 const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions)

@@ -40,8 +40,9 @@ export const mutations = {
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string }) => {
             const hashedPassword = await bcrypt.hash(args.password, 10);
             try {
-                const newId = await userService.addUser(args.name, hashedPassword, args.email)
-                return newId;
+                const user = await userService.addUser(args.name, hashedPassword, args.email)
+                return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn')
+                
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
                 if (viesti.includes('to be unique')) throw new UserInputError(`Name ${args.name} is already taken!`)

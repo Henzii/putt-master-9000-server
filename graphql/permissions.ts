@@ -1,3 +1,4 @@
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { rule, shield, deny, allow } from "graphql-shield";
 import { ContextWithUser } from "../types";
 
@@ -14,5 +15,6 @@ export default shield({
     Mutation: {
         "*": isLoggedIn,
         login: allow,
+        createUser: allow,
     }
 })

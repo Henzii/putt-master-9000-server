@@ -25,6 +25,7 @@ export const typeDefs = gql`
         layout: String!
         holes: Int!
         pars: [Int!]
+        par: Int
         date: String!
         scorecards: [Scorecard!]!
         isOpen: Boolean
@@ -32,6 +33,7 @@ export const typeDefs = gql`
     type Scorecard {
         user: User
         scores: [Int]
+        total: Int
     }
     input NewLayout {
         name: String!
@@ -57,7 +59,7 @@ export const typeDefs = gql`
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
 
-        createUser(name: String!, password: String!, email: String): ID
+        createUser(name: String!, password: String!, email: String): String
         login(user: String!, password: String!): String!
         addFriend(friendId: ID, friendName: String): Boolean
     }
