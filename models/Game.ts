@@ -14,6 +14,7 @@ const skeema = new mongoose.Schema({
             },
             scores: [],
             _id: false,
+            beers: Number,
         }
     ],
     isOpen: Boolean,

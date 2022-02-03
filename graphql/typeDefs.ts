@@ -34,6 +34,7 @@ export const typeDefs = gql`
         user: User
         scores: [Int]
         total: Int
+        beers: Int
     }
     input NewLayout {
         name: String!
@@ -58,6 +59,8 @@ export const typeDefs = gql`
         createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
+        closeGame(gameId: ID!): Game
+        setBeersDrank(gameId: ID!, beers: Int!): Game
 
         createUser(name: String!, password: String!, email: String): String
         login(user: String!, password: String!): String!

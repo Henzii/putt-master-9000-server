@@ -36,6 +36,12 @@ export const mutations = {
         setScore: async (_root: unknown, args: SetScoreArgs) => {
             return await gameService.setScore(args);
         },
+        closeGame: async(_root: unknown, args: { gameId: ID }) => {
+            return await gameService.closeGame(args.gameId);
+        },
+        setBeersDrank: async(_root: unknown, args: { gameId: ID, beers: number}, context: ContextWithUser) => {
+            return await gameService.setBeersDrank(args.gameId, context.user.id, args.beers);
+        },
         // User mutations
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string }) => {
             const hashedPassword = await bcrypt.hash(args.password, 10);

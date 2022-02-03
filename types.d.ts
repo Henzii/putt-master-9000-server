@@ -19,13 +19,15 @@ export type Game = {
     pars: number[],
     par: number,
     layout: Layout | ID,
-    scorecards: Scorecard[]
+    scorecards: Scorecard[],
+    isOpen: boolean,
 }
 
 export type Scorecard = {
     id: string | number,
     user: User,
-    scores: number[]
+    scores: number[],
+    beers: number,
 }
 
 export type User = {

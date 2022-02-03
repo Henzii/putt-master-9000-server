@@ -1,4 +1,4 @@
-import { Game, ID, Course } from "../types";
+import { Game, ID, Course, Scorecard } from "../types";
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
@@ -17,7 +17,7 @@ export const getGames = async (userId: ID, populateUsers = false) => {
     const uId = new mongoose.Types.ObjectId(userId);
     if (populateUsers) {
         return await GameModel.find({
-           'scorecards.user': userId
+            'scorecards.user': userId
         }).populate({
             path: 'scorecards',
             populate: {
@@ -25,10 +25,9 @@ export const getGames = async (userId: ID, populateUsers = false) => {
             }
         }) as (Document & Game)[]
     } else {
-        const games = await GameModel.find({ 
+        const games = await GameModel.find({
             'scorecards.user': userId
         }) as (Document & Game)[];
-        console.log(games)
         return games;
     }
 
@@ -86,7 +85,23 @@ export const setScore = async (args: SetScoreArgs) => {
     await game.save();
     return game;
 }
-export default { getGame, getGames, createGame, addPlayersToGame, setScore }
+export const closeGame = async (gameId: ID) => {
+    const game = await GameModel.findByIdAndUpdate(gameId, {
+        isOpen: false
+    }, { returnDocument: 'after' });
+    return game;
+}
+export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => {
+    const game = await GameModel.findById(gameId) as Document & Game;
+    game.scorecards = game.scorecards.map(sc => {
+        if (sc.user.toString() === playerId) {
+            sc['beers'] = beers;
+        }  
+        return sc;
+    })
+    return await game.save();
+}
+export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank }
 
 interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
     scorecards:
