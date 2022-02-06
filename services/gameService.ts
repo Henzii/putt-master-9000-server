@@ -27,7 +27,7 @@ export const getGames = async (userId: ID, populateUsers = false) => {
     } else {
         const games = await GameModel.find({
             'scorecards.user': userId
-        }) as (Document & Game)[];
+        }).sort({ date: -1 }) as (Document & Game)[];
         return games;
     }
 
