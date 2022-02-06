@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setScore = exports.createGame = exports.addPlayersToGame = exports.getGames = exports.getGame = void 0;
+exports.setBeersDrank = exports.closeGame = exports.setScore = exports.createGame = exports.addPlayersToGame = exports.getGames = exports.getGame = void 0;
 const Game_1 = __importDefault(require("../models/Game"));
 const Course_1 = __importDefault(require("../models/Course"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -40,8 +40,7 @@ const getGames = (userId, populateUsers = false) => __awaiter(void 0, void 0, vo
     else {
         const games = yield Game_1.default.find({
             'scorecards.user': userId
-        });
-        console.log(games);
+        }).sort({ date: -1 });
         return games;
     }
 });
@@ -99,5 +98,23 @@ const setScore = (args) => __awaiter(void 0, void 0, void 0, function* () {
     return game;
 });
 exports.setScore = setScore;
-exports.default = { getGame: exports.getGame, getGames: exports.getGames, createGame: exports.createGame, addPlayersToGame: exports.addPlayersToGame, setScore: exports.setScore };
+const closeGame = (gameId) => __awaiter(void 0, void 0, void 0, function* () {
+    const game = yield Game_1.default.findByIdAndUpdate(gameId, {
+        isOpen: false
+    }, { returnDocument: 'after' });
+    return game;
+});
+exports.closeGame = closeGame;
+const setBeersDrank = (gameId, playerId, beers) => __awaiter(void 0, void 0, void 0, function* () {
+    const game = yield Game_1.default.findById(gameId);
+    game.scorecards = game.scorecards.map(sc => {
+        if (sc.user.toString() === playerId) {
+            sc['beers'] = beers;
+        }
+        return sc;
+    });
+    return yield game.save();
+});
+exports.setBeersDrank = setBeersDrank;
+exports.default = { getGame: exports.getGame, getGames: exports.getGames, createGame: exports.createGame, addPlayersToGame: exports.addPlayersToGame, setScore: exports.setScore, closeGame: exports.closeGame, setBeersDrank: exports.setBeersDrank };
 const games = [];

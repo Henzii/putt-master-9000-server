@@ -18,6 +18,7 @@ const skeema = new mongoose_1.default.Schema({
             },
             scores: [],
             _id: false,
+            beers: Number,
         }
     ],
     isOpen: Boolean,

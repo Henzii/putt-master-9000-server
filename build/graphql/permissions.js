@@ -22,5 +22,6 @@ exports.default = (0, graphql_shield_1.shield)({
     Mutation: {
         "*": isLoggedIn,
         login: graphql_shield_1.allow,
+        createUser: graphql_shield_1.allow,
     }
 });

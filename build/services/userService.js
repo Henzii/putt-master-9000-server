@@ -26,7 +26,7 @@ const addUser = (name, passwordHash, email) => __awaiter(void 0, void 0, void 0,
         email
     });
     yield newUser.save();
-    return newUser.id;
+    return newUser;
 });
 const makeFriends = (userOne, userTwo) => __awaiter(void 0, void 0, void 0, function* () {
     try {

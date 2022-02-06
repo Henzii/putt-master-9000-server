@@ -37,12 +37,18 @@ exports.mutations = {
         setScore: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             return yield gameService_1.default.setScore(args);
         }),
+        closeGame: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield gameService_1.default.closeGame(args.gameId);
+        }),
+        setBeersDrank: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield gameService_1.default.setBeersDrank(args.gameId, context.user.id, args.beers);
+        }),
         // User mutations
         createUser: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             const hashedPassword = yield bcrypt_1.default.hash(args.password, 10);
             try {
-                const newId = yield userService_1.default.addUser(args.name, hashedPassword, args.email);
-                return newId;
+                const user = yield userService_1.default.addUser(args.name, hashedPassword, args.email);
+                return jsonwebtoken_1.default.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             }
             catch (e) {
                 const viesti = e.message;
