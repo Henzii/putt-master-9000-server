@@ -30,10 +30,6 @@ const resolvers = Object.assign(Object.assign(Object.assign({}, queries_1.querie
             yield root.populate('friends');
             return root.friends;
         })
-    }, Game: {
-        par: (root) => {
-            return root.pars.reduce((p, c) => (p + c), 0);
-        }
     }, Scorecard: {
         total: (root) => {
             return root.scores.reduce((p, c) => {
@@ -41,6 +37,14 @@ const resolvers = Object.assign(Object.assign(Object.assign({}, queries_1.querie
                     return p + c;
                 return p;
             }, 0);
+        }
+    }, Game: {
+        par: (root) => {
+            return root.pars.reduce((p, c) => (p + c), 0);
+        },
+        myScorecard: (root, args, context) => {
+            // Etsitään contextissa olevan käyttäjän tuloskortti, populoituna tai ilman
+            return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id));
         }
     } });
 const schema = (0, graphql_middleware_1.applyMiddleware)((0, schema_1.makeExecutableSchema)({ typeDefs: typeDefs_1.typeDefs, resolvers }), permissions_1.default);

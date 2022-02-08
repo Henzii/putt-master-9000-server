@@ -29,6 +29,7 @@ exports.typeDefs = (0, apollo_server_1.gql) `
         pars: [Int!]
         par: Int
         date: String!
+        myScorecard: Scorecard
         scorecards: [Scorecard!]!
         isOpen: Boolean
     }

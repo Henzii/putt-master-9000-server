@@ -3,7 +3,7 @@ import { typeDefs } from "./typeDefs";
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { Game, Layout, SafeUser, Scorecard, User } from "../types";
+import { ContextWithUser, Game, Layout, SafeUser, Scorecard, User } from "../types";
 import { Document } from "mongoose";
 import jwt from 'jsonwebtoken';
 
@@ -27,11 +27,6 @@ const resolvers = {
             return root.friends;
         }
     },
-    Game: {
-        par: (root: Game) => {
-            return root.pars.reduce((p, c) => (p + c), 0);
-        }
-    },
     Scorecard: {
         total: (root: Scorecard) => {
             return root.scores.reduce((p,c) => {
@@ -39,7 +34,16 @@ const resolvers = {
                 return p;
             }, 0)
         }
-    }
+    },
+    Game: {
+        par: (root: Game) => {
+            return root.pars.reduce((p, c) => (p + c), 0);
+        },
+        myScorecard: (root: Game, args: unknown, context: ContextWithUser) => {
+            // Etsitään contextissa olevan käyttäjän tuloskortti, populoituna tai ilman
+            return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id))
+        }
+    },
 }
 
 const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions)

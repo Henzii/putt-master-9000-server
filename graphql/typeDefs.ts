@@ -27,6 +27,7 @@ export const typeDefs = gql`
         pars: [Int!]
         par: Int
         date: String!
+        myScorecard: Scorecard
         scorecards: [Scorecard!]!
         isOpen: Boolean
     }
