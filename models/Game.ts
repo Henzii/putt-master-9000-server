@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const skeema = new mongoose.Schema({
-    date: Date,
+    date: String,
     course: String,
     layout: String,
     pars: [Number],

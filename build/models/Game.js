@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const skeema = new mongoose_1.default.Schema({
-    date: Date,
+    date: String,
     course: String,
     layout: String,
     pars: [Number],
