@@ -3,34 +3,15 @@ import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
-import mongoose from 'mongoose';
 
 export const getGame = async (id: ID) => {
-    return await GameModel.findById(id).populate({
-        path: 'scorecards',
-        populate: {
-            path: 'user'
-        }
-    }) as Document & Game;
+    return await GameModel.findById(id) as Document & Game;
 }
-export const getGames = async (userId: ID, populateUsers = false) => {
-    const uId = new mongoose.Types.ObjectId(userId);
-    if (populateUsers) {
-        return await GameModel.find({
-            'scorecards.user': userId
-        }).populate({
-            path: 'scorecards',
-            populate: {
-                path: 'user'
-            }
-        }) as (Document & Game)[]
-    } else {
-        const games = await GameModel.find({
-            'scorecards.user': userId
-        }).sort({ date: -1 }) as (Document & Game)[];
-        return games;
-    }
-
+export const getGames = async (userId: ID) => {
+    const games = await GameModel.find({
+        'scorecards.user': userId
+    }).sort({ date: -1 }) as (Document & Game)[];
+    return games;
 }
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     console.log(gameId, playerIds)
@@ -96,7 +77,7 @@ export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => 
     game.scorecards = game.scorecards.map(sc => {
         if (sc.user.toString() === playerId) {
             sc['beers'] = beers;
-        }  
+        }
         return sc;
     })
     return await game.save();

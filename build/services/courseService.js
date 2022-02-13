@@ -14,14 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addLayout = exports.addCourse = exports.getCourses = void 0;
 const Course_1 = __importDefault(require("../models/Course"));
-function getCourses({ name, courseId }) {
+function getCourses({ limit, offset, search }) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (courseId)
-            return [yield Course_1.default.findById(courseId)];
-        else if (name) {
-            return yield Course_1.default.find({ name: { $regex: '.*' + name + '.*' } });
-        }
-        return yield Course_1.default.find({});
+        const params = (search) ? { name: { $regex: '.*' + search + '*.' } } : {};
+        const documents = yield Course_1.default.count(params);
+        const kurssit = yield Course_1.default.find(params).skip(offset).limit(limit);
+        return { data: kurssit, count: documents, hasMore: (offset + limit < documents) };
     });
 }
 exports.getCourses = getCourses;

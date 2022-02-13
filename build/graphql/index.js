@@ -39,6 +39,14 @@ const resolvers = Object.assign(Object.assign(Object.assign({}, queries_1.querie
             }, 0);
         }
     }, Game: {
+        scorecards: (root, args, context, info) => __awaiter(void 0, void 0, void 0, function* () {
+            // Jotta ei turhaan rasiteta tietokantaa, populoidaan scorecards:ssa olevat käyttäjätiedot
+            // vain jos user-field on queryssä mukana
+            if (info.fieldNodes[0].selectionSet.selections.find((s) => s.name.value === 'user')) {
+                yield root.populate('scorecards.user');
+            }
+            return root.scorecards;
+        }),
         par: (root) => {
             return root.pars.reduce((p, c) => (p + c), 0);
         },

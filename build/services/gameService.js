@@ -15,34 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setBeersDrank = exports.closeGame = exports.setScore = exports.createGame = exports.addPlayersToGame = exports.getGames = exports.getGame = void 0;
 const Game_1 = __importDefault(require("../models/Game"));
 const Course_1 = __importDefault(require("../models/Course"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const getGame = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield Game_1.default.findById(id).populate({
-        path: 'scorecards',
-        populate: {
-            path: 'user'
-        }
-    });
+    return yield Game_1.default.findById(id);
 });
 exports.getGame = getGame;
-const getGames = (userId, populateUsers = false) => __awaiter(void 0, void 0, void 0, function* () {
-    const uId = new mongoose_1.default.Types.ObjectId(userId);
-    if (populateUsers) {
-        return yield Game_1.default.find({
-            'scorecards.user': userId
-        }).populate({
-            path: 'scorecards',
-            populate: {
-                path: 'user'
-            }
-        });
-    }
-    else {
-        const games = yield Game_1.default.find({
-            'scorecards.user': userId
-        }).sort({ date: -1 });
-        return games;
-    }
+const getGames = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const games = yield Game_1.default.find({
+        'scorecards.user': userId
+    }).sort({ date: -1 });
+    return games;
 });
 exports.getGames = getGames;
 const addPlayersToGame = (gameId, playerIds) => __awaiter(void 0, void 0, void 0, function* () {

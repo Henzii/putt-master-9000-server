@@ -1,14 +1,13 @@
 import { Document } from "mongoose";
-import mongoose from 'mongoose';
 import CourseModel from "../models/Course";
-import { Course, Layout, NewLayoutArgs } from "../types"
+import { Course, NewLayoutArgs } from "../types"
 
-export async function getCourses({name, courseId}: { name?: string, courseId?: string }) {
-    if (courseId) return  [ await CourseModel.findById(courseId)];
-    else if (name) {
-        return await CourseModel.find({ name: { $regex: '.*' + name + '.*' }})
-    }
-    return await CourseModel.find({})
+export async function getCourses({ limit, offset, search }: { limit: number, offset: number, search?: string }) {
+    const params = (search) ? { name: { $regex: '.*' + search + '*.' }} : {};
+    const documents = await CourseModel.count(params);
+    const kurssit = await CourseModel.find(params).skip(offset).limit(limit);
+    return { data: kurssit, count: documents, hasMore: (offset + limit < documents)};
+
 }
 export async function addCourse(name: string) {
     const newCourse = new CourseModel({
@@ -22,5 +21,5 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
     const course = await CourseModel.findById(courseId) as Document & Course
     course.layouts.push(layout);
     await course.save();
-    return course.layouts[course.layouts.length-1].id;
+    return course.layouts[course.layouts.length - 1].id;
 }

@@ -3,6 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.typeDefs = void 0;
 const apollo_server_1 = require("apollo-server");
 exports.typeDefs = (0, apollo_server_1.gql) `
+    type GetCoursesResponse {
+        courses: [Course]!
+        hasMore: Boolean!
+        nextOffset: Int
+        count: Int!
+    }
     type Course {
         id: ID!
         name: String!
@@ -45,7 +51,7 @@ exports.typeDefs = (0, apollo_server_1.gql) `
         holes: Int!
     }
     type Query {
-        getCourses(name: String, courseId: ID): [Course]
+        getCourses(limit: Int!, offset: Int!, search: String): GetCoursesResponse
 
         getGame(gameId: ID!): Game
         getGames: [Game]

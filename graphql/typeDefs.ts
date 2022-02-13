@@ -1,6 +1,12 @@
 import { gql } from "apollo-server";
 
 export const typeDefs = gql`
+    type GetCoursesResponse {
+        courses: [Course]!
+        hasMore: Boolean!
+        nextOffset: Int
+        count: Int!
+    }
     type Course {
         id: ID!
         name: String!
@@ -43,7 +49,7 @@ export const typeDefs = gql`
         holes: Int!
     }
     type Query {
-        getCourses(name: String, courseId: ID): [Course]
+        getCourses(limit: Int!, offset: Int!, search: String): GetCoursesResponse
 
         getGame(gameId: ID!): Game
         getGames: [Game]

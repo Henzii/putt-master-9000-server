@@ -19,15 +19,20 @@ const userService_1 = __importDefault(require("../services/userService"));
 exports.queries = {
     Query: {
         getCourses: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
-            return yield (0, courseService_1.getCourses)(args);
+            const { data: courses, count, hasMore } = yield (0, courseService_1.getCourses)(args);
+            return {
+                courses,
+                hasMore,
+                count,
+                nextOffset: hasMore ? (args.offset + args.limit) : null
+            };
         }),
         getMe: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             return yield userService_1.default.getUser(undefined, (_a = context.user) === null || _a === void 0 ? void 0 : _a.id);
         }),
-        getGames: (r, r2, context, r4) => __awaiter(void 0, void 0, void 0, function* () {
-            // Jos kyselyssä kysytään user:ia -> parametriksi true -> user populoidaan.
-            return yield (0, gameService_1.getGames)(context.user.id, r4.fieldNodes[0].selectionSet.loc.source.body.includes('user {'));
+        getGames: (root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield (0, gameService_1.getGames)(context.user.id);
         }),
         getGame: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             if (!args.gameId)

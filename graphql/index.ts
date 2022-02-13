@@ -8,7 +8,6 @@ import { Document } from "mongoose";
 import jwt from 'jsonwebtoken';
 
 import permissions from "./permissions";
-import { GraphQLSchema } from "graphql";
 import { applyMiddleware } from "graphql-middleware";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
@@ -36,6 +35,14 @@ const resolvers = {
         }
     },
     Game: {
+        scorecards: async (root: any, args: unknown, context: unknown, info: any) => {
+            // Jotta ei turhaan rasiteta tietokantaa, populoidaan scorecards:ssa olevat käyttäjätiedot
+            // vain jos user-field on queryssä mukana
+            if(info.fieldNodes[0].selectionSet.selections.find((s:any) => s.name.value === 'user')) {
+                await root.populate('scorecards.user')
+            }
+            return root.scorecards;
+        },
         par: (root: Game) => {
             return root.pars.reduce((p, c) => (p + c), 0);
         },

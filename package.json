@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./build/index.js",
     "tsc": "tsc",
-    "dev": "ts-node-dev index.ts"
+    "dev": "set NODE_ENV=development&&ts-node-dev index.ts"
   },
   "author": "",
   "license": "ISC",

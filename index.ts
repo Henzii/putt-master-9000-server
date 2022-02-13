@@ -5,8 +5,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Yhteys mongoDB:hen
+const db_uri = ((process.env.NODE_ENV === 'development') ? process.env.MONGO_URI_DEV : process.env.MONGO_URI) as string
 console.log('Connecting to MongoDb...')
-mongoose.connect(process.env.MONGO_URI as string).then(() => {
+mongoose.connect(db_uri).then(() => {
     console.log('Connected to MongoDB!');
 }).catch((error) => {
     console.log('\n╔═══════════════════════════════════╗\n' +

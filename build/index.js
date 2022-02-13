@@ -8,8 +8,9 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 // Yhteys mongoDB:hen
+const db_uri = ((process.env.NODE_ENV === 'development') ? process.env.MONGO_URI_DEV : process.env.MONGO_URI);
 console.log('Connecting to MongoDb...');
-mongoose_1.default.connect(process.env.MONGO_URI).then(() => {
+mongoose_1.default.connect(db_uri).then(() => {
     console.log('Connected to MongoDB!');
 }).catch((error) => {
     console.log('\n╔═══════════════════════════════════╗\n' +
