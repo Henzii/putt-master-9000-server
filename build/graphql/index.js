@@ -37,6 +37,13 @@ const resolvers = Object.assign(Object.assign(Object.assign({}, queries_1.querie
                     return p + c;
                 return p;
             }, 0);
+        },
+        plusminus: (root) => {
+            return root.scores.reduce((total, current, indeksi) => {
+                if (!isNaN(current))
+                    return total + current - root.pars[indeksi];
+                return total;
+            }, 0);
         }
     }, Game: {
         scorecards: (root, args, context, info) => __awaiter(void 0, void 0, void 0, function* () {
@@ -45,7 +52,12 @@ const resolvers = Object.assign(Object.assign(Object.assign({}, queries_1.querie
             if (info.fieldNodes[0].selectionSet.selections.find((s) => s.name.value === 'user')) {
                 yield root.populate('scorecards.user');
             }
-            return root.scorecards;
+            // Lisätään radan par:it jokaiseen scorecardiin jotta saadaan plusminus laskettua Scorecardin resolverissa
+            return root.scorecards.map(s => {
+                const a = s;
+                a.pars = root.pars;
+                return a;
+            });
         }),
         par: (root) => {
             return root.pars.reduce((p, c) => (p + c), 0);

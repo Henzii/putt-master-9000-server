@@ -28,20 +28,32 @@ const resolvers = {
     },
     Scorecard: {
         total: (root: Scorecard) => {
-            return root.scores.reduce((p,c) => {
-                if (!isNaN(c)) return p+c;
+            return root.scores.reduce((p, c) => {
+                if (!isNaN(c)) return p + c;
                 return p;
             }, 0)
+        },
+        plusminus: (root: Scorecard) => {
+            return root.scores.reduce((total: number, current: number, indeksi: number) => {
+                if (!isNaN(current)) return total + current - root.pars[indeksi];
+                return total;
+            }, 0);
         }
     },
     Game: {
-        scorecards: async (root: any, args: unknown, context: unknown, info: any) => {
+        scorecards: async (root: Game & Document, args: unknown, context: unknown, info: any) => {
             // Jotta ei turhaan rasiteta tietokantaa, populoidaan scorecards:ssa olevat käyttäjätiedot
             // vain jos user-field on queryssä mukana
-            if(info.fieldNodes[0].selectionSet.selections.find((s:any) => s.name.value === 'user')) {
+            if (info.fieldNodes[0].selectionSet.selections.find((s: any) => s.name.value === 'user')) {
                 await root.populate('scorecards.user')
             }
-            return root.scorecards;
+
+            // Lisätään radan par:it jokaiseen scorecardiin jotta saadaan plusminus laskettua Scorecardin resolverissa
+            return root.scorecards.map(s => {
+                const a = s;
+                a.pars = root.pars;
+                return a;
+            })
         },
         par: (root: Game) => {
             return root.pars.reduce((p, c) => (p + c), 0);

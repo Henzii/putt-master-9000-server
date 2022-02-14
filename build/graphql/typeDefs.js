@@ -44,6 +44,7 @@ exports.typeDefs = (0, apollo_server_1.gql) `
         scores: [Int]
         total: Int
         beers: Int
+        plusminus: Int
     }
     input NewLayout {
         name: String!
