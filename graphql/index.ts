@@ -31,7 +31,7 @@ const resolvers = {
             return root.scores.reduce((p, c) => {
                 if (!isNaN(c)) return p + c;
                 return p;
-            }, 0)
+            }, 0);
         },
         plusminus: (root: Scorecard) => {
             return root.scores.reduce((total: number, current: number, indeksi: number) => {
@@ -45,7 +45,7 @@ const resolvers = {
             // Jotta ei turhaan rasiteta tietokantaa, populoidaan scorecards:ssa olevat käyttäjätiedot
             // vain jos user-field on queryssä mukana
             if (info.fieldNodes[0].selectionSet.selections.find((s: any) => s.name.value === 'user')) {
-                await root.populate('scorecards.user')
+                await root.populate('scorecards.user');
             }
 
             // Lisätään radan par:it jokaiseen scorecardiin jotta saadaan plusminus laskettua Scorecardin resolverissa
@@ -53,26 +53,26 @@ const resolvers = {
                 const a = s;
                 a.pars = root.pars;
                 return a;
-            })
+            });
         },
         par: (root: Game) => {
             return root.pars.reduce((p, c) => (p + c), 0);
         },
         myScorecard: (root: Game, args: unknown, context: ContextWithUser) => {
             // Etsitään contextissa olevan käyttäjän tuloskortti, populoituna tai ilman
-            return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id))
+            return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id));
         }
     },
-}
+};
 
-const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions)
+const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions);
 
 export const server = new ApolloServer({
     typeDefs,
     resolvers,
     schema,
     context: ({ req }: { req: ContextRequest }) => {
-        const token = (req.headers?.authorization)?.slice(7)
+        const token = (req.headers?.authorization)?.slice(7);
         if (token && process.env.TOKEN_KEY) {
             try {
                 const decode = jwt.verify(token, process.env.TOKEN_KEY) as SafeUser;
@@ -81,13 +81,13 @@ export const server = new ApolloServer({
                         id: decode.id,
                         name: decode.name,
                     }
-                }
+                };
             } catch (e) {
                 return null;
             }
         }
     }
-})
+});
 
 type ContextRequest = {
     headers?: {
