@@ -1,6 +1,6 @@
 import { getCourses } from "../services/courseService";
 import { getGames, getGame } from "../services/gameService";
-import { ContextWithUser, Course, ID } from "../types";
+import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
 
@@ -13,24 +13,24 @@ export const queries = {
                 hasMore,
                 count,
                 nextOffset: hasMore ? (args.offset + args.limit) : null
-            }
+            };
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            return await userService.getUser(undefined, context.user?.id)
+            return await userService.getUser(undefined, context.user?.id);
         },
         getGames: async (root: unknown, args: unknown, context: ContextWithUser) => {
-            return await getGames(context.user.id)
+            return await getGames(context.user.id);
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
-            if (!args.gameId) throw new Error('Not enough parameters')
-            return await getGame(args.gameId)
+            if (!args.gameId) throw new Error('Not enough parameters');
+            return await getGame(args.gameId);
         },
-        ping: (): String => 'pong!',
+        ping: (): string => 'pong!',
         getUsers: async () => {
             return await userService.getUsers();
         },
     }
-}
+};
 
 type getCoursesArgs = {
     limit: number,

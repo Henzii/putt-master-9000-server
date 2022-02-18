@@ -20,18 +20,17 @@ export type SetScoreArgs = {
 export const mutations = {
     Mutation: {
         addCourse: (_root: unknown, args: { name: string }) => {
-            return addCourse(args.name)
+            return addCourse(args.name);
         },
         addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }) => {
-            return addLayout(args.courseId, args.layout)
+            return addLayout(args.courseId, args.layout);
         },
-        
         // Game mutations
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
             return gameService.createGame(args.courseId, args.layoutId);
         },
         addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }) => {
-            return await gameService.addPlayersToGame(args.gameId, args.playerIds)
+            return await gameService.addPlayersToGame(args.gameId, args.playerIds);
         },
         setScore: async (_root: unknown, args: SetScoreArgs) => {
             return await gameService.setScore(args);
@@ -46,32 +45,30 @@ export const mutations = {
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string }) => {
             const hashedPassword = await bcrypt.hash(args.password, 10);
             try {
-                const user = await userService.addUser(args.name, hashedPassword, args.email)
-                return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn')
-                
+                const user = await userService.addUser(args.name, hashedPassword, args.email);
+                return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
-                if (viesti.includes('to be unique')) throw new UserInputError(`Name ${args.name} is already taken!`)
-                throw new UserInputError(`Error when creating accoount! (${(e as mongoose.Error).name})`)
+                if (viesti.includes('to be unique')) throw new UserInputError(`Name ${args.name} is already taken!`);
+                throw new UserInputError(`Error when creating accoount! (${(e as mongoose.Error).name})`);
             }
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
-            return await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName })
+            return await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
         },
         login: async (_root: unknown, args: LoginArgs) => {
-            const user = await userService.getUser(args.user)
+            const user = await userService.getUser(args.user);
             if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
-                throw new UserInputError('Wrong username or password')
+                throw new UserInputError('Wrong username or password');
             } else {
                 const payload = {
                     id: user.id,
                     name: user.name,
-                }
-                return jwt.sign(payload, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn')
+                };
+                return jwt.sign(payload, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             }
-            
         }
     }
-}
+};
 
 

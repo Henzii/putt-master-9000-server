@@ -1,5 +1,5 @@
 export type Course = {
-    name: String,
+    name: string,
     id: number | string,
     layouts: Layout[]
 }

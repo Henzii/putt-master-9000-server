@@ -87,7 +87,7 @@ export default { getGame, getGames, createGame, addPlayersToGame, setScore, clos
 interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
     scorecards:
     {
-        user: String,
+        user: string,
         scores: number[]
     }[]
 }
