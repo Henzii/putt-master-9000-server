@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./build/index.js",
     "tsc": "tsc",
+    "build": "tsc",
     "dev": "set NODE_ENV=development&&ts-node-dev index.ts",
     "lint": "eslint ."
   },

@@ -4,7 +4,7 @@ on:
     branches: [main, master]
     types: [opened, synchronize]
 
-job:
+jobs:
   Tarkasta_Ja_Julkaise:
     runs-on: ubuntu-latest
     steps:
