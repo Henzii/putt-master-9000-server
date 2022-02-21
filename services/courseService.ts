@@ -14,11 +14,11 @@ export async function addCourse(name: string) {
         layouts: [],
     });
     await newCourse.save();
-    return newCourse.id;
+    return newCourse;
 }
 export async function addLayout(courseId: number | string, layout: NewLayoutArgs) {
     const course = await CourseModel.findById(courseId) as Document & Course;
     course.layouts.push(layout);
     await course.save();
-    return course.layouts[course.layouts.length - 1].id;
+    return course;
 }

@@ -61,8 +61,8 @@ export const typeDefs = gql`
     }
 
     type Mutation {
-        addCourse(name: String!): ID!
-        addLayout(courseId: ID!, layout: NewLayout!): ID!
+        addCourse(name: String!): Course!
+        addLayout(courseId: ID!, layout: NewLayout!): Course!
 
         createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
