@@ -24,6 +24,7 @@ export const typeDefs = gql`
         name: String!
         email: String
         friends: [User!]
+        blockFriendRequests: Boolean
     }
     type Game {
         id: ID!
@@ -73,5 +74,6 @@ export const typeDefs = gql`
         createUser(name: String!, password: String!, email: String): String
         login(user: String!, password: String!): String!
         addFriend(friendId: ID, friendName: String): Boolean
+        changeSettings(blockFriendRequests: Boolean): User
     }
 `;
