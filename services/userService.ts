@@ -7,7 +7,7 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
     if (users.length === 0) return [];
     return users;
-}
+};
 const addUser = async (name: string, passwordHash: string, email?: string): Promise<User> => {
     const newUser = new Users({
         name,
@@ -16,7 +16,7 @@ const addUser = async (name: string, passwordHash: string, email?: string): Prom
     }) as Document & User;
     await newUser.save();
     return newUser;
-}
+};
 const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => {
 
     try {
@@ -59,7 +59,8 @@ const updateSettings = async (userId: ID, settings: UserSettingsArgs) => {
         { _id: userId },
         {
             $set: settings
-        }
+        },
+        { returnDocument: 'after' }
     );
     return user;
 };
@@ -68,4 +69,4 @@ type makeFriendsArg = {
     id?: ID,
 }
 
-export default { getUsers, addUser, getUser, makeFriends, updateSettings}
+export default { getUsers, addUser, getUser, makeFriends, updateSettings};

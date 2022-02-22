@@ -19,13 +19,12 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
         { _id: gameId },
         {
             $addToSet: {
-                scorecards: playerIds.map(p => {
+                scorecards: playerIds.map((p) => {
                     return { user: p, scores: [] };
                 })
             }
         }
-    );
-    console.log(game);
+    ) as Document & Game;
     return game;
 };
 export const createGame = async (courseId: ID, layoutId: ID) => {

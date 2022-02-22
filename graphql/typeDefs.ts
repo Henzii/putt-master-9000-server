@@ -44,11 +44,18 @@ export const typeDefs = gql`
         total: Int
         beers: Int
         plusminus: Int
+        hc: Int
     }
     input NewLayout {
         name: String!
         pars: [Int]!
         holes: Int!
+    }
+    type GetHcResponse {
+        id: ID
+        games: Int
+        scores: [Int]
+        hc: Float
     }
     type Query {
         getCourses(limit: Int!, offset: Int!, search: String): GetCoursesResponse
@@ -59,6 +66,8 @@ export const typeDefs = gql`
 
         getMe: User
         getUsers: [User]!
+
+        getHc: [GetHcResponse]!
     }
 
     type Mutation {

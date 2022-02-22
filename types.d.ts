@@ -29,6 +29,7 @@ export type Scorecard = {
     scores: number[],
     beers: number,
     plusminus: number,
+    hc: number,
     pars: number[] // plusminuksen laskemiseen
 }
 

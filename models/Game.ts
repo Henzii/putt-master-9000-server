@@ -17,10 +17,14 @@ const skeema = new mongoose.Schema({
             beers: {
                 type: Number,
                 default: 0,
+            },
+            hc: {
+                type: Number,
+                default: 0,
             }
         }
     ],
     isOpen: Boolean,
-})
+});
 
 export default mongoose.model('Game', skeema);

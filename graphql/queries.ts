@@ -3,6 +3,8 @@ import { getGames, getGame } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
+import { getPlayersScores } from "../services/statsService";
+import { median } from "../utils/median";
 
 export const queries = {
     Query: {
@@ -29,6 +31,17 @@ export const queries = {
         getUsers: async () => {
             return await userService.getUsers();
         },
+        getHc: async (_root: unknown, args: unknown, context: ContextWithUser) => {
+            const res = await getPlayersScores([context.user.id]);
+            return res.map(user => {
+                return {
+                    id: user._id,
+                    games: user.games,
+                    scores: user.scores,
+                    hc: median(user.scores.slice(0, 10)),
+                };
+            });
+        }
     }
 };
 
