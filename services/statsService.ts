@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import GameModel from '../models/Game';
 import { ID } from '../types';
 
-export const getPlayersScores = async (playerIds: ID[]) => {
+export const getPlayersScores = async (course: string, layout: string, playerIds: ID[]) => {
     // Tehdään stringilistasta mongoosen objectId-lista.
     const playerIdObjects = playerIds.map(pid => new mongoose.Types.ObjectId(pid));
     return GameModel.aggregate([
@@ -10,13 +10,13 @@ export const getPlayersScores = async (playerIds: ID[]) => {
         // ja jotka vastaavat tiettyä rataa
         {
             $match: {
-                course: 'Malmis',
-                layout: 'Main',
+                course: course,
+                layout: layout,
                 'scorecards.user': { '$in': playerIdObjects }
             }
         },
         // Järjestetään päivämäärän mukaan
-        { $sort: { 'date': -1 }},
+        { $sort: { 'date': 1 } },
 
         // Avataan scorecards osa
         { $unwind: '$scorecards' },
@@ -37,8 +37,8 @@ export const getPlayersScores = async (playerIds: ID[]) => {
                             }
                         }
                     }
-                },
-            },
-        },
+                }
+            }
+        }
     ]);
 };

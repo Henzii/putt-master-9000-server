@@ -14,7 +14,6 @@ export const getGames = async (userId: ID) => {
     return games;
 };
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
-    console.log(gameId, playerIds);
     const game = await GameModel.findOneAndUpdate(
         { _id: gameId },
         {
@@ -50,6 +49,7 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
         return newGame.id;
 
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e);
     }
 };

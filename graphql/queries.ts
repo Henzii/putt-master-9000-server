@@ -31,8 +31,8 @@ export const queries = {
         getUsers: async () => {
             return await userService.getUsers();
         },
-        getHc: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            const res = await getPlayersScores([context.user.id]);
+        getHc: async (_root: unknown, args: {course: string, layout: string }, context: ContextWithUser) => {
+            const res = await getPlayersScores(args.course, args.layout, [context.user.id]);
             return res.map(user => {
                 return {
                     id: user._id,

@@ -21,6 +21,9 @@ export const typeDefs = gql`
     }
     type User {
         id: ID!
+        """
+        Username
+        """
         name: String!
         email: String
         friends: [User!]
@@ -57,17 +60,31 @@ export const typeDefs = gql`
         scores: [Int]
         hc: Float
     }
+    
     type Query {
+        """
+        Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
+        Tuloksia voi rajata antamalla search argumentin
+        """
         getCourses(limit: Int!, offset: Int!, search: String): GetCoursesResponse
-
-        getGame(gameId: ID!): Game
+        """
+        Hakee yhden pelin.
+        """
+        getGame(gameId: ID!): Game 
+        """
+        Listaa kirjautuneen käyttäjän pelaamat pelit
+        """
         getGames: [Game]
         ping: String
-
+        """
+        Kirjautunut käyttäjä
+        """
         getMe: User
         getUsers: [User]!
-
-        getHc: [GetHcResponse]!
+        """
+        Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
+        """
+        getHc (course: String!, layout: String!): [GetHcResponse]!
     }
 
     type Mutation {

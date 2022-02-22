@@ -1,9 +1,9 @@
 export function median(numbersArray: number[]) {
 
-    if (numbersArray.length === 0) return 0;
-
     // Järjestetty kopio numbersArray:sta sekä null & undefined arvot poistettuna
     const sortedValues = [...numbersArray].sort((a, b) => a - b).filter(n => n);
+
+    if (sortedValues.length === 0) return 0;
 
     const half = Math.floor(sortedValues.length / 2);
 
