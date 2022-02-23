@@ -1,13 +1,13 @@
 import { ID, User } from "../types";
 import Users from '../models/User';
 import { Document } from "mongoose";
-import jwt from 'jsonwebtoken';
+import { UserSettingsArgs } from "../graphql/mutations";
 
 const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
     if (users.length === 0) return [];
     return users;
-}
+};
 const addUser = async (name: string, passwordHash: string, email?: string): Promise<User> => {
     const newUser = new Users({
         name,
@@ -16,13 +16,21 @@ const addUser = async (name: string, passwordHash: string, email?: string): Prom
     }) as Document & User;
     await newUser.save();
     return newUser;
-}
+};
 const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => {
 
     try {
         const fOne = await getUser(userOne.name, userOne.id);
-        const fTwo = await getUser(userTwo.name, userTwo.id);
+        const fTwo = await getUser(userTwo.name, userTwo.id) as Document & User;
         if (!fOne || !fTwo) {
+            return false;
+        }
+        // Jos userTwo:lla on kaveriesto päällä tai yritetään lisätä itseään
+        if (fTwo.blockFriendRequests === true || fOne.id === fTwo.id) {
+            return false;
+        }
+        // Jos kaveri on jo kaverilistalla
+        if (fOne.friends.find(f => f.toString() === fTwo.id)) {
             return false;
         }
 
@@ -34,7 +42,7 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => 
     } catch (e) {
         return false;
     }
-}
+};
 const getUser = async (name?: string, id?: ID): Promise<Document & User | null> => {
     let user: Document & User;
     if (id) {
@@ -44,12 +52,21 @@ const getUser = async (name?: string, id?: ID): Promise<Document & User | null> 
     } else {
         return null;
     }
-    return user
-}
-
+    return user;
+};
+const updateSettings = async (userId: ID, settings: UserSettingsArgs) => {
+    const user = await Users.findOneAndUpdate(
+        { _id: userId },
+        {
+            $set: settings
+        },
+        { returnDocument: 'after' }
+    );
+    return user;
+};
 type makeFriendsArg = {
     name?: string,
     id?: ID,
 }
 
-export default { getUsers, addUser, getUser, makeFriends }
+export default { getUsers, addUser, getUser, makeFriends, updateSettings};

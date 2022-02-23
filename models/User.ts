@@ -1,30 +1,34 @@
 import mongoose from "mongoose";
+import validator from 'mongoose-unique-validator';
 
 const skeema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         minlength: 3,
+        unique: true,
     },
     passwordHash: {
         type: String,
         required: true,
     },
     email: String,
-    friends: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        }
-    ],
-    Games: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Game'
-        }
-    ]
+    friends: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    Games: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game'
+    }],
+    blockFriendRequests: {
+        type: Boolean,
+        default: false,
+    }
 
-})
+});
+
+skeema.plugin(validator);
 
 skeema.set('toJSON', {
     transform: (document, returnedObj) => {
@@ -32,6 +36,6 @@ skeema.set('toJSON', {
         delete returnedObj._id;
         delete returnedObj._v;
     }
-})
+});
 
 export default mongoose.model('User', skeema);

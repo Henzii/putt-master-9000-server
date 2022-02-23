@@ -7,16 +7,6 @@ import mongoose from "mongoose";
 import { UserInputError } from "apollo-server";
 import jwt from "jsonwebtoken";
 
-type LoginArgs = {
-    user: string,
-    password: string
-}
-export type SetScoreArgs = {
-    gameId: ID,
-    playerId: ID,
-    hole: number,
-    value: number,
-}
 export const mutations = {
     Mutation: {
         addCourse: (_root: unknown, args: { name: string }) => {
@@ -67,8 +57,23 @@ export const mutations = {
                 };
                 return jwt.sign(payload, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             }
-        }
+        },
+        changeSettings: async (_root: unknown, args: UserSettingsArgs, context: ContextWithUser) => {
+            return await userService.updateSettings(context.user.id, args);
+        },
     }
 };
 
-
+type LoginArgs = {
+    user: string,
+    password: string
+}
+export type UserSettingsArgs = {
+    blockFriendRequests: boolean,
+}
+export type SetScoreArgs = {
+    gameId: ID,
+    playerId: ID,
+    hole: number,
+    value: number,
+}

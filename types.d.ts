@@ -18,7 +18,8 @@ export type Game = {
     date: Date,
     pars: number[],
     par: number,
-    layout: Layout | ID,
+    layout: string,
+    course: string,
     scorecards: Scorecard[],
     isOpen: boolean,
 }
@@ -29,6 +30,8 @@ export type Scorecard = {
     scores: number[],
     beers: number,
     plusminus: number,
+    hc: number,
+    median10: number,
     pars: number[] // plusminuksen laskemiseen
 }
 
@@ -36,7 +39,8 @@ export type User = {
     id: string | number,
     name: string,
     passwordHash: string,
-    friends: (ID | User)[]
+    friends: (ID | User)[],
+    blockFriendRequests: boolean,
 }
 export type SafeUser = Pick<User, 'id' | 'name'>
 

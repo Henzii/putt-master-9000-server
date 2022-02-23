@@ -19,6 +19,7 @@
         "no-extra-semi": "error",
         "semi": "warn",
         "no-trailing-spaces": "error",
-        "no-multiple-empty-lines": "error"
+        "no-multiple-empty-lines": "error",
+        "no-console": "warn"
     }
 }
