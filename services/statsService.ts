@@ -12,6 +12,7 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
             $match: {
                 course: course,
                 layout: layout,
+                isOpen: false,
                 'scorecards.user': { '$in': playerIdObjects }
             }
         },

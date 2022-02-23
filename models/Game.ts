@@ -18,7 +18,7 @@ const skeema = new mongoose.Schema({
                 type: Number,
                 default: 0,
             },
-            hc: {
+            median10: {
                 type: Number,
                 default: 0,
             }

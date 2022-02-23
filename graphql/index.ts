@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken';
 import permissions from "./permissions";
 import { applyMiddleware } from "graphql-middleware";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { isConstValueNode } from "graphql";
 
 const resolvers = {
     ...queries,
@@ -38,7 +39,7 @@ const resolvers = {
                 if (!isNaN(current)) return total + current - root.pars[indeksi];
                 return total;
             }, 0);
-        }
+        },
     },
     Game: {
         scorecards: async (root: Game & Document, args: unknown, context: unknown, info: any) => {

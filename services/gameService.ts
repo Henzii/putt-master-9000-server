@@ -19,21 +19,24 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     // Haetaan tasoitukset
     const peli = await GameModel.findById(gameId) as Document & Game;
     const handicaps = await getPlayersScores(peli.course, peli.layout, playerIds);
-    const game = await GameModel.findOneAndUpdate(
-        { _id: gameId },
-        {
-            $addToSet: {
-                scorecards: playerIds.map((p) => {
-                    return {
-                        user: p,
-                        scores: [],
-                        hc: median(handicaps.find(hcp => hcp._id.toString() === p).scores) || 0,
-                    };
-                })
+    try {
+        const game = await GameModel.findOneAndUpdate(
+            { _id: gameId },
+            {
+                $addToSet: {
+                    scorecards: playerIds.map((p) => {
+                        return {
+                            user: p,
+                            scores: [],
+                            median10: median( handicaps.find(pl => pl._id.toString() === p)?.scores ) || 0,
+                        };
+                    })
+                }
             }
-        }
-    ) as Document & Game;
-    return game;
+        ) as Document & Game;
+        return game;
+    // eslint-disable-next-line no-console
+    } catch (e) { console.log(e); }
 };
 export const createGame = async (courseId: ID, layoutId: ID) => {
     try {
