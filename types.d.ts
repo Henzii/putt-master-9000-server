@@ -18,7 +18,8 @@ export type Game = {
     date: Date,
     pars: number[],
     par: number,
-    layout: Layout | ID,
+    layout: string,
+    course: string,
     scorecards: Scorecard[],
     isOpen: boolean,
 }

@@ -3,6 +3,8 @@ import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
+import { getPlayersScores } from "./statsService";
+import { median } from "../utils/median";
 
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
@@ -14,12 +16,19 @@ export const getGames = async (userId: ID) => {
     return games;
 };
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
+    // Haetaan tasoitukset
+    const peli = await GameModel.findById(gameId) as Document & Game;
+    const handicaps = await getPlayersScores(peli.course, peli.layout, playerIds);
     const game = await GameModel.findOneAndUpdate(
         { _id: gameId },
         {
             $addToSet: {
                 scorecards: playerIds.map((p) => {
-                    return { user: p, scores: [] };
+                    return {
+                        user: p,
+                        scores: [],
+                        hc: median(handicaps.find(hcp => hcp._id.toString() === p).scores) || 0,
+                    };
                 })
             }
         }

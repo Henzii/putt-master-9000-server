@@ -47,7 +47,7 @@ export const typeDefs = gql`
         total: Int
         beers: Int
         plusminus: Int
-        hc: Int
+        hc: Float
     }
     input NewLayout {
         name: String!
