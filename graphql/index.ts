@@ -3,7 +3,7 @@ import { typeDefs } from "./typeDefs";
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { ContextWithUser, Game, Layout, SafeUser, Scorecard, User } from "../types";
+import { ContextWithUser, Game, Layout, RawStatsDataHC, SafeUser, Scorecard, User } from "../types";
 import { Document } from "mongoose";
 import jwt from 'jsonwebtoken';
 
@@ -11,6 +11,8 @@ import permissions from "./permissions";
 import { applyMiddleware } from "graphql-middleware";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { isConstValueNode } from "graphql";
+import { median } from "../utils/median";
+import { calculateHc } from "../utils/calculateHc";
 
 const resolvers = {
     ...queries,
@@ -64,6 +66,12 @@ const resolvers = {
             return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id));
         }
     },
+    GetHcResponse: {
+        // Lasketaan tasoitus
+        hc: (root: RawStatsDataHC) => {
+            return calculateHc(root.pars, root.scores);
+        }
+    }
 };
 
 const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions);
