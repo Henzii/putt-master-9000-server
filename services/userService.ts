@@ -31,6 +31,7 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => 
         }
         // Jos kaveri on jo kaverilistalla
         if (fOne.friends.find(f => f.toString() === fTwo.id)) {
+            console.log('block')
             return false;
         }
 
@@ -40,6 +41,7 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => 
         await fTwo.save();
         return true;
     } catch (e) {
+        console.log(e)
         return false;
     }
 };

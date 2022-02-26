@@ -28,6 +28,7 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
             $group: {
                 _id: '$scorecards.user',
                 "games": { $sum: 1 },
+                "pars": { $first: '$pars' },
                 scores: {
                     $push: {
                         $reduce: {
@@ -39,6 +40,14 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
                         }
                     }
                 }
+            }
+        },
+        {
+            $project: {
+                'id': '$_id',
+                'games': '$games',
+                'pars': '$pars',
+                'scores': '$scores',
             }
         }
     ]);

@@ -47,7 +47,7 @@ export const typeDefs = gql`
         total: Int
         beers: Int
         plusminus: Int
-        median10: Float
+        hc: Float
     }
     input NewLayout {
         name: String!
@@ -58,7 +58,7 @@ export const typeDefs = gql`
         id: ID
         games: Int
         scores: [Int]
-        median10: Float
+        hc: Float
     }
     
     type Query {

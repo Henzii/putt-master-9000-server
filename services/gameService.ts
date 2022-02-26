@@ -5,6 +5,7 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { median } from "../utils/median";
+import { calculateHc } from "../utils/calculateHc";
 
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
@@ -18,7 +19,7 @@ export const getGames = async (userId: ID) => {
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     // Haetaan tasoitukset
     const peli = await GameModel.findById(gameId) as Document & Game;
-    const handicaps = await getPlayersScores(peli.course, peli.layout, playerIds);
+    const scoresTable = await getPlayersScores(peli.course, peli.layout, playerIds);
     try {
         const game = await GameModel.findOneAndUpdate(
             { _id: gameId },
@@ -28,10 +29,12 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
                         return {
                             user: p,
                             scores: [],
-                            median10: median( handicaps.find(pl => pl._id.toString() === p)?.scores ) || 0,
+                            hc: calculateHc(peli.pars, scoresTable.find(ps => ps.id.toString() === p)?.scores || []),
                         };
                     })
                 }
+            }, {
+                returnDocument: 'after',
             }
         ) as Document & Game;
         return game;

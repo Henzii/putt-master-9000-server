@@ -38,7 +38,7 @@ export const queries = {
                     id: user._id,
                     games: user.games,
                     scores: user.scores,
-                    median10: median(user.scores.slice(0, 10)),
+                    pars: user.pars,
                 };
             });
         }

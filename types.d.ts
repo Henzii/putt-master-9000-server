@@ -49,3 +49,10 @@ export type ID = string | number
 export type ContextWithUser = {
     user: SafeUser
 }
+
+export type RawStatsDataHC = {
+    id: ID,
+    games: number,
+    scores: number[],
+    pars: number[],
+}
