@@ -4,7 +4,6 @@ import CourseModel from "../models/Course";
 import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
-import { median } from "../utils/median";
 import { calculateHc } from "../utils/calculateHc";
 
 export const getGame = async (id: ID) => {
@@ -96,7 +95,28 @@ export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => 
     });
     return await game.save();
 };
-export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank };
+export const abandonGame = async(gameId: ID, playerId: ID) => {
+    try {
+        const game = await GameModel.findById(gameId) as Game & Document;
+        // Pelaajan pitää olla pelissä mukana
+        if (!game.scorecards.find(sc => sc.user.toString() === playerId)) {
+            return false;
+        }
+        // Jos peli on auki, poistetaan koko peli
+        if (game.isOpen) {
+            await GameModel.findByIdAndRemove(gameId);
+            return true;
+        // Muutoin poistetaan vain pelaajan tuloskortti pelistä
+        } else {
+            game.scorecards = game.scorecards.filter(sc => sc.user.toString() !== playerId)
+            await game.save();
+            return true;
+        }
+    } catch (e) {
+        return false;
+    }
+};
+export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame };
 
 interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
     scorecards:

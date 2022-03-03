@@ -94,12 +94,15 @@ export const typeDefs = gql`
         createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
+        abandonGame(gameId: ID!): Boolean
         closeGame(gameId: ID!): Game
         setBeersDrank(gameId: ID!, beers: Int!): Game
 
         createUser(name: String!, password: String!, email: String): String
         login(user: String!, password: String!): String!
         addFriend(friendId: ID, friendName: String): Boolean
+        removeFriend(friendId: ID!): Boolean
+        deleteAccount: Boolean
         changeSettings(blockFriendRequests: Boolean): User
     }
 `;
