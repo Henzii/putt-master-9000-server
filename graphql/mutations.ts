@@ -28,6 +28,9 @@ export const mutations = {
         closeGame: async(_root: unknown, args: { gameId: ID }) => {
             return await gameService.closeGame(args.gameId);
         },
+        abandonGame: async(_root: unknown, args: { gameId: ID}, context: ContextWithUser) => {
+            return await gameService.abandonGame(args.gameId, context.user.id);
+        },
         setBeersDrank: async(_root: unknown, args: { gameId: ID, beers: number}, context: ContextWithUser) => {
             return await gameService.setBeersDrank(args.gameId, context.user.id, args.beers);
         },
@@ -45,6 +48,12 @@ export const mutations = {
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
             return await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
+        },
+        removeFriend: async (_root: unknown, args: { friendId: ID }, context: ContextWithUser) => {
+            return await userService.removeFriend(context.user.id, args.friendId);
+        },
+        deleteAccount: async (_root: unknown, _args: unknown, context: ContextWithUser) => {
+            return await userService.deleteAccount(context.user.id);
         },
         login: async (_root: unknown, args: LoginArgs) => {
             const user = await userService.getUser(args.user);
