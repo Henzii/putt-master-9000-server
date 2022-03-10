@@ -87,13 +87,14 @@ export const closeGame = async (gameId: ID) => {
 };
 export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => {
     const game = await GameModel.findById(gameId) as Document & Game;
-    game.scorecards = game.scorecards.map(sc => {
-        if (sc.user.toString() === playerId) {
-            sc['beers'] = beers;
-        }
-        return sc;
-    });
-    return await game.save();
+    const scorecard = game.scorecards.find(sc => sc.user.toString() === playerId);
+    if (!scorecard) throw new Error('Scorecard not found!');
+    scorecard['beers'] = beers;
+    await game.save();
+    return {
+        user: scorecard.user.toString(),
+        scorecard,
+    }
 };
 export const abandonGame = async(gameId: ID, playerId: ID) => {
     try {
