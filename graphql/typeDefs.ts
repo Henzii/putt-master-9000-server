@@ -42,6 +42,7 @@ export const typeDefs = gql`
         isOpen: Boolean
     }
     type Scorecard {
+        id: ID!
         user: User
         scores: [Int]
         total: Int
@@ -53,6 +54,10 @@ export const typeDefs = gql`
         name: String!
         pars: [Int]!
         holes: Int!
+    }
+    type UpdatedScorecard {
+        user: ID!
+        scorecard: Scorecard
     }
     type GetHcResponse {
         id: ID
@@ -96,7 +101,7 @@ export const typeDefs = gql`
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
         abandonGame(gameId: ID!): Boolean
         closeGame(gameId: ID!): Game
-        setBeersDrank(gameId: ID!, beers: Int!): Game
+        setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
 
         createUser(name: String!, password: String!, email: String): String
         login(user: String!, password: String!): String!

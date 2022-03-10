@@ -31,8 +31,8 @@ export const mutations = {
         abandonGame: async(_root: unknown, args: { gameId: ID}, context: ContextWithUser) => {
             return await gameService.abandonGame(args.gameId, context.user.id);
         },
-        setBeersDrank: async(_root: unknown, args: { gameId: ID, beers: number}, context: ContextWithUser) => {
-            return await gameService.setBeersDrank(args.gameId, context.user.id, args.beers);
+        setBeersDrank: async(_root: unknown, args: { gameId: ID, playerId: ID, beers: number}) => {
+            return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
         },
         // User mutations
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string }) => {
