@@ -12,6 +12,7 @@ const skeema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    pushToken: String,
     email: String,
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
