@@ -1,21 +1,13 @@
-name: Koodin tarkastus
+name: Julkaisu herokuun
 on:
   push:
+    branches: [main, master]
 
 jobs:
-  Tarkasta_Ja_Julkaise:
+  AsennaJaJulkaise:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Asennus
-        run: npm install
-      - name: Linttaus
-        run: npm run lint
-      - name: Build
-        run: npm run tsc
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
