@@ -41,6 +41,7 @@ export type User = {
     passwordHash: string,
     friends: (ID | User)[],
     blockFriendRequests: boolean,
+    pushToken?: string,
 }
 export type SafeUser = Pick<User, 'id' | 'name'>
 

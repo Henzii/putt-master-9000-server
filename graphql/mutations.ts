@@ -1,7 +1,7 @@
 import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
-import { ContextWithUser, ID, NewLayoutArgs } from "../types";
+import { ContextWithUser, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import { UserInputError } from "apollo-server";
@@ -56,6 +56,11 @@ export const mutations = {
             return await userService.deleteAccount(context.user.id);
         },
         login: async (_root: unknown, args: LoginArgs) => {
+            if (!process.env.TOKEN_KEY) {
+                // eslint-disable-next-line no-console
+                console.error('TOKEN_KEY is not set!');
+                throw new Error();
+            }
             const user = await userService.getUser(args.user);
             if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
                 throw new UserInputError('Wrong username or password');
@@ -64,7 +69,11 @@ export const mutations = {
                     id: user.id,
                     name: user.name,
                 };
-                return jwt.sign(payload, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
+                if (args.pushToken && (args.pushToken !== user.pushToken)) {
+                    user.pushToken = args.pushToken;
+                    await user.save();
+                }
+                return jwt.sign(payload, process.env.TOKEN_KEY);
             }
         },
         changeSettings: async (_root: unknown, args: UserSettingsArgs, context: ContextWithUser) => {
@@ -75,7 +84,8 @@ export const mutations = {
 
 type LoginArgs = {
     user: string,
-    password: string
+    password: string,
+    pushToken?: string,
 }
 export type UserSettingsArgs = {
     blockFriendRequests: boolean,

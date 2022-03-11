@@ -104,7 +104,7 @@ export const typeDefs = gql`
         setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
 
         createUser(name: String!, password: String!, email: String): String
-        login(user: String!, password: String!): String!
+        login(user: String!, password: String!, pushToken: String): String!
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
