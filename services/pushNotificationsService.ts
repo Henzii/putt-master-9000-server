@@ -20,9 +20,14 @@ const handleBadToken = (token: ExpoPushToken) => {
     userService.removePushToken(token);
 };
 const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushMessage) => {
+    // Filteröidään vialliset pushTokenit pois
+    const validPushTokens = pushTokens.filter(token => Expo.isExpoPushToken(token));
+
+    if (validPushTokens.length < 1) return;
+
     // Tehdään viestit joissa on vastaanottaja
     const messagesWithTokens: ExpoPushMessage[] = [{
-        to: pushTokens,
+        to: validPushTokens,
         ...message,
     }];
     const tickets = await expo.sendPushNotificationsAsync(messagesWithTokens);
@@ -30,7 +35,7 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
     const ticketsAndTokens = tickets.map((r, i) => {
         return {
             ...r,
-            token: pushTokens[i],
+            token: validPushTokens[i],
         };
     });
 
@@ -40,7 +45,6 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
     }, 30000);
 };
 const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[]) => {
-    console.info('Tarkastetaan tiketit');
     for (const ticket of tickets) {
         const id = (ticket as ExpoPushSuccessTicket).id;
 

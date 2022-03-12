@@ -1,4 +1,4 @@
-import { ID, User } from "../types";
+import { ID, SafeUser, User } from "../types";
 import Users from '../models/User';
 import Game from '../models/Game';
 import { Document } from "mongoose";
@@ -8,6 +8,18 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
     if (users.length === 0) return [];
     return users;
+};
+const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean}> => {
+    const users = await Users.find({
+        name: { $regex: searchString, $options: 'i' },
+        blockFriendRequests: false,
+    }).limit(10) as (Document & User)[];
+    return { users: users.map(u => {
+        return {
+            id: u.id,
+            name: u.name
+        };
+    }), hasMore: users.length >= 10};
 };
 const getUsersPushTokens = async (userIds: ID[]): Promise<string[]> => {
     const users = await Users.find(
@@ -95,7 +107,6 @@ const deleteAccount = async (userId: ID) => {
  * @returns [userOne.id, userTwo.id]
  */
 const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg): Promise<ID[] | null> => {
-
     try {
         const fOne = await getUser(userOne.name, userOne.id);
         const fTwo = await getUser(userTwo.name, userTwo.id) as Document & User;
@@ -115,7 +126,7 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg): Pr
         fTwo.friends.push(fOne);
         await fOne.save();
         await fTwo.save();
-        return [ fOne.id, fTwo.id ];
+        return [fOne.id, fTwo.id];
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e);
@@ -152,4 +163,8 @@ type makeFriendsArg = {
     id?: ID,
 }
 
-export default { getUsers, addUser, getUser, makeFriends, updateSettings, removeFriend, deleteAccount, getUsersPushTokens, removePushToken };
+export default {
+    getUsers, addUser, getUser, makeFriends, updateSettings,
+    removeFriend, deleteAccount, getUsersPushTokens,
+    removePushToken, searchUser,
+};

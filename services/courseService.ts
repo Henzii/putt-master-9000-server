@@ -4,7 +4,6 @@ import { Course, NewLayoutArgs } from "../types";
 
 export async function getCourses({ limit, offset, search }: { limit: number, offset: number, search?: string }) {
     const params = (search) ? { name: { $regex: search, $options: 'i' }} : {};
-    console.log(params);
     const documents = await CourseModel.count(params);
     const kurssit = await CourseModel.find(params).skip(offset).limit(limit);
     return { data: kurssit, count: documents, hasMore: (offset + limit < documents)};
