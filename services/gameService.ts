@@ -37,8 +37,11 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
             }
         ) as Document & Game;
         return game;
-    // eslint-disable-next-line no-console
-    } catch (e) { console.log(e); }
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log(e);
+        throw new Error('Error while adding players');
+    }
 };
 export const createGame = async (courseId: ID, layoutId: ID) => {
     try {
@@ -82,7 +85,8 @@ export const setScore = async (args: SetScoreArgs) => {
 export const closeGame = async (gameId: ID) => {
     const game = await GameModel.findByIdAndUpdate(gameId, {
         isOpen: false
-    }, { returnDocument: 'after' });
+    }, { returnDocument: 'after' }) as Document & Game;
+    await game.populate('scorecards.user');
     return game;
 };
 export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => {
@@ -94,7 +98,7 @@ export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => 
     return {
         user: scorecard.user.toString(),
         scorecard,
-    }
+    };
 };
 export const abandonGame = async(gameId: ID, playerId: ID) => {
     try {
@@ -109,7 +113,7 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
             return true;
         // Muutoin poistetaan vain pelaajan tuloskortti pelistä
         } else {
-            game.scorecards = game.scorecards.filter(sc => sc.user.toString() !== playerId)
+            game.scorecards = game.scorecards.filter(sc => sc.user.toString() !== playerId);
             await game.save();
             return true;
         }

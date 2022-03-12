@@ -61,4 +61,4 @@ const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[])
         }
     }
 };
-export default { sendPushNotifications, sendNotification }
+export default { sendNotification };
