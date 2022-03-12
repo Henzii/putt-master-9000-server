@@ -9,6 +9,34 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     if (users.length === 0) return [];
     return users;
 };
+const getUsersPushTokens = async (userIds: ID[]): Promise<string[]> => {
+    const users = await Users.find(
+        {
+            _id: { $in: userIds },
+            pushToken: { $exists: true }
+        },
+    ) as (Document & User)[];
+    if (!users) return [];
+    return users.map(u => u.pushToken || '');
+};
+const removePushToken = async (token: string) => {
+    try {
+        await Users.findOneAndUpdate(
+            {
+                pushToken: token,
+            },
+            {
+                $unset: { pushToken: "" }
+            }
+        );
+        return true;
+    }
+    catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+    }
+    return false;
+};
 const addUser = async (name: string, passwordHash: string, email?: string): Promise<User> => {
     const newUser = new Users({
         name,
@@ -21,7 +49,7 @@ const addUser = async (name: string, passwordHash: string, email?: string): Prom
 const removeFriend = async (removeFromUserId: ID, userIdToRemove: ID) => {
     try {
         await Users.updateMany(
-            { _id: { $in: [removeFromUserId, userIdToRemove] }},
+            { _id: { $in: [removeFromUserId, userIdToRemove] } },
             { $pull: { friends: { $in: [removeFromUserId, userIdToRemove] } } }
         );
         return true;
@@ -83,7 +111,8 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => 
         await fTwo.save();
         return true;
     } catch (e) {
-        console.log(e)
+        // eslint-disable-next-line no-console
+        console.log(e);
         return false;
     }
 };
@@ -117,4 +146,4 @@ type makeFriendsArg = {
     id?: ID,
 }
 
-export default { getUsers, addUser, getUser, makeFriends, updateSettings, removeFriend, deleteAccount };
+export default { getUsers, addUser, getUser, makeFriends, updateSettings, removeFriend, deleteAccount, getUsersPushTokens, removePushToken };

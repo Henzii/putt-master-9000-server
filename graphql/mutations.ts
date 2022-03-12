@@ -1,6 +1,7 @@
 import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
+import pushNotificationsService from "../services/pushNotificationsService";
 import { ContextWithUser, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
