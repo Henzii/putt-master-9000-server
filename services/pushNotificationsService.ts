@@ -37,7 +37,7 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
     // Tarkastetaan kuitit 30sek päästä virheiden varalta
     setTimeout(() => {
         checkReceipts(ticketsAndTokens);
-    }, 3000);
+    }, 30000);
 };
 const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[]) => {
     console.info('Tarkastetaan tiketit');
