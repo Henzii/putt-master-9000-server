@@ -2,7 +2,7 @@ import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
 import pushNotificationsService from "../services/pushNotificationsService";
-import { ContextWithUser, ID, NewLayoutArgs, User } from "../types";
+import { ContextWithUser, ID, NewLayoutArgs } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import { UserInputError } from "apollo-server";
@@ -48,7 +48,16 @@ export const mutations = {
             }
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
-            return await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
+            const res = await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
+            // Jos kaverin lisäys onnistui, lähetetään lisätylle push-notifikaatio
+            if (res && res[1]) {
+                pushNotificationsService.sendNotification([res[1]], {
+                    body: `${context.user.name} added you as a friend`,
+                    sound: 'default',
+                });
+                return true;
+            }
+            return false;
         },
         removeFriend: async (_root: unknown, args: { friendId: ID }, context: ContextWithUser) => {
             return await userService.removeFriend(context.user.id, args.friendId);

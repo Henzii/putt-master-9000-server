@@ -88,33 +88,39 @@ const deleteAccount = async (userId: ID) => {
         return false;
     }
 };
-const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg) => {
+/**
+ *
+ * @param userOne Lisääjän id tai nimi
+ * @param userTwo Lisätyn id tai nimi
+ * @returns [userOne.id, userTwo.id]
+ */
+const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg): Promise<ID[] | null> => {
 
     try {
         const fOne = await getUser(userOne.name, userOne.id);
         const fTwo = await getUser(userTwo.name, userTwo.id) as Document & User;
         if (!fOne || !fTwo) {
-            return false;
+            return null;
         }
         // Jos userTwo:lla on kaveriesto päällä tai yritetään lisätä itseään
         if (fTwo.blockFriendRequests === true || fOne.id === fTwo.id) {
-            return false;
+            return null;
         }
         // Jos kaveri on jo kaverilistalla
         if (fOne.friends.find(f => f.toString() === fTwo.id)) {
-            return false;
+            return null;
         }
 
         fOne.friends.push(fTwo);
         fTwo.friends.push(fOne);
         await fOne.save();
         await fTwo.save();
-        return true;
+        return [ fOne.id, fTwo.id ];
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e);
-        return false;
     }
+    return null;
 };
 const getUser = async (name?: string, id?: ID): Promise<Document & User | null> => {
     let user: Document & User;

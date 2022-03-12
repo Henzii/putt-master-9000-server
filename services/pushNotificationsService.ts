@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Expo, ExpoPushMessage, ExpoPushReceipt, ExpoPushSuccessTicket, ExpoPushTicket, ExpoPushToken } from 'expo-server-sdk';
+import { Expo, ExpoPushMessage, ExpoPushSuccessTicket, ExpoPushTicket, ExpoPushToken } from 'expo-server-sdk';
 import { ID } from '../types';
 import userService from './userService';
 
@@ -8,8 +8,12 @@ const expo = new Expo();
 type PushMessage = Omit<ExpoPushMessage, 'to'>;
 
 const sendNotification = async (userIds: ID[], message: PushMessage) => {
-    const tokens = await userService.getUsersPushTokens(userIds);
-    sendPushNotifications(tokens, message);
+    try {
+        const tokens = await userService.getUsersPushTokens(userIds);
+        sendPushNotifications(tokens, message);
+    } catch(e) {
+        console.error('Pushnotifikaation lähetys epäonnistui!\n', e);
+    }
 };
 const handleBadToken = (token: ExpoPushToken) => {
     console.warn('Poistetaan token', token);
@@ -33,9 +37,9 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
     // Tarkastetaan kuitit 30sek päästä virheiden varalta
     setTimeout(() => {
         checkReceipts(ticketsAndTokens);
-    }, 1000);
+    }, 3000);
 };
-const checkReceipts = async (tickets: (( ExpoPushTicket) & { token?: string })[]) => {
+const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[]) => {
     console.info('Tarkastetaan tiketit');
     for (const ticket of tickets) {
         const id = (ticket as ExpoPushSuccessTicket).id;
