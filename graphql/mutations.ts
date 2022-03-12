@@ -1,7 +1,8 @@
 import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
-import { ContextWithUser, ID, NewLayoutArgs, User } from "../types";
+import pushNotificationsService from "../services/pushNotificationsService";
+import { ContextWithUser, Game, ID, NewLayoutArgs } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import { UserInputError } from "apollo-server";
@@ -19,19 +20,52 @@ export const mutations = {
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
             return gameService.createGame(args.courseId, args.layoutId);
         },
-        addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }) => {
-            return await gameService.addPlayersToGame(args.gameId, args.playerIds);
+        addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }, context: ContextWithUser): Promise<Game> => {
+            const game = await gameService.addPlayersToGame(args.gameId, args.playerIds);
+
+            // Filtteröidään oma id pois listalta, jotta ei turhaan tule notifikaatiota
+            const playerIds = args.playerIds.filter(pid => pid !== context.user.id);
+
+            pushNotificationsService.sendNotification(playerIds, {
+                title: 'New game',
+                body: `${context.user.name} created a new game`,
+                sound: 'default',
+            });
+            return game;
         },
         setScore: async (_root: unknown, args: SetScoreArgs) => {
             return await gameService.setScore(args);
         },
-        closeGame: async(_root: unknown, args: { gameId: ID }) => {
-            return await gameService.closeGame(args.gameId);
+        closeGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
+            try {
+                const game = await gameService.closeGame(args.gameId);
+                // Mäpätään pelin pelaajien id, filteröidään oma pois.
+                const playerIds = game.scorecards.map(sc => sc.user.id.toString()).filter(id => id !== context.user.id);
+
+                // Haetaan voittaja
+                const winner = game.scorecards.reduce((p, c) => {
+                    const totalScore = c.scores.reduce((total, score) => total + score, 0);
+                    if (totalScore < p.score || p.score === 0) {
+                        return { name: c.user.name, score: totalScore };
+                    }
+                    return p;
+                }, { name: 'Nobody', score: 0 });
+                // Radan ihannetulos
+                const coursePar = game.pars.reduce((total, score) => total+score, 0);
+                // Noitifikaatiota sulkemisesta
+                pushNotificationsService.sendNotification(playerIds, {
+                    title: 'Game over',
+                    body: `${context.user.name} closed the game.\nThen winner was ${winner.name} (${winner.score-coursePar})`,
+                });
+                return game;
+            } catch (e) {
+                console.log(e);
+            }
         },
-        abandonGame: async(_root: unknown, args: { gameId: ID}, context: ContextWithUser) => {
+        abandonGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
             return await gameService.abandonGame(args.gameId, context.user.id);
         },
-        setBeersDrank: async(_root: unknown, args: { gameId: ID, playerId: ID, beers: number}) => {
+        setBeersDrank: async (_root: unknown, args: { gameId: ID, playerId: ID, beers: number }) => {
             return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
         },
         // User mutations
@@ -47,7 +81,16 @@ export const mutations = {
             }
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
-            return await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
+            const res = await userService.makeFriends({ id: context.user.id }, { id: args.friendId, name: args.friendName });
+            // Jos kaverin lisäys onnistui, lähetetään lisätylle push-notifikaatio
+            if (res && res[1]) {
+                pushNotificationsService.sendNotification([res[1]], {
+                    body: `${context.user.name} added you as a friend`,
+                    sound: 'default',
+                });
+                return true;
+            }
+            return false;
         },
         removeFriend: async (_root: unknown, args: { friendId: ID }, context: ContextWithUser) => {
             return await userService.removeFriend(context.user.id, args.friendId);
