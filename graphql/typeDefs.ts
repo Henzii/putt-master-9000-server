@@ -29,6 +29,10 @@ export const typeDefs = gql`
         friends: [User!]
         blockFriendRequests: Boolean
     }
+    type SafeUser {
+        id: ID!
+        name: String!
+    }
     type Game {
         id: ID!
         course: String!
@@ -65,7 +69,10 @@ export const typeDefs = gql`
         scores: [Int]
         hc: Float
     }
-    
+    type SearchUserResponse {
+        users: [SafeUser]!
+        hasMore: Boolean!
+    }
     type Query {
         """
         Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
@@ -90,6 +97,12 @@ export const typeDefs = gql`
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
         getHc (course: String!, layout: String!): [GetHcResponse]!
+        """
+        Hakee search hakusanalla käyttäjiä ja palauttaa listan (max 10) SafeUsereita (vain id ja nimi) sekä
+        booleanin siitä onko hakutuloksia mahdollisesti lisää -> tuleeko hakua tarkentaa.
+        Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
+        """
+        searchUser(search: String!): SearchUserResponse!
     }
 
     type Mutation {

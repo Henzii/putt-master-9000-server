@@ -41,7 +41,11 @@ export const queries = {
                     pars: user.pars,
                 };
             });
-        }
+        },
+        searchUser: async (_root: unknown, args: { search: string }, context: ContextWithUser) => {
+            const res = await userService.searchUser(args.search);
+            return res;
+        },
     }
 };
 

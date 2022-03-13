@@ -59,6 +59,7 @@ export const mutations = {
                 });
                 return game;
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.log(e);
             }
         },
