@@ -29,6 +29,7 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
     const messagesWithTokens: ExpoPushMessage[] = [{
         to: validPushTokens,
         ...message,
+        priority: 'high',
     }];
     const tickets = await expo.sendPushNotificationsAsync(messagesWithTokens);
     // Lisätään kuitteihin pushtoken, jotta se voidaan poistaa virheiden varalta

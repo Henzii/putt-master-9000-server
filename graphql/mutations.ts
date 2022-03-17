@@ -2,11 +2,12 @@ import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
 import pushNotificationsService from "../services/pushNotificationsService";
-import { ContextWithUser, Game, ID, NewLayoutArgs } from "../types";
+import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
-import { UserInputError } from "apollo-server";
+import { ApolloError, UserInputError } from "apollo-server";
 import jwt from "jsonwebtoken";
+import { createEvent, CreateEventArgs } from "../services/eventsService";
 
 export const mutations = {
     Mutation: {
@@ -51,11 +52,11 @@ export const mutations = {
                     return p;
                 }, { name: 'Nobody', score: 0 });
                 // Radan ihannetulos
-                const coursePar = game.pars.reduce((total, score) => total+score, 0);
+                const coursePar = game.pars.reduce((total, score) => total + score, 0);
                 // Noitifikaatiota sulkemisesta
                 pushNotificationsService.sendNotification(playerIds, {
                     title: 'Game over',
-                    body: `${context.user.name} closed the game.\nThen winner was ${winner.name} (${winner.score-coursePar})`,
+                    body: `${context.user.name} closed the game.\nThen winner was ${winner.name} (${winner.score - coursePar})`,
                 });
                 return game;
             } catch (e) {
@@ -120,9 +121,54 @@ export const mutations = {
                 return jwt.sign(payload, process.env.TOKEN_KEY);
             }
         },
-        changeSettings: async (_root: unknown, args: UserSettingsArgs, context: ContextWithUser) => {
-            return await userService.updateSettings(context.user.id, args);
+        changeSettings: async (_root: unknown, rawargs: ChangeSettingsArgs, context: ContextWithUser) => {
+            const { password, ...args } = rawargs;
+            const finalArgs = args as UserSettingsArgs;
+            if (password) {
+                finalArgs['passwordHash'] = await bcrypt.hash(password, 10);
+            }
+            return await userService.updateSettings(context.user.id, finalArgs);
         },
+        restoreAccount: async (_root: unknown, args: RestoreAccountArgs) => {
+            const { name, password, restoreCode } = args;
+            // Jos argumentteja tulee oudosti
+            if (!name || (password && !restoreCode || !password && restoreCode)) {
+                throw new ApolloError('Invalid argument count');
+            }
+            const user = await userService.getUser(name) as User;
+
+            // Jos käyttäjää ei löydy tai käyttäjä ei ole antanut sähköpostiosoitettaan
+            if (!user || !user.email) return true;
+
+            // Jos ei vielä ole palautuskoodia ja uutta salasanaa, lähetetään sähköpostilla
+            // palautuskoodi ja tallennetaan se käyttäjälle tietokantaan
+            if (!password || !restoreCode) {
+                const code = 'ABCD'; // Random ;)
+                await userService.updateSettings(user.id, { restoreCode: code });
+                return true;
+            }
+            // Jos palautuskoodi on oikein, vaihdetaan salasana
+            else if (restoreCode === user.restoreCode) {
+                await userService.updateSettings(user.id, { passwordHash: await bcrypt.hash(password, 10) });
+                return true;
+            }
+
+            return true;
+        },
+        //////////////////////////
+        //                      //
+        //    Event mutations   //
+        //                      //
+        //////////////////////////
+        createEvent: async (root: unknown, { event }: { event: CreateEventArgs }, context: ContextWithUser) => {
+            return null;
+            try {
+                const newEvent = await createEvent(event, context.user.id);
+                return newEvent;
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 };
 
@@ -131,8 +177,20 @@ type LoginArgs = {
     password: string,
     pushToken?: string,
 }
-export type UserSettingsArgs = {
-    blockFriendRequests: boolean,
+interface RestoreAccountArgs {
+    name?: string,
+    restoreCode?: string,
+    password?: string,
+}
+interface SettingsArgs {
+    blockFriendRequests?: boolean,
+}
+interface ChangeSettingsArgs extends SettingsArgs {
+    password?: string,
+}
+export interface UserSettingsArgs extends SettingsArgs {
+    passwordHash?: string,
+    restoreCode?: string,
 }
 export type SetScoreArgs = {
     gameId: ID,

@@ -1,16 +1,55 @@
 import { gql } from "apollo-server";
 
 export const typeDefs = gql`
+    type Event {
+        id: ID!
+        name: String!
+        date: String!
+        course: String
+        layout: String
+        commnet: String
+        invites: EventInvites
+        registrationOpen: Boolean
+        messages: [EventMessage]
+        creator: ID!
+    }
+    type EventMessage {
+        message: String!
+        user: User!
+    }
+    type EventInvites {
+        invited: [User]!
+        rejected: [User]!
+        accepted: [User]!
+    }
+    input CreateEventArgs {
+        name: String!
+        date: String!
+        comment: String
+    }
     type GetCoursesResponse {
         courses: [Course]!
         hasMore: Boolean!
         nextOffset: Int
         count: Int!
     }
+    type Location {
+        coordinates: [Float!]!
+    }
+    input InputLocation {
+        lat: Float!
+        lon: Float!
+    }
+    type Distance {
+        meters: Int!
+        string: String!
+    }
     type Course {
         id: ID!
         name: String!
+        location: Location
         layouts: [Layout]!
+        distance: Distance
     }
     type Layout {
         id: ID!
@@ -78,7 +117,7 @@ export const typeDefs = gql`
         Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
         Tuloksia voi rajata antamalla search argumentin
         """
-        getCourses(limit: Int!, offset: Int!, search: String): GetCoursesResponse
+        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float]): GetCoursesResponse
         """
         Hakee yhden pelin.
         """
@@ -103,10 +142,12 @@ export const typeDefs = gql`
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
+
+        getEvents: [Event]
     }
 
     type Mutation {
-        addCourse(name: String!): Course!
+        addCourse(name: String!, coordinates: InputLocation): Course!
         addLayout(courseId: ID!, layout: NewLayout!): Course!
 
         createGame(courseId: ID!, layoutId: ID!): ID!
@@ -121,6 +162,10 @@ export const typeDefs = gql`
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean): User
+        changeSettings(blockFriendRequests: Boolean, password: String): User
+
+        restoreAccount(name: String, restoreCode: String, password: String): Boolean
+
+        createEvent(event: CreateEventArgs!): Event
     }
 `;

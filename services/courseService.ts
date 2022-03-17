@@ -2,11 +2,26 @@ import { Document } from "mongoose";
 import CourseModel from "../models/Course";
 import { Course, NewLayoutArgs } from "../types";
 
-export async function getCourses({ limit, offset, search }: { limit: number, offset: number, search?: string }) {
-    const params = (search) ? { name: { $regex: search, $options: 'i' }} : {};
+type getCoursesArgs = {
+    limit: number,
+    offset: number,
+    search?: string,
+    coordinates?: [number, number]
+}
+
+export async function getCourses({ limit, offset, search, coordinates = [0,0] }: getCoursesArgs) {
+    const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
-    const kurssit = await CourseModel.find(params).skip(offset).limit(limit);
-    return { data: kurssit, count: documents, hasMore: (offset + limit < documents)};
+    const kurssit = await CourseModel.find({
+        ...params,
+        location: {
+            $near: {
+                $geometry: { type: 'Point', coordinates: coordinates },
+            }
+        }
+    }
+    ).skip(offset).limit(limit);
+    return { data: kurssit, count: documents, hasMore: (offset + limit < documents) };
 
 }
 export async function addCourse(name: string) {

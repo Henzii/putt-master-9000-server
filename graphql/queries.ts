@@ -8,13 +8,17 @@ import { getPlayersScores } from "../services/statsService";
 export const queries = {
     Query: {
         getCourses: async (_root: unknown, args: getCoursesArgs) => {
-            const { data: courses, count, hasMore } = await getCourses(args);
-            return {
-                courses,
-                hasMore,
-                count,
-                nextOffset: hasMore ? (args.offset + args.limit) : null
-            };
+            try {
+                const { data: courses, count, hasMore } = await getCourses(args);
+                return {
+                    courses,
+                    hasMore,
+                    count,
+                    nextOffset: hasMore ? (args.offset + args.limit) : null
+                };
+            } catch (e) {
+                console.log(e, args);
+            }
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
             if (!context.user?.id) return null;
@@ -42,9 +46,12 @@ export const queries = {
                 };
             });
         },
-        searchUser: async (_root: unknown, args: { search: string }, context: ContextWithUser) => {
+        searchUser: async (_root: unknown, args: { search: string }) => {
             const res = await userService.searchUser(args.search);
             return res;
+        },
+        getEvents: async (_root: unknown, args: unknown, context: ContextWithUser) => {
+            return null;
         },
     }
 };
