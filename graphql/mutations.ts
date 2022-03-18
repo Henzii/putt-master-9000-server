@@ -11,8 +11,8 @@ import { createEvent, CreateEventArgs } from "../services/eventsService";
 
 export const mutations = {
     Mutation: {
-        addCourse: (_root: unknown, args: { name: string }) => {
-            return addCourse(args.name);
+        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number }}) => {
+            return addCourse(args.name, args.coordinates);
         },
         addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }) => {
             return addLayout(args.courseId, args.layout);

@@ -9,7 +9,7 @@ type getCoursesArgs = {
     coordinates?: [number, number]
 }
 
-export async function getCourses({ limit, offset, search, coordinates = [0,0] }: getCoursesArgs) {
+export async function getCourses({ limit, offset, search, coordinates = [0, 0] }: getCoursesArgs) {
     const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
     const kurssit = await CourseModel.find({
@@ -24,10 +24,13 @@ export async function getCourses({ limit, offset, search, coordinates = [0,0] }:
     return { data: kurssit, count: documents, hasMore: (offset + limit < documents) };
 
 }
-export async function addCourse(name: string) {
+export async function addCourse(name: string, coordinates: { lat: number, lon: number }) {
     const newCourse = new CourseModel({
         name,
         layouts: [],
+        location: {
+            coordinates: [coordinates.lon, coordinates.lat]
+        },
     });
     await newCourse.save();
     return newCourse;

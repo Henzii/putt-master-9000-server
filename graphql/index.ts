@@ -25,16 +25,24 @@ const resolvers = {
     },
     Course: {
         distance: (root: any, args: unknown, context: unknown, info: any) => {
-            const [lat1, lon1] = root.location.coordinates;
-            const [lat2, lon2] = info.variableValues.coordinates;
-            const distance = getDistance(
-                { latitude: lat1, longitude: lon1 },
-                { latitude: lat2, longitude: lon2 }
-            );
-            return {
-                meters: distance,
-                string: (distance < 1000) ? distance + ' m' : (Math.round(distance / 1000 * 100) / 100) + ' km',
-            };
+            try {
+                const [lat1, lon1] = root.location.coordinates;
+                const [lat2, lon2] = info.variableValues.coordinates;
+                const distance = getDistance(
+                    { latitude: lat1, longitude: lon1 },
+                    { latitude: lat2, longitude: lon2 }
+                );
+                return {
+                    meters: distance,
+                    string: (distance > 1000)
+                        ? Math.floor(distance/1000) + ' km'
+                        : (distance < 1000)
+                            ? distance + ' m'
+                            : Math.round(distance/1000*100)/100 + ' km'
+                };
+            } catch (e) {
+                return { meters: 0, string: '' };
+            }
         }
     },
     User: {

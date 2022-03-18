@@ -23,6 +23,7 @@ export default shield({
             if (thrownThing instanceof ApolloError) {
                 return thrownThing;
             }
+            console.log(thrownThing);
             return new ApolloError('Server error', 'ERR_INTERNAL_SERVER')
         }
     }
