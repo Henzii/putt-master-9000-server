@@ -31,6 +31,7 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^14.2.0",
     "expo-server-sdk": "^3.6.0",
+    "geolib": "^3.3.3",
     "graphql": "^16.2.0",
     "graphql-middleware": "^6.1.13",
     "graphql-shield": "^7.5.0",

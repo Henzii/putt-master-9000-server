@@ -25,7 +25,8 @@ const skeema = new mongoose.Schema({
     blockFriendRequests: {
         type: Boolean,
         default: false,
-    }
+    },
+    restoreCode: String,
 
 });
 
