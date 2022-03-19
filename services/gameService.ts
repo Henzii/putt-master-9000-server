@@ -56,6 +56,8 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
         const newGame = new GameModel({
             date: new Date(),
             layout: layout?.name,
+            layout_id: layoutId,
+            startTime: new Date(),
             course: course.name,
             pars: layout?.pars,
             holes: layout?.holes,
@@ -84,7 +86,8 @@ export const setScore = async (args: SetScoreArgs) => {
 };
 export const closeGame = async (gameId: ID) => {
     const game = await GameModel.findByIdAndUpdate(gameId, {
-        isOpen: false
+        isOpen: false,
+        endTime: new Date(),
     }, { returnDocument: 'after' }) as Document & Game;
     await game.populate('scorecards.user');
     return game;

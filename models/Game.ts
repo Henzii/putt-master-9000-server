@@ -4,6 +4,9 @@ const skeema = new mongoose.Schema({
     date: String,
     course: String,
     layout: String,
+    layout_id: mongoose.Types.ObjectId,
+    startTime: Date,
+    endTime: Date,
     pars: [Number],
     holes: Number,
     scorecards: [
