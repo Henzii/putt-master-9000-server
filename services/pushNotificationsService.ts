@@ -3,7 +3,7 @@ import { Expo, ExpoPushMessage, ExpoPushSuccessTicket, ExpoPushTicket, ExpoPushT
 import { ID } from '../types';
 import userService from './userService';
 
-const expo = new Expo();
+const expo = new Expo({ accessToken: process.env.PUSH_ACCESS_TOKEN });
 
 type PushMessage = Omit<ExpoPushMessage, 'to'>;
 
