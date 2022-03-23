@@ -5,6 +5,7 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
+import { UserInputError, AuthenticationError } from "apollo-server";
 
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
@@ -12,7 +13,7 @@ export const getGame = async (id: ID) => {
 export const getGames = async (userId: ID) => {
     const games = await GameModel.find({
         'scorecards.user': userId
-    }).sort({ date: -1 }) as (Document & Game)[];
+    }).sort({ startTime: -1 }) as (Document & Game)[];
     return games;
 };
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
@@ -103,6 +104,29 @@ export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => 
         scorecard,
     };
 };
+export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolean, startTime: string | Date }, userId: ID) => {
+    const newSettings = { ...settings };
+    if (newSettings.startTime) {
+        if (isNaN(Date.parse(newSettings.startTime as string))) {
+            throw new UserInputError(`${newSettings.startTime} is not a valid date`);
+        }
+        newSettings.startTime = new Date(newSettings.startTime);
+    }
+    const game = await GameModel.findOneAndUpdate(
+        {
+            _id: gameId,
+            isOpen: true,
+            'scorecards.user': userId,
+        },
+        {
+            $set: { ...newSettings }
+        }
+    ).populate('scorecards.user');
+    if (!game) {
+        throw new Error('Game for settings change not found. Illeagal parameters?');
+    }
+    return game;
+}
 export const abandonGame = async(gameId: ID, playerId: ID) => {
     try {
         const game = await GameModel.findById(gameId) as Game & Document;
@@ -124,7 +148,7 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
         return false;
     }
 };
-export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame };
+export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings };
 
 interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
     scorecards:
