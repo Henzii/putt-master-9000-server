@@ -37,6 +37,9 @@ export const mutations = {
         setScore: async (_root: unknown, args: SetScoreArgs) => {
             return await gameService.setScore(args);
         },
+        changeGameSettings: async(_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
+            return await gameService.changeGameSettings(args.gameId, args.settings, context.user.id);
+        },
         closeGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
             try {
                 const game = await gameService.closeGame(args.gameId);
@@ -56,7 +59,7 @@ export const mutations = {
                 // Noitifikaatiota sulkemisesta
                 pushNotificationsService.sendNotification(playerIds, {
                     title: 'Game over',
-                    body: `${context.user.name} closed the game.\nThen winner was ${winner.name} (${winner.score - coursePar})`,
+                    body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
                 });
                 return game;
             } catch (e) {
@@ -181,6 +184,13 @@ interface RestoreAccountArgs {
     name?: string,
     restoreCode?: string,
     password?: string,
+}
+type GameSettingsArgs = {
+    gameId: ID,
+    settings: {
+        isOpen: boolean,
+        startTime: string | Date
+    }
 }
 interface SettingsArgs {
     blockFriendRequests?: boolean,
