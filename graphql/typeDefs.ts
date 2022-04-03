@@ -76,6 +76,7 @@ export const typeDefs = gql`
         id: ID!
         course: String!
         startTime: String!
+        endTime: String
         layout: String!
         holes: Int!
         pars: [Int!]
