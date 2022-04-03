@@ -32,7 +32,6 @@ const resolvers = {
                     { latitude: lat1, longitude: lon1 },
                     { latitude: lat2, longitude: lon2 }
                 );
-                console.log('Dist ',lat1,lon1,'to', lat2,lon2, '=', distance)
                 return {
                     meters: distance,
                     string: (distance > 10000)
