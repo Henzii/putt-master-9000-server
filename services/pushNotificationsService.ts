@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
+import { ApolloError } from 'apollo-server';
 import { Expo, ExpoPushMessage, ExpoPushSuccessTicket, ExpoPushTicket, ExpoPushToken } from 'expo-server-sdk';
-import { ID } from '../types';
+import { ID, User } from '../types';
+import { validUser } from '../utils/validators';
 import userService from './userService';
 
 const expo = new Expo({ accessToken: process.env.PUSH_ACCESS_TOKEN });
@@ -66,4 +68,15 @@ const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[])
         }
     }
 };
-export default { sendNotification };
+const sendNotificationToAllFriends = async (userId: ID, message: PushMessage) => {
+    const user = await userService.getUser(undefined, userId);
+    if (!user) throw new ApolloError(`User with id ${userId} not found`);
+    // Populoidaan ystävät
+    await user.populate('friends');
+    const tokenArray= user.friends.map(f => {
+        if (!validUser(f)) return;
+        return f.pushToken;
+    });
+    console.log(tokenArray);
+};
+export default { sendNotification, sendNotificationToAllFriends };

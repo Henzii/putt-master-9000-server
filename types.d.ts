@@ -8,7 +8,10 @@ export type Layout = {
     id?: number | string,
     name: string,
     holes: number,
-    pars: number[]
+    pars: number[],
+    location: {
+        coordinates: [number, number]
+    }
 }
 
 export type NewLayoutArgs = Omit<Layout, "id">

@@ -13,6 +13,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import { calculateHc } from "../utils/calculateHc";
 
 import { getDistance } from 'geolib';
+import { plusminus, total } from "../utils/calculators";
 
 const resolvers = {
     ...queries,
@@ -24,7 +25,7 @@ const resolvers = {
         },
     },
     Course: {
-        distance: (root: any, args: unknown, context: unknown, info: any) => {
+        distance: (root: Layout, args: unknown, context: unknown, info: InfoWithCoordinates) => {
             try {
                 const [lon1, lat1] = root.location.coordinates;
                 const [lon2, lat2] = info.variableValues.coordinates;
@@ -35,10 +36,10 @@ const resolvers = {
                 return {
                     meters: distance,
                     string: (distance > 10000)
-                        ? Math.floor(distance/1000) + ' km'
+                        ? Math.floor(distance / 1000) + ' km'
                         : (distance < 1000)
                             ? distance + ' m'
-                            : Math.round(distance/1000*10)/10 + ' km'
+                            : Math.round(distance / 1000 * 10) / 10 + ' km'
                 };
             } catch (e) {
                 return { meters: 0, string: '' };
@@ -53,17 +54,21 @@ const resolvers = {
     },
     Scorecard: {
         total: (root: Scorecard) => {
-            return root.scores.reduce((p, c) => {
-                if (!isNaN(c)) return p + c;
-                return p;
-            }, 0);
+            return total(root.scores);
         },
         plusminus: (root: Scorecard) => {
-            return root.scores.reduce((total: number, current: number, indeksi: number) => {
-                if (!isNaN(current)) return total + current - root.pars[indeksi];
-                return total;
-            }, 0);
+            return plusminus(root.scores, root.pars);
         },
+        // Beer Handicap
+        bHc: (root: Scorecard) => {
+            return root.beers / 2 || 0;
+        },
+        hcTotal: (root: Scorecard) => {
+            return total(root.scores) - root.hc - (root.beers / 2 || 0);
+        },
+        hcPlusminus: (root: Scorecard) => {
+            return (plusminus(root.scores, root.pars)) - root.hc - (root.beers / 2 || 0);
+        }
     },
     Game: {
         scorecards: async (root: Game & Document, args: unknown, context: unknown, info: any) => {
@@ -126,3 +131,8 @@ type ContextRequest = {
     }
 }
 
+type InfoWithCoordinates = {
+    variableValues: {
+        coordinates: [number, number]
+    }
+}

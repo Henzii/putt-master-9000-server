@@ -93,7 +93,11 @@ export const typeDefs = gql`
         total: Int
         beers: Int
         plusminus: Int
+
         hc: Float
+        bHc: Float
+        hcTotal: Float
+        hcPlusminus: Float
     }
     input NewLayout {
         name: String!
