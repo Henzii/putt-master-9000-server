@@ -4,6 +4,7 @@ import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
 import { getPlayersScores } from "../services/statsService";
+import { ApolloError } from "apollo-server";
 
 export const queries = {
     Query: {
