@@ -17,6 +17,7 @@ const skeema = new mongoose.Schema({
             default: [0.0, 0.0]
         },
     },
+    creator: mongoose.Types.ObjectId,
     layouts: [
         {
             name: {
@@ -24,9 +25,10 @@ const skeema = new mongoose.Schema({
                 minlength: 3,
             },
             holes: Number,
-            pars: []
+            pars: [],
+            creator: mongoose.Types.ObjectId,
         }
-    ]
+    ],
 
 });
 skeema.plugin(validator);

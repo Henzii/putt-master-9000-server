@@ -10,6 +10,7 @@ export default shield({
     Query: {
         "*": isLoggedIn,
         getMe: allow,
+        getLiveGame: allow,
 
     },
     Mutation: {

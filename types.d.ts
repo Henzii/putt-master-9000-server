@@ -8,10 +8,13 @@ export type Layout = {
     id?: number | string,
     name: string,
     holes: number,
-    pars: number[]
+    pars: number[],
+    location: {
+        coordinates: [number, number]
+    }
 }
 
-export type NewLayoutArgs = Omit<Layout, "id">
+export type NewLayoutArgs = Omit<Layout, "id"> & { creator: ID }
 
 export type Game = {
     id: string | number,
@@ -22,6 +25,8 @@ export type Game = {
     course: string,
     scorecards: Scorecard[],
     isOpen: boolean,
+    startTime: Date,
+    endTime: Date,
 }
 
 export type Scorecard = {
