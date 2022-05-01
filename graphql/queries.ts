@@ -31,6 +31,15 @@ export const queries = {
             if (!args.gameId) throw new Error('Not enough parameters');
             return await getGame(args.gameId);
         },
+        getLiveGame: async (_root: unknown, args: { gameId: ID }) => {
+            if (!args.gameId) throw new Error('Params error');
+            const game = await getGame(args.gameId);
+            if (game.isOpen) return game;
+            // Kauanko peli on ollut suljettuna (tuntia)
+            const diff = ((new Date(Date.now()).getTime() - new Date(game.endTime).getTime()) / 1000 / 60 / 60);
+            if (diff > 24) throw new ApolloError('Game is no longer available on live feed');
+            return game;
+        },
         ping: (): string => 'pong!',
         getUsers: async () => {
             return await userService.getUsers();

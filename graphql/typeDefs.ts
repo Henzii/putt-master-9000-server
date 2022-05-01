@@ -132,6 +132,7 @@ export const typeDefs = gql`
         Hakee yhden pelin.
         """
         getGame(gameId: ID!): Game 
+        getLiveGame(gameId: ID!): Game
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
