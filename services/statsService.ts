@@ -17,7 +17,7 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
             }
         },
         // Järjestetään päivämäärän mukaan
-        { $sort: { 'date': 1 } },
+        { $sort: { 'startTime': 1 } },
 
         // Avataan scorecards osa
         { $unwind: '$scorecards' },

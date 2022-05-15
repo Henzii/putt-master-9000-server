@@ -14,11 +14,11 @@ const sendNotification = async (userIds: ID[], message: PushMessage) => {
         const tokens = await userService.getUsersPushTokens(userIds);
         sendPushNotifications(tokens, message);
     } catch(e) {
-        console.error('Pushnotifikaation lähetys epäonnistui!\n', e);
+        console.log('Pushnotifikaation lähetys epäonnistui!\n', e);
     }
 };
 const handleBadToken = (token: ExpoPushToken) => {
-    console.warn('Poistetaan token', token);
+    console.log('Poistetaan token', token);
     userService.removePushToken(token);
 };
 const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushMessage) => {
