@@ -5,7 +5,7 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
-import { UserInputError, AuthenticationError } from "apollo-server";
+import { UserInputError } from "apollo-server";
 
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
@@ -29,7 +29,7 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
                         return {
                             user: p,
                             scores: [],
-                            hc: calculateHc(peli.pars, scoresTable.find(ps => ps.id.toString() === p)?.scores || []),
+                            hc: calculateHc(peli.pars, scoresTable.find(ps => ps.id.toString() === p)?.scores.slice(-10) || []),
                         };
                     })
                 }
@@ -126,7 +126,7 @@ export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolea
         throw new Error('Game for settings change not found. Illeagal parameters?');
     }
     return game;
-}
+};
 export const abandonGame = async(gameId: ID, playerId: ID) => {
     try {
         const game = await GameModel.findById(gameId) as Game & Document;

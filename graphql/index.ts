@@ -94,9 +94,9 @@ const resolvers = {
         }
     },
     GetHcResponse: {
-        // Lasketaan tasoitus
+        // Lasketaan tasoitus (10 viimeisintä kierrosta)
         hc: (root: RawStatsDataHC) => {
-            return calculateHc(root.pars, root.scores);
+            return calculateHc(root.pars, root.scores.slice(-10));
         }
     }
 };
