@@ -10,9 +10,13 @@ import { UserInputError } from "apollo-server";
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
 };
-export const getGames = async (userId: ID) => {
+export const getGames = async (userId: ID, onlyOpenGames = false) => {
     const games = await GameModel.find({
-        'scorecards.user': userId
+        'scorecards.user': userId,
+        $or: [
+            { isOpen: true },
+            { isOpen: onlyOpenGames },
+        ]
     }).sort({ startTime: -1 }) as (Document & Game)[];
     return games;
 };

@@ -88,7 +88,7 @@ export const typeDefs = gql`
     }
     type Scorecard {
         id: ID!
-        user: User
+        user: SafeUser
         scores: [Int]
         total: Int
         beers: Int
@@ -136,7 +136,7 @@ export const typeDefs = gql`
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
-        getGames: [Game]
+        getGames(onlyOpenGames: Boolean): [Game]
         ping: String
         """
         Kirjautunut käyttäjä
@@ -168,7 +168,7 @@ export const typeDefs = gql`
         closeGame(gameId: ID!): Game
         setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
         changeGameSettings(gameId: ID!, settings: GameSettings!): Game
-        createUser(name: String!, password: String!, email: String): String
+        createUser(name: String!, password: String!, email: String, pushToken: String): String
         login(user: String!, password: String!, pushToken: String): String!
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean

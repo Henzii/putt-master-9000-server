@@ -18,6 +18,7 @@ export const queries = {
                     nextOffset: hasMore ? (args.offset + args.limit) : null
                 };
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.log(e, args);
             }
         },
@@ -25,8 +26,8 @@ export const queries = {
             if (!context.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
-        getGames: async (root: unknown, args: unknown, context: ContextWithUser) => {
-            return await getGames(context.user.id);
+        getGames: async (root: unknown, args: { onlyOpenGames?: boolean }, context: ContextWithUser) => {
+            return await getGames(context.user.id, args.onlyOpenGames);
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
             if (!args.gameId) throw new Error('Not enough parameters');

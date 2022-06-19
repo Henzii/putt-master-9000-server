@@ -11,11 +11,11 @@ import { createEvent, CreateEventArgs } from "../services/eventsService";
 
 export const mutations = {
     Mutation: {
-        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number }}) => {
-            return addCourse(args.name, args.coordinates);
+        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number }}, context: ContextWithUser) => {
+            return addCourse(args.name, args.coordinates, context.user.id);
         },
-        addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }) => {
-            return addLayout(args.courseId, args.layout);
+        addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
+            return addLayout(args.courseId, { ...args.layout, creator: context.user.id });
         },
         // Game mutations
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
@@ -74,10 +74,10 @@ export const mutations = {
             return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
         },
         // User mutations
-        createUser: async (_root: unknown, args: { name: string, password: string, email?: string }) => {
+        createUser: async (_root: unknown, args: { name: string, password: string, email?: string, pushToken?: string }) => {
             const hashedPassword = await bcrypt.hash(args.password, 10);
             try {
-                const user = await userService.addUser(args.name, hashedPassword, args.email);
+                const user = await userService.addUser(args.name, hashedPassword, args.email, args.pushToken);
                 return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
