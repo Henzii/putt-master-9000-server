@@ -28,7 +28,7 @@ const skeema = new mongoose.Schema({
     },
     restoreCode: String,
 
-});
+}, { timestamps: true });
 
 skeema.plugin(validator);
 

@@ -30,7 +30,7 @@ const skeema = new mongoose.Schema({
         }
     ],
 
-});
+}, { timestamps: true });
 skeema.plugin(validator);
 
 export default mongoose.model('Course', skeema);

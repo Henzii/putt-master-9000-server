@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 import CourseModel from "../models/Course";
-import { Course, NewLayoutArgs } from "../types";
+import { Course, ID, NewLayoutArgs } from "../types";
 
 type getCoursesArgs = {
     limit: number,
@@ -24,13 +24,14 @@ export async function getCourses({ limit, offset, search, coordinates = [0, 0] }
     return { data: kurssit, count: documents, hasMore: (offset + limit < documents) };
 
 }
-export async function addCourse(name: string, coordinates: { lat: number, lon: number }) {
+export async function addCourse(name: string, coordinates: { lat: number, lon: number }, creator: ID) {
     const newCourse = new CourseModel({
         name,
         layouts: [],
         location: {
             coordinates: [coordinates.lon, coordinates.lat]
         },
+        creator,
     });
     await newCourse.save();
     return newCourse;

@@ -49,11 +49,12 @@ const removePushToken = async (token: string) => {
     }
     return false;
 };
-const addUser = async (name: string, passwordHash: string, email?: string): Promise<User> => {
+const addUser = async (name: string, passwordHash: string, email?: string, pushToken?: string): Promise<User> => {
     const newUser = new Users({
-        name,
+        name: name.toLowerCase(),
         passwordHash,
-        email
+        email,
+        pushToken,
     }) as Document & User;
     await newUser.save();
     return newUser;
