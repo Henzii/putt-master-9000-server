@@ -3,7 +3,7 @@ import { typeDefs } from "./typeDefs";
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { ContextWithUser, Game, Layout, RawStatsDataHC, SafeUser, Scorecard, User } from "../types";
+import { ContextWithUser, Game, Layout, RawStatsDataHC, SafeUser, Scorecard, User, Course } from "../types";
 import { Document } from "mongoose";
 import jwt from 'jsonwebtoken';
 
@@ -25,7 +25,7 @@ const resolvers = {
         },
     },
     Course: {
-        distance: (root: Layout, args: unknown, context: unknown, info: InfoWithCoordinates) => {
+        distance: (root: Course, args: unknown, context: unknown, info: InfoWithCoordinates) => {
             try {
                 const [lon1, lat1] = root.location.coordinates;
                 const [lon2, lat2] = info.variableValues.coordinates;

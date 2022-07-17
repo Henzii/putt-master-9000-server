@@ -2,6 +2,9 @@ export type Course = {
     name: string,
     id: number | string,
     layouts: Layout[]
+    location: {
+        coordinates: [number, number]
+    }
 }
 
 export type Layout = {
@@ -9,12 +12,10 @@ export type Layout = {
     name: string,
     holes: number,
     pars: number[],
-    location: {
-        coordinates: [number, number]
-    }
+    creator?: ID,
 }
 
-export type NewLayoutArgs = Omit<Layout, "id"> & { creator: ID }
+export type NewLayoutArgs = Layout & { creator: ID }
 
 export type Game = {
     id: string | number,
@@ -49,8 +50,12 @@ export type User = {
     blockFriendRequests: boolean,
     pushToken?: string,
     restoreCode?: string,
+    accountType?: AccountType
 }
-export type SafeUser = Pick<User, 'id' | 'name'>
+
+export type AccountType = 'user' | 'admin' | 'god'
+
+export type SafeUser = Pick<User, 'id' | 'name', 'accountType'>
 
 export type ID = string | number
 

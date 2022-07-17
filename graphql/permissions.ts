@@ -11,6 +11,7 @@ export default shield({
         "*": isLoggedIn,
         getMe: allow,
         getLiveGame: allow,
+        searchUser: allow,
 
     },
     Mutation: {
@@ -24,6 +25,7 @@ export default shield({
             if (thrownThing instanceof ApolloError) {
                 return thrownThing;
             }
+            // eslint-disable-next-line no-console
             console.log(thrownThing);
             return new ApolloError('Server error', 'ERR_INTERNAL_SERVER')
         }

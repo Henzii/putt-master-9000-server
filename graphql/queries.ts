@@ -57,8 +57,13 @@ export const queries = {
                 };
             });
         },
-        searchUser: async (_root: unknown, args: { search: string }) => {
+        searchUser: async (_root: unknown, args: { search: string }, context: ContextWithUser) => {
             const res = await userService.searchUser(args.search);
+            if (!context.user?.id) {
+                res.users = res.users.map(user => {
+                    return {...user, id: 'null'};
+                });
+            }
             return res;
         },
         getEvents: async (_root: unknown, args: unknown, context: ContextWithUser) => {
