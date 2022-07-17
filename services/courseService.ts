@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server";
 import { Document } from "mongoose";
 import CourseModel from "../models/Course";
 import { Course, ID, NewLayoutArgs } from "../types";
@@ -38,7 +39,21 @@ export async function addCourse(name: string, coordinates: { lat: number, lon: n
 }
 export async function addLayout(courseId: number | string, layout: NewLayoutArgs) {
     const course = await CourseModel.findById(courseId) as Document & Course;
-    course.layouts.push(layout);
+    // Jos layoutilla on jo id, kyseessä muokkaus, ei lisäys...
+    if (layout.id) {
+        course.layouts = course.layouts.map(lo => {
+            if (lo.id === layout.id) {
+                if (lo.creator?.toString() !== layout.creator) {
+                    throw new UserInputError('Error, layout not created by you!');
+                }
+                return layout;
+            }
+            return lo;
+
+        });
+    } else {
+        course.layouts.push(layout);
+    }
     await course.save();
     return course;
 }

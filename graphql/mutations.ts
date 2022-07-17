@@ -11,7 +11,7 @@ import { createEvent, CreateEventArgs } from "../services/eventsService";
 
 export const mutations = {
     Mutation: {
-        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number }}, context: ContextWithUser) => {
+        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number } }, context: ContextWithUser) => {
             return addCourse(args.name, args.coordinates, context.user.id);
         },
         addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
@@ -37,34 +37,45 @@ export const mutations = {
         setScore: async (_root: unknown, args: SetScoreArgs) => {
             return await gameService.setScore(args);
         },
-        changeGameSettings: async(_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
+        changeGameSettings: async (_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
             return await gameService.changeGameSettings(args.gameId, args.settings, context.user.id);
         },
-        closeGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
-            try {
-                const game = await gameService.closeGame(args.gameId);
-                // Mäpätään pelin pelaajien id, filteröidään oma pois.
+        closeGame: async (_root: unknown, args: { gameId: ID, reopen: boolean }, context: ContextWithUser) => {
+            if (args.reopen === true) {
+                const game = await gameService.closeGame(args.gameId, true);
                 const playerIds = game.scorecards.map(sc => sc.user.id.toString()).filter(id => id !== context.user.id);
-
-                // Haetaan voittaja
-                const winner = game.scorecards.reduce((p, c) => {
-                    const totalScore = c.scores.reduce((total, score) => total + score, 0);
-                    if (totalScore < p.score || p.score === 0) {
-                        return { name: c.user.name, score: totalScore };
-                    }
-                    return p;
-                }, { name: 'Nobody', score: 0 });
-                // Radan ihannetulos
-                const coursePar = game.pars.reduce((total, score) => total + score, 0);
-                // Noitifikaatiota sulkemisesta
                 pushNotificationsService.sendNotification(playerIds, {
-                    title: 'Game over',
-                    body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
+                    title: 'Game reopened!',
+                    body: `${context.user.name} is trying to cheat! He just reopened a game :P (${game.course} / ${game.layout})!`,
                 });
                 return game;
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.log(e);
+            }
+            else {
+                try {
+                    const game = await gameService.closeGame(args.gameId);
+                    // Mäpätään pelin pelaajien id, filteröidään oma pois.
+                    const playerIds = game.scorecards.map(sc => sc.user.id.toString()).filter(id => id !== context.user.id);
+
+                    // Haetaan voittaja
+                    const winner = game.scorecards.reduce((p, c) => {
+                        const totalScore = c.scores.reduce((total, score) => total + score, 0);
+                        if (totalScore < p.score || p.score === 0) {
+                            return { name: c.user.name, score: totalScore };
+                        }
+                        return p;
+                    }, { name: 'Nobody', score: 0 });
+                    // Radan ihannetulos
+                    const coursePar = game.pars.reduce((total, score) => total + score, 0);
+                    // Noitifikaatiota sulkemisesta
+                    pushNotificationsService.sendNotification(playerIds, {
+                        title: 'Game over',
+                        body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
+                    });
+                    return game;
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+
+                }
             }
         },
         abandonGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {

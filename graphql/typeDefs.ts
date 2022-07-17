@@ -103,6 +103,7 @@ export const typeDefs = gql`
         name: String!
         pars: [Int]!
         holes: Int!
+        id: ID
     }
     input GameSettings {
         isOpen: Boolean,
@@ -165,7 +166,7 @@ export const typeDefs = gql`
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
         abandonGame(gameId: ID!): Boolean
-        closeGame(gameId: ID!): Game
+        closeGame(gameId: ID!, reopen: Boolean): Game
         setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
         changeGameSettings(gameId: ID!, settings: GameSettings!): Game
         createUser(name: String!, password: String!, email: String, pushToken: String): String

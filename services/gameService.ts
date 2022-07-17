@@ -89,11 +89,11 @@ export const setScore = async (args: SetScoreArgs) => {
     await game.save();
     return game;
 };
-export const closeGame = async (gameId: ID) => {
-    const game = await GameModel.findByIdAndUpdate(gameId, {
-        isOpen: false,
-        endTime: new Date(),
-    }, { returnDocument: 'after' }) as Document & Game;
+export const closeGame = async (gameId: ID, isOpen = false) => {
+    const game = await GameModel.findById(gameId) as Document & Game;
+    game.isOpen = isOpen;
+    if (!isOpen) game.endTime = new Date();
+    await game.save();
     await game.populate('scorecards.user');
     return game;
 };
