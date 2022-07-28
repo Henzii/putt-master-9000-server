@@ -5,6 +5,7 @@ export type Course = {
     location: {
         coordinates: [number, number]
     }
+    creator?: ID,
 }
 
 export type Layout = {
@@ -68,4 +69,15 @@ export type RawStatsDataHC = {
     games: number,
     scores: number[],
     pars: number[],
+}
+
+declare interface GetArgs {
+    limit: number,
+    offset: number
+}
+declare interface getCoursesArgs extends GetArgs {
+    search?: string
+}
+declare interface GetGamesArgs extends GetArgs {
+    onlyOpenGames?: boolean
 }

@@ -1,34 +1,15 @@
 import { gql } from "apollo-server";
 
 export const typeDefs = gql`
-    type Event {
-        id: ID!
-        name: String!
-        date: String!
-        course: String
-        layout: String
-        commnet: String
-        invites: EventInvites
-        registrationOpen: Boolean
-        messages: [EventMessage]
-        creator: ID!
-    }
-    type EventMessage {
-        message: String!
-        user: User!
-    }
-    type EventInvites {
-        invited: [User]!
-        rejected: [User]!
-        accepted: [User]!
-    }
-    input CreateEventArgs {
-        name: String!
-        date: String!
-        comment: String
-    }
+
     type GetCoursesResponse {
         courses: [Course]!
+        hasMore: Boolean!
+        nextOffset: Int
+        count: Int!
+    }
+    type GetGamesResponse {
+        games: [Game]!
         hasMore: Boolean!
         nextOffset: Int
         count: Int!
@@ -50,6 +31,7 @@ export const typeDefs = gql`
         location: Location
         layouts: [Layout]!
         distance: Distance
+        canEdit: Boolean
     }
     type Layout {
         id: ID!
@@ -57,6 +39,7 @@ export const typeDefs = gql`
         pars: [Int]
         holes: Int
         par: Int
+        canEdit: Boolean!
     }
     type User {
         id: ID!
@@ -78,6 +61,7 @@ export const typeDefs = gql`
         startTime: String!
         endTime: String
         layout: String!
+        layout_id: ID!
         holes: Int!
         pars: [Int!]
         par: Int
@@ -137,7 +121,7 @@ export const typeDefs = gql`
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
-        getGames(onlyOpenGames: Boolean): [Game]
+        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int): GetGamesResponse!
         ping: String
         """
         Kirjautunut käyttäjä
@@ -154,8 +138,6 @@ export const typeDefs = gql`
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
-
-        getEvents: [Event]
     }
 
     type Mutation {
@@ -178,6 +160,5 @@ export const typeDefs = gql`
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
 
-        createEvent(event: CreateEventArgs!): Event
     }
 `;

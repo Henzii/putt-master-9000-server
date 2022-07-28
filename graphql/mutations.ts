@@ -7,7 +7,6 @@ import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import { ApolloError, UserInputError } from "apollo-server";
 import jwt from "jsonwebtoken";
-import { createEvent, CreateEventArgs } from "../services/eventsService";
 
 export const mutations = {
     Mutation: {
@@ -169,20 +168,6 @@ export const mutations = {
 
             return true;
         },
-        //////////////////////////
-        //                      //
-        //    Event mutations   //
-        //                      //
-        //////////////////////////
-        createEvent: async (root: unknown, { event }: { event: CreateEventArgs }, context: ContextWithUser) => {
-            return null;
-            try {
-                const newEvent = await createEvent(event, context.user.id);
-                return newEvent;
-            } catch (e) {
-                console.log(e);
-            }
-        }
     }
 };
 

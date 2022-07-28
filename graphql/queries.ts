@@ -6,6 +6,17 @@ import userService from "../services/userService";
 import { getPlayersScores } from "../services/statsService";
 import { ApolloError } from "apollo-server";
 
+interface GetArgs {
+    limit: number,
+    offset: number
+}
+interface getCoursesArgs extends GetArgs {
+    search?: string
+}
+interface GetGamesArgs extends GetArgs {
+    onlyOpenGames?: boolean
+}
+
 export const queries = {
     Query: {
         getCourses: async (_root: unknown, args: getCoursesArgs) => {
@@ -26,8 +37,8 @@ export const queries = {
             if (!context.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
-        getGames: async (root: unknown, args: { onlyOpenGames?: boolean }, context: ContextWithUser) => {
-            return await getGames(context.user.id, args.onlyOpenGames);
+        getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {
+            return await getGames({ userId: context.user.id, ...args});
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
             if (!args.gameId) throw new Error('Not enough parameters');
@@ -66,14 +77,5 @@ export const queries = {
             }
             return res;
         },
-        getEvents: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            return null;
-        },
     }
 };
-
-type getCoursesArgs = {
-    limit: number,
-    offset: number,
-    search?: string
-}
