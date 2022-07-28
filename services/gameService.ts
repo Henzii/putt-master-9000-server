@@ -7,18 +7,36 @@ import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
 import { UserInputError } from "apollo-server";
 
+type GetGamesArgs = {
+    userId: ID,
+    onlyOpenGames?: boolean,
+    limit: number,
+    offset: number
+}
+
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
 };
-export const getGames = async (userId: ID, onlyOpenGames = false) => {
-    const games = await GameModel.find({
+export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0}: GetGamesArgs) => {
+    const searchString = {
         'scorecards.user': userId,
         $or: [
             { isOpen: true },
             { isOpen: onlyOpenGames },
         ]
-    }).sort({ startTime: -1 }) as (Document & Game)[];
-    return games;
+    };
+    const count = await GameModel.count(searchString);
+    const games = await GameModel.find(searchString)
+        .sort({ startTime: -1 })
+        .skip(offset)
+        .limit(limit) as (Document & Game)[];
+    const hasMore = count > offset+limit;
+    return {
+        games,
+        count,
+        hasMore,
+        nextOffset: hasMore ? offset+limit : null
+    };
 };
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     // Haetaan tasoitukset

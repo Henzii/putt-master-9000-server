@@ -23,8 +23,14 @@ const resolvers = {
         par: (root: Layout) => {
             return root.pars.reduce((p, c) => (p + c), 0);
         },
+        canEdit: (root: Layout, args: unknown, context: ContextWithUser) => {
+            return context.user.id === root.creator?.toString();
+        }
     },
     Course: {
+        canEdit: (root: Course, args: unknown, context: ContextWithUser) => {
+            return context.user.id === root.creator?.toString();
+        },
         distance: (root: Course, args: unknown, context: unknown, info: InfoWithCoordinates) => {
             try {
                 const [lon1, lat1] = root.location.coordinates;
@@ -71,9 +77,11 @@ const resolvers = {
         }
     },
     Game: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scorecards: async (root: Game & Document, args: unknown, context: unknown, info: any) => {
             // Jotta ei turhaan rasiteta tietokantaa, populoidaan scorecards:ssa olevat käyttäjätiedot
             // vain jos user-field on queryssä mukana
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (info.fieldNodes[0].selectionSet.selections.find((s: any) => s.name.value === 'user')) {
                 await root.populate('scorecards.user');
             }
