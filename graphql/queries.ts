@@ -8,18 +8,19 @@ import { ApolloError } from "apollo-server";
 
 interface GetArgs {
     limit: number,
-    offset: number
-}
-interface getCoursesArgs extends GetArgs {
+    offset: number,
     search?: string
 }
 interface GetGamesArgs extends GetArgs {
     onlyOpenGames?: boolean
 }
-
 export const queries = {
     Query: {
-        getCourses: async (_root: unknown, args: getCoursesArgs) => {
+        handShake: async () => {
+            // TODO
+            return null;
+        },
+        getCourses: async (_root: unknown, args: GetArgs) => {
             try {
                 const { data: courses, count, hasMore } = await getCourses(args);
                 return {

@@ -12,6 +12,7 @@ export default shield({
         getMe: allow,
         getLiveGame: allow,
         searchUser: allow,
+        handShake: allow,
 
     },
     Mutation: {
@@ -27,7 +28,7 @@ export default shield({
             }
             // eslint-disable-next-line no-console
             console.log(thrownThing);
-            return new ApolloError('Server error', 'ERR_INTERNAL_SERVER')
+            return new ApolloError('Server error', 'ERR_INTERNAL_SERVER');
         }
     }
 );
