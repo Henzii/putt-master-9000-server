@@ -34,7 +34,7 @@ export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0,
 
     if (search) searchString['layout'] = { $regex: search, $options: 'i' };
 
-    const count = await GameModel.count(searchString);
+    const count = 0; //await GameModel.count(searchString);
     const games = await GameModel.find(searchString)
         .sort({ startTime: -1 })
         .skip(offset)
