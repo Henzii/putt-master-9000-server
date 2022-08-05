@@ -24,12 +24,14 @@ export const getGame = async (id: ID) => {
 };
 export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0, search}: GetGamesArgs) => {
     const searchString:GamesSearchString = {
+
         'scorecards.user': userId,
         $or: [
             { isOpen: true },
             { isOpen: onlyOpenGames },
         ]
     };
+
     if (search) searchString['layout'] = { $regex: search, $options: 'i' };
 
     const count = await GameModel.count(searchString);
