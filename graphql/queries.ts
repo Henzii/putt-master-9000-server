@@ -8,18 +8,19 @@ import { ApolloError } from "apollo-server";
 
 interface GetArgs {
     limit: number,
-    offset: number
-}
-interface getCoursesArgs extends GetArgs {
+    offset: number,
     search?: string
 }
 interface GetGamesArgs extends GetArgs {
     onlyOpenGames?: boolean
 }
-
 export const queries = {
     Query: {
-        getCourses: async (_root: unknown, args: getCoursesArgs) => {
+        handShake: async () => {
+            // TODO
+            return null;
+        },
+        getCourses: async (_root: unknown, args: GetArgs) => {
             try {
                 const { data: courses, count, hasMore } = await getCourses(args);
                 return {
@@ -37,8 +38,8 @@ export const queries = {
             if (!context.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
-        getGames: async (root: unknown, args: { onlyOpenGames?: boolean }, context: ContextWithUser) => {
-            return await getGames(context.user.id, args.onlyOpenGames);
+        getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {
+            return await getGames({ userId: context.user.id, ...args});
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
             if (!args.gameId) throw new Error('Not enough parameters');

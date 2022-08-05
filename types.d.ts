@@ -5,7 +5,7 @@ export type Course = {
     location: {
         coordinates: [number, number]
     }
-    creator?: ID,
+    creator?: ID
 }
 
 export type Layout = {
@@ -14,6 +14,7 @@ export type Layout = {
     holes: number,
     pars: number[],
     creator?: ID,
+    courseCreator?: ID
 }
 
 export type NewLayoutArgs = Layout & { creator: ID }

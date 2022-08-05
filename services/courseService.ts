@@ -43,10 +43,10 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
     if (layout.id) {
         course.layouts = course.layouts.map(lo => {
             if (lo.id === layout.id) {
-                if (lo.creator?.toString() !== layout.creator) {
+                if (lo.creator?.toString() !== layout.creator && course.creator?.toString() !== layout.creator) {
                     throw new UserInputError('Error, layout not created by you!');
                 }
-                return layout;
+                else return layout;
             }
             return lo;
 

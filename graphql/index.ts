@@ -24,10 +24,16 @@ const resolvers = {
             return root.pars.reduce((p, c) => (p + c), 0);
         },
         canEdit: (root: Layout, args: unknown, context: ContextWithUser) => {
-            return context.user.id === root.creator?.toString();
+            return context.user.id === root.creator?.toString() || context.user.id == root.courseCreator?.toString();
         }
     },
     Course: {
+        layouts: (root: Course) => {
+            return root.layouts.map(layout => {
+                layout.courseCreator = root.creator;
+                return layout;
+            });
+        },
         canEdit: (root: Course, args: unknown, context: ContextWithUser) => {
             return context.user.id === root.creator?.toString();
         },

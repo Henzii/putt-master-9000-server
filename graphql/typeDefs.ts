@@ -8,6 +8,12 @@ export const typeDefs = gql`
         nextOffset: Int
         count: Int!
     }
+    type GetGamesResponse {
+        games: [Game]!
+        hasMore: Boolean!
+        nextOffset: Int
+        count: Int!
+    }
     type Location {
         coordinates: [Float!]!
     }
@@ -25,7 +31,7 @@ export const typeDefs = gql`
         location: Location
         layouts: [Layout]!
         distance: Distance
-        canEdit: Boolean
+        canEdit: Boolean!
     }
     type Layout {
         id: ID!
@@ -115,7 +121,7 @@ export const typeDefs = gql`
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
-        getGames(onlyOpenGames: Boolean): [Game]
+        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String): GetGamesResponse!
         ping: String
         """
         Kirjautunut käyttäjä
@@ -132,6 +138,7 @@ export const typeDefs = gql`
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
+        handShake(version: String!): String
     }
 
     type Mutation {
