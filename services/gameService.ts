@@ -17,7 +17,7 @@ type GetGamesArgs = {
 type GamesSearchString = {
     'scorecards.user': ID
     $or: { isOpen: boolean }[]
-    layout?: { $regex: string, $options: string }
+    course?: { $regex: string, $options: string }
 }
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
@@ -29,10 +29,10 @@ export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0,
         $or: [
             { isOpen: true },
             { isOpen: onlyOpenGames },
-        ]
+        ],
     };
 
-    if (search) searchString['layout'] = { $regex: search, $options: 'i' };
+    if (search) searchString['course'] = { $regex: search, $options: 'i' };
 
     const count = await GameModel.count(searchString);
     const games = await GameModel.find(searchString)
