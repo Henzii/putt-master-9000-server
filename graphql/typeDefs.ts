@@ -103,6 +103,23 @@ export const typeDefs = gql`
         scores: [Int]
         hc: Float
     }
+    type HoleStats {
+        index: Int!
+        total: Int!
+        count: Int!
+        best: Int!
+        eagle: Int!
+        birdie: Int!
+        par: Int!
+        bogey: Int!
+        doubleBogey: Int!
+        average: Float!
+    }
+    type LayoutStats {
+        playerId: ID
+        games: Int
+        holes: [HoleStats]
+    }
     type SearchUserResponse {
         users: [SafeUser]!
         hasMore: Boolean!
@@ -128,6 +145,10 @@ export const typeDefs = gql`
         """
         getMe: User
         getUsers: [User]!
+        """
+        Palauttaa väyläkohtaista tilastoa
+        """
+        getLayoutStats(layoutId: ID!, playersIds: [ID!]): [LayoutStats!]!
         """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
