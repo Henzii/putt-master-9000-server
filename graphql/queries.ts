@@ -3,7 +3,7 @@ import { getGames, getGame } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
-import { getPlayersScores } from "../services/statsService";
+import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 import { ApolloError } from "apollo-server";
 
 interface GetArgs {
@@ -57,6 +57,10 @@ export const queries = {
         ping: (): string => 'pong!',
         getUsers: async () => {
             return await userService.getUsers();
+        },
+        getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
+            const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
+            return res;
         },
         getHc: async (_root: unknown, args: { course: string, layout: string }, context: ContextWithUser) => {
             const res = await getPlayersScores(args.course, args.layout, [context.user.id]);
