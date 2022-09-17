@@ -50,6 +50,7 @@ export const typeDefs = gql`
         email: String
         friends: [User!]
         blockFriendRequests: Boolean
+        blockStatsSharing: Boolean
     }
     type SafeUser {
         id: ID!
@@ -178,7 +179,7 @@ export const typeDefs = gql`
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean, password: String): User
+        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean): User
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
 

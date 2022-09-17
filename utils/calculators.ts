@@ -22,7 +22,12 @@ export const total = (scores: number[]): number => {
         return p;
     }, 0);
 };
-
+/**
+ * # Kuraa, voisi tehdä suoraan tietokantakyselyllä?
+ * @param scores
+ * @param parsStr
+ * @returns sumArray
+ */
 export const holestats = (scores: string[][], parsStr: string[]) => {
     const pars = parsStr.map(par => Number.parseInt(par));
     let sumArray:Stat[] = [];
