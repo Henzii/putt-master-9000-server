@@ -27,6 +27,10 @@ const skeema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    blockStatsSharing: {
+        type: Boolean,
+        default: false,
+    },
     restoreCode: String,
 
 }, { timestamps: true });
