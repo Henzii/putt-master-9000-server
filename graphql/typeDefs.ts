@@ -14,6 +14,9 @@ export const typeDefs = gql`
         nextOffset: Int
         count: Int!
     }
+    type HandshakeResponse {
+        latestVersion: Int!
+    }
     type Location {
         coordinates: [Float!]!
     }
@@ -160,7 +163,7 @@ export const typeDefs = gql`
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
-        handShake(version: String!): String
+        handShake: HandshakeResponse!
     }
 
     type Mutation {
