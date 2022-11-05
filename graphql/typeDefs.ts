@@ -14,6 +14,9 @@ export const typeDefs = gql`
         nextOffset: Int
         count: Int!
     }
+    type HandshakeResponse {
+        latestVersion: Int!
+    }
     type Location {
         coordinates: [Float!]!
     }
@@ -153,14 +156,14 @@ export const typeDefs = gql`
         """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
-        getHc (course: String!, layout: String!): [GetHcResponse]!
+        getHc (course: String!, layout: String!, userIds: [String]): [GetHcResponse]!
         """
         Hakee search hakusanalla käyttäjiä ja palauttaa listan (max 10) SafeUsereita (vain id ja nimi) sekä
         booleanin siitä onko hakutuloksia mahdollisesti lisää -> tuleeko hakua tarkentaa.
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
-        handShake(version: String!): String
+        handShake: HandshakeResponse!
     }
 
     type Mutation {

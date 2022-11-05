@@ -6,6 +6,8 @@ import userService from "../services/userService";
 import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 import { ApolloError } from "apollo-server";
 
+import appInfo from "../utils/appInfo";
+
 interface GetArgs {
     limit: number,
     offset: number,
@@ -17,8 +19,9 @@ interface GetGamesArgs extends GetArgs {
 export const queries = {
     Query: {
         handShake: async () => {
-            // TODO
-            return null;
+            return {
+                ...appInfo
+            };
         },
         getCourses: async (_root: unknown, args: GetArgs) => {
             try {
@@ -62,8 +65,8 @@ export const queries = {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
             return res;
         },
-        getHc: async (_root: unknown, args: { course: string, layout: string }, context: ContextWithUser) => {
-            const res = await getPlayersScores(args.course, args.layout, [context.user.id]);
+        getHc: async (_root: unknown, args: { course: string, layout: string, userIds: ID[] }, context: ContextWithUser) => {
+            const res = await getPlayersScores(args.course, args.layout, args.userIds || [context.user.id]);
             return res.map(user => {
                 return {
                     id: user._id,

@@ -82,3 +82,5 @@ declare interface getCoursesArgs extends GetArgs {
 declare interface GetGamesArgs extends GetArgs {
     onlyOpenGames?: boolean
 }
+
+declare module '*.json';
