@@ -7,7 +7,6 @@
     "start": "node ./build/index.js",
     "tsc": "tsc",
     "build": "tsc",
-    "install": "npm install&&tsc",
     "dev": "set NODE_ENV=development&&ts-node-dev index.ts",
     "lint": "eslint .",
     "pushTest": "node ./services/pushNotificationsService.js"
