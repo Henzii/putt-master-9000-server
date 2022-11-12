@@ -11,7 +11,8 @@ import appInfo from "../utils/appInfo";
 interface GetArgs {
     limit: number,
     offset: number,
-    search?: string
+    search?: string,
+    maxDistance?: number,
 }
 interface GetGamesArgs extends GetArgs {
     onlyOpenGames?: boolean

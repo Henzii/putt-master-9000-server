@@ -131,9 +131,9 @@ export const typeDefs = gql`
     type Query {
         """
         Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
-        Tuloksia voi rajata antamalla search argumentin
+        Tuloksia voi rajata antamalla search tai maxDistance argumentin.
         """
-        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float]): GetCoursesResponse
+        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
         """
         Hakee yhden pelin.
         """

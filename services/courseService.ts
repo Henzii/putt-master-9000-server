@@ -7,10 +7,11 @@ type getCoursesArgs = {
     limit: number,
     offset: number,
     search?: string,
-    coordinates?: [number, number]
+    coordinates?: [number, number],
+    maxDistance?: number
 }
 
-export async function getCourses({ limit, offset, search, coordinates = [0, 0] }: getCoursesArgs) {
+export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance }: getCoursesArgs) {
     const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
     const kurssit = await CourseModel.find({
@@ -18,6 +19,7 @@ export async function getCourses({ limit, offset, search, coordinates = [0, 0] }
         location: {
             $near: {
                 $geometry: { type: 'Point', coordinates: coordinates },
+                ...(maxDistance ? { $maxDistance: maxDistance } : null)
             }
         }
     }
