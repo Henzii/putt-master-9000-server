@@ -96,7 +96,7 @@ export const queries = {
             const games = (await getMyAndFriendsGames(args.minPlayerCount, me?.friends as ID[], args.filterYear))
                 .map(game => {
                     game.scorecards = game.scorecards.filter(sc => {
-                        return friendList.includes(sc.user.toString());
+                        return sc.user.toString() === context.user.id || friendList.includes(sc.user.toString());
                     });
                     return game;
                 })
