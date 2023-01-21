@@ -19,6 +19,16 @@ type GamesSearchString = {
     $or: { isOpen: boolean }[]
     course?: { $regex: string, $options: string }
 }
+export const getMyAndFriendsGames = async (minCount: number, friendList: ID[], filterYear: number) => {
+    return await GameModel.find({
+        [`scorecards.${minCount-1}`]: { $exists: true },
+        startTime: {
+            $gt: `${filterYear}-01-01`,
+            $lt: `${filterYear}-12-31`
+        },
+        'scorecards.user': { $in: friendList }
+    });
+};
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
 };

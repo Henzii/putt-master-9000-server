@@ -164,6 +164,10 @@ export const typeDefs = gql`
         """
         searchUser(search: String!): SearchUserResponse!
         handShake: HandshakeResponse!
+        """
+        Hakee omat ja kavereiden pelit joissa annettu pelaajamäärä ylittyy, rajataan vuoden mukaan
+        """
+        getAllGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
     }
 
     type Mutation {

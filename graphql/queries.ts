@@ -1,5 +1,5 @@
 import { getCourses } from "../services/courseService";
-import { getGames, getGame } from "../services/gameService";
+import { getGames, getGame, getMyAndFriendsGames } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
@@ -15,7 +15,8 @@ interface GetArgs {
     maxDistance?: number,
 }
 interface GetGamesArgs extends GetArgs {
-    onlyOpenGames?: boolean
+    onlyOpenGames?: boolean,
+    minPlayerCount?: number
 }
 export const queries = {
     Query: {
@@ -86,5 +87,10 @@ export const queries = {
             }
             return res;
         },
+        getAllGames: async (_root: unknown, args: { minPlayerCount: number, filterYear: number}, context: ContextWithUser) => {
+            const me = await userService.getUser(undefined, context.user.id);
+            const games = await getMyAndFriendsGames(args.minPlayerCount, me?.friends as ID[], args.filterYear);
+            return games || [];
+        }
     }
 };
