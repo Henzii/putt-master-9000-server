@@ -27,7 +27,7 @@ export const getMyAndFriendsGames = async (minCount: number, friendList: ID[], f
             $lt: `${filterYear}-12-31`
         },
         'scorecards.user': { $in: friendList }
-    });
+    }) as (Document & Game)[];
 };
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
