@@ -34,7 +34,6 @@ export type Game = {
 }
 
 export type Scorecard = {
-    id: string | number,
     user: User,
     scores: number[],
     beers: number,

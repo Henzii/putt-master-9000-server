@@ -7,6 +7,7 @@ jest.mock('../userService');
 jest.mock('../pushNotificationsService');
 
 const clonedUser = () => ({...JSON.parse(JSON.stringify(user)), save: () => null});
+const clonedGame = () => JSON.parse(JSON.stringify(game));
 
 jest.mock('../statsService', () => ({
     getStatsForLayoyt: jest.fn()
@@ -20,12 +21,19 @@ describe('Achievements are added correctly', () => {
     it('add win all holes', async () => {
         const clone = clonedUser();
         (getUser as jest.Mock).mockImplementation(() => clone);
-        await addAchievement(checkWinAllHoles(game), 'winAllHoles');
+        await addAchievement(checkWinAllHoles(clonedGame()), 'winAllHoles');
         expect(clone.achievements).toEqual(
             expect.arrayContaining([expect.objectContaining({ layout_id: game.layout_id, id: 'winAllHoles'})])
         );
     });
-
+    it ('no achievement is added', async () => {
+        const clone = clonedUser();
+        const game2 = clonedGame();
+        game2.scorecards[0].scores[7] = 4;
+        (getUser as jest.Mock).mockImplementation(() => clone);
+        await addAchievement(checkWinAllHoles(game2), 'winAllHoles');
+        expect(clone.achievements).toHaveLength(0);
+    })
     it('100 malmis is not added if count < 100', async () => {
         const clone = clonedUser();
         //clone2.achievements = []

@@ -35,9 +35,8 @@ export const addAchievement = async ({userId, layoutId}: UserAndLayout, id: Achi
 
 export const checkAchievements = async (game: Game) => {
     if (game.scorecards.length < MIN_PLAYER_COUNT) return;
-    /* addAchievement(checkWinAllHoles(game), 'winAllHoles');
-    Ei toimi
-    addAchievement(checkWinAllHoles(game, false), 'loseAllHoles'); */
+    addAchievement(checkWinAllHoles(game), 'winAllHoles');
+    addAchievement(checkWinAllHoles(game, false), 'loseAllHoles');
     (await checkSadasMalmis(game)).forEach(player => {
         addAchievement(player, '100Malmis');
     });
@@ -50,17 +49,6 @@ export const checkAchievements = async (game: Game) => {
 
 };
 
-export const checkWinAllHoles = (game: Game, findWinner=true): UserAndLayout => {
-    const winner: Scorecard | undefined = getBestForHole(game.scorecards, 0, findWinner);
-    const holes = game.pars.length;
-    for (let i = 1; i < holes; i++) {
-        const holeWinner = getBestForHole(game.scorecards, i, findWinner);
-        if (!winner || holeWinner?.id !== winner.id) {
-            return { userId: undefined };
-        }
-    }
-    return { userId: winner?.user.id, layoutId: game.layout_id };
-};
 export const checkHoleInOnes = (game: Game): UserAndLayout[] => {
     return game.scorecards.filter(sc => {
         return !!sc.scores.find(score => score === 1);
@@ -90,9 +78,23 @@ export const checkZeroPars = (game: Game): UserAndLayout[] => {
     return winners.map(sc => ({userId: sc.user.id, layoutId: game.layout_id}));
 };
 
+export const checkWinAllHoles = (game: Game, findWinner=true): UserAndLayout => {
+    const winner: Scorecard | undefined = getBestForHole(game.scorecards, 0, findWinner);
+    if (!winner) return {};
+    const holes = game.pars.length;
+    for (let i = 1; i < holes; i++) {
+        const holeWinner = getBestForHole(game.scorecards, i, findWinner);
+        if (holeWinner?.user?.id !== winner?.user.id) {
+            return { userId: undefined };
+        }
+    }
+    return { userId: winner?.user.id, layoutId: game.layout_id };
+};
+
 export const getBestForHole = (cards: Scorecard[], hole: number, findWinner: boolean): Scorecard | undefined => {
     if (cards.length < 2) return;
-    const sorted = [...cards].sort((a, b) =>(a.scores[hole] - b.scores[hole]));
+    const clonedCards = JSON.parse(JSON.stringify(cards)) as Scorecard[];
+    const sorted = clonedCards.sort((a, b) =>(a.scores[hole] - b.scores[hole]));
     if (!findWinner) {
         sorted.reverse();
     }
