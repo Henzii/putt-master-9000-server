@@ -19,10 +19,6 @@ const skeema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     }],
-    Games: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Game'
-    }],
     blockFriendRequests: {
         type: Boolean,
         default: false,
@@ -32,6 +28,11 @@ const skeema = new mongoose.Schema({
         default: false,
     },
     restoreCode: String,
+    achievements: [{
+        _id: false,
+        id: String,
+        layout_id: String,
+    }],
 
 }, { timestamps: true });
 

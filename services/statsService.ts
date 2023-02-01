@@ -98,3 +98,7 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
         }
     ]);
 };
+
+export default {
+    getStatsForLayoyt,
+};
