@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { ApolloError } from 'apollo-server';
 import { Expo, ExpoPushMessage, ExpoPushSuccessTicket, ExpoPushTicket, ExpoPushToken } from 'expo-server-sdk';
-import { ID, User } from '../types';
+import { ID } from '../types';
 import { validUser } from '../utils/validators';
 import userService from './userService';
 
@@ -22,6 +22,11 @@ const handleBadToken = (token: ExpoPushToken) => {
     userService.removePushToken(token);
 };
 const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushMessage) => {
+    if (process.env.NODE_ENV === 'development') {
+        console.log('Push notifikaatiota ei lähetetty koska DEV mode');
+        console.log(`${message.title} / ${message.body}`);
+        return;
+    }
     // Filteröidään vialliset pushTokenit pois
     const validPushTokens = pushTokens.filter(token => Expo.isExpoPushToken(token));
 
@@ -33,19 +38,23 @@ const sendPushNotifications = async (pushTokens: ExpoPushToken[], message: PushM
         ...message,
         priority: 'high',
     }];
-    const tickets = await expo.sendPushNotificationsAsync(messagesWithTokens);
-    // Lisätään kuitteihin pushtoken, jotta se voidaan poistaa virheiden varalta
-    const ticketsAndTokens = tickets.map((r, i) => {
-        return {
-            ...r,
-            token: validPushTokens[i],
-        };
-    });
+    try {
+        const tickets = await expo.sendPushNotificationsAsync(messagesWithTokens);
+        // Lisätään kuitteihin pushtoken, jotta se voidaan poistaa virheiden varalta
+        const ticketsAndTokens = tickets.map((r, i) => {
+            return {
+                ...r,
+                token: validPushTokens[i],
+            };
+        });
 
-    // Tarkastetaan kuitit 30sek päästä virheiden varalta
-    setTimeout(() => {
-        checkReceipts(ticketsAndTokens);
-    }, 30000);
+        // Tarkastetaan kuitit 30sek päästä virheiden varalta
+        setTimeout(() => {
+            checkReceipts(ticketsAndTokens);
+        }, 30000);
+    } catch {
+        console.log('Push notifikaatiota ei voitu lähettää');
+    }
 };
 const checkReceipts = async (tickets: ((ExpoPushTicket) & { token?: string })[]) => {
     for (const ticket of tickets) {

@@ -29,8 +29,9 @@ const skeema = new mongoose.Schema({
     },
     restoreCode: String,
     achievements: [{
-        achievementId: String,
-        layoutId: String,
+        _id: false,
+        id: String,
+        layout_id: String,
     }],
 
 }, { timestamps: true });
