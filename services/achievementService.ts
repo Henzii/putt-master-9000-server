@@ -35,8 +35,8 @@ export const addAchievement = async ({userId, layoutId}: UserAndLayout, id: Achi
 
 export const checkAchievements = async (game: Game) => {
     if (game.scorecards.length < MIN_PLAYER_COUNT) return;
-    addAchievement(checkWinAllHoles(game), 'winAllHoles');
-    /* Ei toimi
+    /* addAchievement(checkWinAllHoles(game), 'winAllHoles');
+    Ei toimi
     addAchievement(checkWinAllHoles(game, false), 'loseAllHoles'); */
     (await checkSadasMalmis(game)).forEach(player => {
         addAchievement(player, '100Malmis');
