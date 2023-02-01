@@ -4,6 +4,7 @@ import game from "../mocks/game";
 import stats from "../mocks/stats";
 
 jest.mock('../userService');
+jest.mock('../pushNotificationsService');
 
 const clonedUser = () => ({...JSON.parse(JSON.stringify(user)), save: () => null});
 
@@ -19,9 +20,9 @@ describe('Achievements are added correctly', () => {
     it('add win all holes', async () => {
         const clone = clonedUser();
         (getUser as jest.Mock).mockImplementation(() => clone);
-        await addAchievement(checkWinAllHoles(game), 'winAll');
+        await addAchievement(checkWinAllHoles(game), 'winAllHoles');
         expect(clone.achievements).toEqual(
-            expect.arrayContaining([expect.objectContaining({ layout_id: game.layout_id, id: 'winAll'})])
+            expect.arrayContaining([expect.objectContaining({ layout_id: game.layout_id, id: 'winAllHoles'})])
         );
     });
 
@@ -45,11 +46,11 @@ describe('Achievements are added correctly', () => {
         (getUser as jest.Mock).mockImplementation(() => clone);
         (getStatsForLayoyt as jest.Mock).mockReturnValue(stats2);
         const players = await checkSadasMalmis(game);
-        await Promise.all(players.map(player => addAchievement(player, 'SATAMalmis')));
+        await Promise.all(players.map(player => addAchievement(player, '100Malmis')));
 
         expect(clone.achievements).toHaveLength(1);
         expect(clone.achievements).toEqual(
-            expect.arrayContaining([expect.objectContaining({ id: 'SATAMalmis'})])
+            expect.arrayContaining([expect.objectContaining({ id: '100Malmis'})])
         );
     });
 
@@ -57,9 +58,9 @@ describe('Achievements are added correctly', () => {
         const clone = clonedUser();
         (getUser as jest.Mock).mockImplementation(() => clone);
         expect(clone.achievements).toHaveLength(0);
-        await addAchievement(checkWinAllHoles(game), 'winAll');
-        await addAchievement(checkWinAllHoles(game), 'winAll');
-        await addAchievement(checkWinAllHoles(game), 'winAll');
+        await addAchievement(checkWinAllHoles(game), 'winAllHoles');
+        await addAchievement(checkWinAllHoles(game), 'winAllHoles');
+        await addAchievement(checkWinAllHoles(game), 'winAllHoles');
         expect(clone.achievements).toHaveLength(1);
     });
 
@@ -67,9 +68,9 @@ describe('Achievements are added correctly', () => {
         const clone = clonedUser();
         (getUser as jest.Mock).mockImplementation(() => clone);
         expect(clone.achievements).toHaveLength(0);
-        await addAchievement(checkWinAllHoles(game), 'loseAll', true);
-        await addAchievement(checkWinAllHoles(game), 'loseAll', true);
-        await addAchievement(checkWinAllHoles(game), 'loseAll', true);
+        await addAchievement(checkWinAllHoles(game), 'loseAllHoles', true);
+        await addAchievement(checkWinAllHoles(game), 'loseAllHoles', true);
+        await addAchievement(checkWinAllHoles(game), 'loseAllHoles', true);
         expect(clone.achievements).toHaveLength(3);
     });
 });

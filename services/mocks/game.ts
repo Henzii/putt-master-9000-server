@@ -8,7 +8,7 @@ const game: MockedGame =
     {
         id: 'mockedGame',
         pars: [3,3,3,3,3,3,3,3,3],
-        layout_id: 'malmisId',
+        layout_id: '61ffbbc9dc4b6f65e2514ee9',
         scorecards: [
             {
                 id: 'card1',

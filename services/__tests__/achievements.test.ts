@@ -89,15 +89,25 @@ describe('Achievements', () => {
             game.scorecards[1].scores = [4,5,5,4,4,7,7,9,10];
             const res = checkZeroPars(game);
             expect(res).toHaveLength(1);
-            expect(res).toContainEqual('player2');
+            expect(res[0]).toEqual(expect.objectContaining({
+                layoutId: game.layout_id,
+                userId: game.scorecards[1].user.id
+            }));
         });
         it('both players with all above pars', () => {
             game.scorecards[0].scores = [4,5,5,4,4,7,7,9,10];
             game.scorecards[1].scores = [4,4,4,5,6,7,11,12,13];
             const res = checkZeroPars(game);
             expect(res).toHaveLength(2);
-            expect(res).toContainEqual('player1');
-            expect(res).toContainEqual('player2');
+            expect(res).toEqual(expect.arrayContaining([expect.objectContaining({
+                layoutId: game.layout_id,
+                userId: game.scorecards[0].user.id
+            })]));
+            expect(res).toEqual(expect.arrayContaining([expect.objectContaining({
+                layoutId: game.layout_id,
+                userId: game.scorecards[1].user.id
+            })]));
+
         });
     });
 });

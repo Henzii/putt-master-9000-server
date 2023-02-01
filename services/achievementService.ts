@@ -73,7 +73,7 @@ export const checkSadasMalmis = async (game: Game): Promise<UserAndLayout[]> => 
     }
     const stats = await statsServices.getStatsForLayoyt(MALMIS_ID, game.scorecards.map(sc => sc.user.id));
     return stats.filter(player => {
-        return player.games >= 5;
+        return player.games >= 100;
     }).map(player => ({userId: player.playerId, layoutId: game.layout_id})) ?? {};
 };
 
