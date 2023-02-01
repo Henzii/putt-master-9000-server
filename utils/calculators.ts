@@ -17,6 +17,7 @@ export const plusminus = (scores: number[], pars: number[]): number => {
  * @returns
  */
 export const total = (scores: number[]): number => {
+    if (!scores) return 0;
     return scores.reduce((p, c) => {
         if (!isNaN(c)) return p + c;
         return p;

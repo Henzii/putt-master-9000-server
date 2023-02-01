@@ -25,6 +25,7 @@ export type Game = {
     pars: number[],
     par: number,
     layout: string,
+    layout_id: string,
     course: string,
     scorecards: Scorecard[],
     isOpen: boolean,
@@ -40,7 +41,7 @@ export type Scorecard = {
     plusminus: number,
     hc: number,
     median10: number,
-    pars: number[] // plusminuksen laskemiseen
+    pars: number[] // plusminuksen laskemiseen,
 }
 
 export type User = {
@@ -52,7 +53,13 @@ export type User = {
     blockFriendRequests: boolean,
     pushToken?: string,
     restoreCode?: string,
-    accountType?: AccountType
+    accountType?: AccountType,
+    achievements?: Achievement[]
+}
+
+export type Achievement = {
+    id: ID,
+    layout_id: ID,
 }
 
 export type AccountType = 'user' | 'admin' | 'god'
