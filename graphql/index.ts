@@ -62,7 +62,7 @@ const resolvers = {
         friends: async (root: Document & User) => {
             await root.populate('friends');
             return root.friends;
-        }
+        },
     },
     Scorecard: {
         total: (root: Scorecard) => {

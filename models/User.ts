@@ -32,6 +32,10 @@ const skeema = new mongoose.Schema({
         _id: false,
         id: String,
         layout_id: String,
+        game: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Game'
+        }
     }],
 
 }, { timestamps: true });
