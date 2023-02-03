@@ -34,7 +34,6 @@ export type Game = {
 }
 
 export type Scorecard = {
-    id: string | number,
     user: User,
     scores: number[],
     beers: number,
@@ -59,7 +58,8 @@ export type User = {
 
 export type Achievement = {
     id: ID,
-    layout_id: ID,
+    game: ID,
+    layout_id: string,
 }
 
 export type AccountType = 'user' | 'admin' | 'god'

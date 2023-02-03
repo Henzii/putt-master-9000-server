@@ -8,36 +8,40 @@ const MALMIS_ID = '61ffbbc9dc4b6f65e2514ee9';
 import config from "../utils/config";
 import pushNotificationsService from "./pushNotificationsService";
 
-type UserAndLayout = {
+type UserAndGame = {
     userId?: ID,
-    layoutId?: ID,
+    game?: Game
 }
 
 type AchievementID = 'winAllHoles' | 'loseAllHoles' | '100Malmis' | '0Pars' | 'HoleInOne'
 
-export const addAchievement = async ({userId, layoutId}: UserAndLayout, id: AchievementID, multiple = false) => {
-    if (!userId) return;
+export const addAchievement = async ({userId, game}: UserAndGame, id: AchievementID, multiple = false) => {
+    if (!userId || !game) return;
     const user = await userService.getUser(undefined, userId);
     if (!user) return;
+
     if (!multiple) {
         if (user?.achievements?.find(achievement => {
-            if (layoutId && layoutId.toString() === achievement.layout_id && achievement.id === id) return true;
-            else if (!layoutId && achievement.id === id) return true;
+            if (game.layout_id && game.layout_id.toString() === achievement.layout_id && achievement.id === id) return true;
+            else if (!game.layout_id && achievement.id === id) return true;
             return false;
         })) return;
     }
     // eslint-disable-next-line no-console
     console.log('Achievement', id, 'added for', userId);
-    user.achievements?.push({ layout_id: layoutId || '', id });
+    user.achievements?.push({
+        id,
+        game: game.id,
+        layout_id: game.layout_id
+    });
     await user.save();
     pushNotificationsService.sendNotification([userId], config.achievements[id].notification);
 };
 
 export const checkAchievements = async (game: Game) => {
     if (game.scorecards.length < MIN_PLAYER_COUNT) return;
-    /* addAchievement(checkWinAllHoles(game), 'winAllHoles');
-    Ei toimi
-    addAchievement(checkWinAllHoles(game, false), 'loseAllHoles'); */
+    addAchievement(checkWinAllHoles(game), 'winAllHoles');
+    addAchievement(checkWinAllHoles(game, false), 'loseAllHoles');
     (await checkSadasMalmis(game)).forEach(player => {
         addAchievement(player, '100Malmis');
     });
@@ -50,34 +54,23 @@ export const checkAchievements = async (game: Game) => {
 
 };
 
-export const checkWinAllHoles = (game: Game, findWinner=true): UserAndLayout => {
-    const winner: Scorecard | undefined = getBestForHole(game.scorecards, 0, findWinner);
-    const holes = game.pars.length;
-    for (let i = 1; i < holes; i++) {
-        const holeWinner = getBestForHole(game.scorecards, i, findWinner);
-        if (!winner || holeWinner?.id !== winner.id) {
-            return { userId: undefined };
-        }
-    }
-    return { userId: winner?.user.id, layoutId: game.layout_id };
-};
-export const checkHoleInOnes = (game: Game): UserAndLayout[] => {
+export const checkHoleInOnes = (game: Game): UserAndGame[] => {
     return game.scorecards.filter(sc => {
         return !!sc.scores.find(score => score === 1);
-    }).map(sc2 => ({layoutId: game.layout_id, userId: sc2.user.id})) || [];
+    }).map(sc2 => ({game, userId: sc2.user.id})) || [];
 };
 
-export const checkSadasMalmis = async (game: Game): Promise<UserAndLayout[]> => {
+export const checkSadasMalmis = async (game: Game): Promise<UserAndGame[]> => {
     if (game.layout_id.toString() !== MALMIS_ID) {
          return [];
     }
     const stats = await statsServices.getStatsForLayoyt(MALMIS_ID, game.scorecards.map(sc => sc.user.id));
     return stats.filter(player => {
         return player.games >= 100;
-    }).map(player => ({userId: player.playerId, layoutId: game.layout_id})) ?? {};
+    }).map(player => ({userId: player.playerId, game})) ?? {};
 };
 
-export const checkZeroPars = (game: Game): UserAndLayout[] => {
+export const checkZeroPars = (game: Game): UserAndGame[] => {
     const winners = game.pars.reduce((p, c, index) => {
         let list: Scorecard[] = [...p];
         for (const scorecard of p) {
@@ -87,12 +80,26 @@ export const checkZeroPars = (game: Game): UserAndLayout[] => {
         }
         return list;
     }, game.scorecards);
-    return winners.map(sc => ({userId: sc.user.id, layoutId: game.layout_id}));
+    return winners.map(sc => ({userId: sc.user.id, game}));
+};
+
+export const checkWinAllHoles = (game: Game, findWinner=true): UserAndGame => {
+    const winner: Scorecard | undefined = getBestForHole(game.scorecards, 0, findWinner);
+    if (!winner) return {};
+    const holes = game.pars.length;
+    for (let i = 1; i < holes; i++) {
+        const holeWinner = getBestForHole(game.scorecards, i, findWinner);
+        if (holeWinner?.user?.id !== winner?.user.id) {
+            return {};
+        }
+    }
+    return { userId: winner?.user.id, game };
 };
 
 export const getBestForHole = (cards: Scorecard[], hole: number, findWinner: boolean): Scorecard | undefined => {
     if (cards.length < 2) return;
-    const sorted = [...cards].sort((a, b) =>(a.scores[hole] - b.scores[hole]));
+    const clonedCards = JSON.parse(JSON.stringify(cards)) as Scorecard[];
+    const sorted = clonedCards.sort((a, b) =>(a.scores[hole] - b.scores[hole]));
     if (!findWinner) {
         sorted.reverse();
     }
