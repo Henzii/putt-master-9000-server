@@ -54,6 +54,12 @@ export const typeDefs = gql`
         friends: [User!]
         blockFriendRequests: Boolean
         blockStatsSharing: Boolean
+        achievements: [Achievement]!
+    }
+    type Achievement {
+        id: String!
+        layout_id: String!
+        game: Game
     }
     type SafeUser {
         id: ID!
