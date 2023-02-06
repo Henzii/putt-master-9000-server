@@ -63,6 +63,10 @@ const resolvers = {
             await root.populate('friends');
             return root.friends;
         },
+        achievements: async (root: Document & User) => {
+            await root.populate('achievements.game');
+            return root.achievements;
+        }
     },
     Scorecard: {
         total: (root: Scorecard) => {
