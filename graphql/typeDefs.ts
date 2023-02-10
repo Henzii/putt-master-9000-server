@@ -128,6 +128,8 @@ export const typeDefs = gql`
     type LayoutStats {
         playerId: ID
         games: Int
+        best: Int
+        hc: Float
         holes: [HoleStats]
     }
     type SearchUserResponse {
