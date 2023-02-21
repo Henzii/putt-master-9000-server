@@ -62,6 +62,10 @@ const resolvers = {
         friends: async (root: Document & User) => {
             await root.populate('friends');
             return root.friends;
+        },
+        achievements: async (root: Document & User) => {
+            await root.populate('achievements.game');
+            return root.achievements;
         }
     },
     Scorecard: {
@@ -112,8 +116,29 @@ const resolvers = {
         hc: (root: RawStatsDataHC) => {
             return calculateHc(root.pars, root.scores.slice(-10));
         }
+    },
+    LayoutStats: {
+        best: (root: LayoutStatsRoot) => {
+            return root.scores.reduce((p, c) => {
+                const total = c.reduce((sum, score) => sum + score, 0);
+                if (!p || total < p) return total;
+                return p;
+            }, 0);
+        },
+        hc: (root: LayoutStatsRoot) => {
+            const sumTable = root.scores.slice(-10).reduce((p, c) => {
+                return [...p, c.reduce((sum, score) => sum + score, 0)];
+            }, []);
+            const hc = calculateHc(root.pars, sumTable);
+            return hc;
+        }
     }
 };
+
+type LayoutStatsRoot = {
+    scores: number[][],
+    pars: number[]
+}
 
 const schema = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissions);
 

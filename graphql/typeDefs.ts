@@ -54,6 +54,12 @@ export const typeDefs = gql`
         friends: [User!]
         blockFriendRequests: Boolean
         blockStatsSharing: Boolean
+        achievements: [Achievement]!
+    }
+    type Achievement {
+        id: String!
+        layout_id: String!
+        game: Game
     }
     type SafeUser {
         id: ID!
@@ -122,6 +128,8 @@ export const typeDefs = gql`
     type LayoutStats {
         playerId: ID
         games: Int
+        best: Int
+        hc: Float
         holes: [HoleStats]
     }
     type SearchUserResponse {

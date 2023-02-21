@@ -44,6 +44,8 @@ export const getStatsForLayoyt = async (layoutId: ID, playerIds: ID[]) => {
             playerId: res._id.toString(),
             games: res.games,
             holes: holestats(res.scores, res.pars),
+            scores: res.scores,
+            pars: res.pars,
         };
     });
     return obj;
@@ -97,4 +99,8 @@ export const getPlayersScores = async (course: string, layout: string, playerIds
             }
         }
     ]);
+};
+
+export default {
+    getStatsForLayoyt,
 };

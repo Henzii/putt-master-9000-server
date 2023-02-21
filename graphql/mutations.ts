@@ -1,6 +1,7 @@
 import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
+import achievementService from "../services/achievementService";
 import pushNotificationsService from "../services/pushNotificationsService";
 import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
@@ -70,6 +71,7 @@ export const mutations = {
                         title: 'Game over',
                         body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
                     });
+                    achievementService.checkAchievements(game);
                     return game;
                 } catch (e) {
                     // eslint-disable-next-line no-console

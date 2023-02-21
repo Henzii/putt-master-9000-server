@@ -134,7 +134,7 @@ const makeFriends = async (userOne: makeFriendsArg, userTwo: makeFriendsArg): Pr
     }
     return null;
 };
-const getUser = async (name?: string, id?: ID): Promise<Document & User | null> => {
+export const getUser = async (name?: string, id?: ID): Promise<Document & User | null> => {
     let user: Document & User;
     try {
         if (id) {
