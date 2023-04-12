@@ -10,10 +10,10 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     return users;
 };
 const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean}> => {
-    const users = await Users.find({
+    const users = await Users.find<User & Document>({
         name: { $regex: searchString, $options: 'i' },
         blockFriendRequests: false,
-    }).limit(10) as (Document & User)[];
+    }).limit(10);
     return { users: users.map(u => {
         return {
             id: u.id,
@@ -50,14 +50,14 @@ const removePushToken = async (token: string) => {
     return false;
 };
 const addUser = async (name: string, passwordHash: string, email?: string, pushToken?: string): Promise<User> => {
-    const newUser = new Users({
+    const newUser = new Users<Partial<User>>({
         name: name.toLowerCase(),
         passwordHash,
         email,
         pushToken,
-    }) as Document & User;
+    });
     await newUser.save();
-    return newUser;
+    return newUser as unknown as User;
 };
 const removeFriend = async (removeFromUserId: ID, userIdToRemove: ID) => {
     try {

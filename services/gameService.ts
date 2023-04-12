@@ -48,7 +48,7 @@ export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0,
     const games = await GameModel.find(searchString)
         .sort({ startTime: -1 })
         .skip(offset)
-        .limit(limit) as (Document & Game)[];
+        .limit(limit);
     const hasMore = count > offset+limit;
     return {
         games,
@@ -105,7 +105,7 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
             holes: layout?.holes,
             isOpen: true,
             scorecards: [],
-        }) as Document & Game;
+        });
         await newGame.save();
         return newGame.id;
 

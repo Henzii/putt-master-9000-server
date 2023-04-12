@@ -47,7 +47,7 @@ export type User = {
     id: string | number,
     name: string,
     passwordHash: string,
-    email: string,
+    email?: string,
     friends: (ID | User)[],
     blockFriendRequests: boolean,
     pushToken?: string,
