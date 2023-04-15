@@ -5,7 +5,6 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
-import { UserInputError } from "apollo-server";
 
 type GetGamesArgs = {
     userId: ID,
@@ -149,7 +148,7 @@ export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolea
     const newSettings = { ...settings };
     if (newSettings.startTime) {
         if (isNaN(Date.parse(newSettings.startTime as string))) {
-            throw new UserInputError(`${newSettings.startTime} is not a valid date`);
+            throw new Error(`${newSettings.startTime} is not a valid date`);
         }
         newSettings.startTime = new Date(newSettings.startTime);
     }

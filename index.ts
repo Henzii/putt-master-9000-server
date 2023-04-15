@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
-import { server } from './graphql/index';
+// import { server } from './graphql/index';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { startServer } from './server';
 
 dotenv.config();
 
@@ -18,4 +19,6 @@ mongoose.connect(db_uri).then(() => {
     );
 });
 
-server.listen(process.env.PORT || 8080).then(({url}) => console.log('Serveri ' + url));
+startServer();
+
+// server.listen(process.env.PORT || 8080).then(({url}) => console.log('Serveri ' + url));

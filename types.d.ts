@@ -68,7 +68,7 @@ export type SafeUser = Pick<User, 'id' | 'name', 'accountType'>
 
 export type ID = string | number
 
-export type ContextWithUser = {
+export interface ContextWithUser {
     user: SafeUser
 }
 
