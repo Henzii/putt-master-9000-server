@@ -7,10 +7,12 @@ import { calculateHc } from "../utils/calculateHc";
 
 import { getDistance } from 'geolib';
 import { plusminus, total } from "../utils/calculators";
+import { subscriptions } from "./subscriptions";
 
 export const resolvers = {
     ...queries,
     ...mutations,
+    ...subscriptions,
 
     Layout: {
         par: (root: Layout) => {

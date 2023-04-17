@@ -7,6 +7,7 @@ import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 
 import appInfo from "../utils/appInfo";
 import { requireAuth } from "./permissions";
+import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 
 interface GetArgs {
     limit: number,
@@ -60,7 +61,10 @@ export const queries = {
             if (diff > 24) throw new Error('Game is no longer available on live feed');
             return game;
         },
-        ping: (): string => 'pong!',
+        ping: () => {
+            pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
+            return 'pong';
+        },
         getUsers: async () => {
             return await userService.getUsers();
         },

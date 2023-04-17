@@ -2,6 +2,7 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { WebSocketServer } from 'ws';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -10,14 +11,39 @@ import { json } from 'body-parser';
 import { typeDefs} from './graphql/typeDefs';
 import { resolvers } from './graphql/index';
 import { ContextWithUser, SafeUser } from './types';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { useServer } from 'graphql-ws/lib/use/ws';
+
 
 const app = express();
 const httpServer = http.createServer(app);
 
+const schema = makeExecutableSchema({typeDefs, resolvers});
+
+const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+});
+
+const cleanup = useServer({schema, onConnect: async (ctx) => {
+//    const token = ctx?.connectionParams?.Authorization as string;
+//    if (!token || !validateToken(token)?.user) throw new Error('Not authorized');
+}}, wsServer);
+
 const server = new ApolloServer<ContextWithUser>({
-    typeDefs,
-    resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    schema,
+    plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+        {
+            async serverWillStart() {
+                return {
+                    async drainServer() {
+                        await cleanup.dispose();
+                    }
+                };
+            }
+        }
+    ],
 });
 
 const validateToken = (authorization?: string): ContextWithUser => {

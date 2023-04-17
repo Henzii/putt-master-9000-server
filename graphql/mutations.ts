@@ -7,6 +7,8 @@ import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { SUB_TRIGGERS, pubsub } from "./subscriptions";
+import { requireAuth } from "./permissions";
 
 export const mutations = {
     Mutation: {
@@ -33,8 +35,10 @@ export const mutations = {
             });
             return game;
         },
-        setScore: async (_root: unknown, args: SetScoreArgs) => {
-            return await gameService.setScore(args);
+        setScore: async (_root: unknown, args: SetScoreArgs, context: ContextWithUser) => {
+            requireAuth(context);
+            const updatedGame = await gameService.setScore(args);
+            pubsub.publish(SUB_TRIGGERS.GAME, {[SUB_TRIGGERS.GAME]: updatedGame});
         },
         changeGameSettings: async (_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
             return await gameService.changeGameSettings(args.gameId, args.settings, context.user.id);
