@@ -102,8 +102,10 @@ export const resolvers = {
             return root.pars.reduce((p, c) => (p + c), 0);
         },
         myScorecard: (root: Game, args: unknown, context: ContextWithUser) => {
+            if (!context?.user?.id) throw new Error('Cannot resolve myScorecard, no valid context present.');
             // Etsitään contextissa olevan käyttäjän tuloskortti, populoituna tai ilman
-            return root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id));
+            const sc = root.scorecards.find(sc => (sc.user.id === context.user.id || sc.user.toString() === context.user.id));
+            return sc;
         }
     },
     GetHcResponse: {

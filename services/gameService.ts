@@ -114,7 +114,7 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
     }
 };
 export const setScore = async (args: SetScoreArgs) => {
-    const game = await GameModel.findById(args.gameId) as Document & UnpopulatedGame;
+    const game = await GameModel.findById(args.gameId) as Document & Game;
     game.scorecards = game.scorecards.map(s => {
         if (s.user.toString() === args.playerId) {
             s.scores[args.hole] = args.value;
@@ -123,7 +123,7 @@ export const setScore = async (args: SetScoreArgs) => {
         return s;
     });
     await game.save();
-    return game;
+    return game.populate('scorecards.user');
 };
 export const closeGame = async (gameId: ID, isOpen = false) => {
     const game = await GameModel.findById(gameId) as Document & Game;
@@ -189,11 +189,3 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
     }
 };
 export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings };
-
-interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
-    scorecards:
-    {
-        user: string,
-        scores: number[]
-    }[]
-}

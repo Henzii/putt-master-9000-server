@@ -42,7 +42,7 @@ export const queries = {
             }
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            if (!context.user?.id) return null;
+            if (!context?.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
         getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {

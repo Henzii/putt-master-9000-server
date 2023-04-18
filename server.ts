@@ -13,6 +13,7 @@ import { resolvers } from './graphql/index';
 import { ContextWithUser, SafeUser } from './types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import { log } from './utils/log';
 
 
 const app = express();
@@ -25,10 +26,14 @@ const wsServer = new WebSocketServer({
     path: '/graphql',
 });
 
-const cleanup = useServer({schema, onConnect: async (ctx) => {
-//    const token = ctx?.connectionParams?.Authorization as string;
-//    if (!token || !validateToken(token)?.user) throw new Error('Not authorized');
-}}, wsServer);
+const cleanup = useServer({
+    schema,
+    onConnect: () => log('Sub connected...'),
+    onComplete: (_ctx, message) => log(['Sub completed', message]),
+    context: async (context) => {
+        return validateToken(context?.connectionParams?.Authorization as string);
+    }
+}, wsServer );
 
 const server = new ApolloServer<ContextWithUser>({
     schema,
@@ -78,5 +83,5 @@ export const startServer = async() => {
     );
     const port = process.env.PORT || 8080;
     await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
-    console.log(`🚀 Server running on port ${port}`);
+    log(['🚀 Server running on port', port], false);
 };
