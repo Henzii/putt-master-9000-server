@@ -16,7 +16,6 @@ const skeema = new mongoose.Schema({
                 ref: 'User'
             },
             scores: [],
-            _id: false,
             beers: {
                 type: Number,
                 default: 0,
