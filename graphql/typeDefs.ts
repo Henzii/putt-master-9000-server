@@ -1,7 +1,10 @@
-import { gql } from "apollo-server";
+import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
-
+    type Subscription {
+        test: String
+        gameUpdated(gameId: ID): Game
+    }
     type GetCoursesResponse {
         courses: [Course]!
         hasMore: Boolean!

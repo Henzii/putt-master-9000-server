@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server";
 import { Document } from "mongoose";
 import CourseModel from "../models/Course";
 import { Course, ID, NewLayoutArgs } from "../types";
@@ -46,7 +45,7 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
         course.layouts = course.layouts.map(lo => {
             if (lo.id === layout.id) {
                 if (lo.creator?.toString() !== layout.creator && course.creator?.toString() !== layout.creator) {
-                    throw new UserInputError('Error, layout not created by you!');
+                    throw new Error('Error, layout not created by you!');
                 }
                 else return layout;
             }

@@ -4,9 +4,10 @@ import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
 import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
-import { ApolloError } from "apollo-server";
 
 import appInfo from "../utils/appInfo";
+import { requireAuth } from "./permissions";
+import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 
 interface GetArgs {
     limit: number,
@@ -25,7 +26,8 @@ export const queries = {
                 ...appInfo
             };
         },
-        getCourses: async (_root: unknown, args: GetArgs) => {
+        getCourses: async (_root: unknown, args: GetArgs, context: ContextWithUser) => {
+            requireAuth(context);
             try {
                 const { data: courses, count, hasMore } = await getCourses(args);
                 return {
@@ -40,7 +42,7 @@ export const queries = {
             }
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            if (!context.user?.id) return null;
+            if (!context?.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
         getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {
@@ -56,10 +58,13 @@ export const queries = {
             if (game.isOpen) return game;
             // Kauanko peli on ollut suljettuna (tuntia)
             const diff = ((new Date(Date.now()).getTime() - new Date(game.endTime).getTime()) / 1000 / 60 / 60);
-            if (diff > 24) throw new ApolloError('Game is no longer available on live feed');
+            if (diff > 24) throw new Error('Game is no longer available on live feed');
             return game;
         },
-        ping: (): string => 'pong!',
+        ping: () => {
+            pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
+            return 'pong';
+        },
         getUsers: async () => {
             return await userService.getUsers();
         },

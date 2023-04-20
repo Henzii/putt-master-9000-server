@@ -22,7 +22,8 @@ describe('Achievements', () => {
             expect(holeInOnes).toHaveLength(1);
             expect(holeInOnes[0]).toEqual(expect.objectContaining({
                 userId: games2.scorecards[0].user.id,
-                layoutId:games2.layout_id }));
+                game: expect.objectContaining({ layout_id: games2.layout_id })
+            }));
         });
         it('dos hole in ones', () => {
             const games2 = clonedGame();
@@ -90,8 +91,9 @@ describe('Achievements', () => {
             const res = checkZeroPars(game);
             expect(res).toHaveLength(1);
             expect(res[0]).toEqual(expect.objectContaining({
-                layoutId: game.layout_id,
-                userId: game.scorecards[1].user.id
+                userId: game.scorecards[1].user.id,
+                game: expect.objectContaining({layout_id: game.layout_id})
+
             }));
         });
         it('both players with all above pars', () => {
@@ -100,12 +102,12 @@ describe('Achievements', () => {
             const res = checkZeroPars(game);
             expect(res).toHaveLength(2);
             expect(res).toEqual(expect.arrayContaining([expect.objectContaining({
-                layoutId: game.layout_id,
-                userId: game.scorecards[0].user.id
+                userId: game.scorecards[0].user.id,
+                game: expect.objectContaining({layout_id: game.layout_id})
             })]));
             expect(res).toEqual(expect.arrayContaining([expect.objectContaining({
-                layoutId: game.layout_id,
-                userId: game.scorecards[1].user.id
+                userId: game.scorecards[1].user.id,
+                game: expect.objectContaining({layout_id: game.layout_id})
             })]));
 
         });

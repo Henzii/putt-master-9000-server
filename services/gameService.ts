@@ -5,7 +5,6 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
-import { UserInputError } from "apollo-server";
 
 type GetGamesArgs = {
     userId: ID,
@@ -48,7 +47,7 @@ export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0,
     const games = await GameModel.find(searchString)
         .sort({ startTime: -1 })
         .skip(offset)
-        .limit(limit) as (Document & Game)[];
+        .limit(limit);
     const hasMore = count > offset+limit;
     return {
         games,
@@ -105,7 +104,7 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
             holes: layout?.holes,
             isOpen: true,
             scorecards: [],
-        }) as Document & Game;
+        });
         await newGame.save();
         return newGame.id;
 
@@ -115,7 +114,7 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
     }
 };
 export const setScore = async (args: SetScoreArgs) => {
-    const game = await GameModel.findById(args.gameId) as Document & UnpopulatedGame;
+    const game = await GameModel.findById(args.gameId) as Document & Game;
     game.scorecards = game.scorecards.map(s => {
         if (s.user.toString() === args.playerId) {
             s.scores[args.hole] = args.value;
@@ -124,7 +123,7 @@ export const setScore = async (args: SetScoreArgs) => {
         return s;
     });
     await game.save();
-    return game;
+    return game.populate('scorecards.user');
 };
 export const closeGame = async (gameId: ID, isOpen = false) => {
     const game = await GameModel.findById(gameId) as Document & Game;
@@ -149,7 +148,7 @@ export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolea
     const newSettings = { ...settings };
     if (newSettings.startTime) {
         if (isNaN(Date.parse(newSettings.startTime as string))) {
-            throw new UserInputError(`${newSettings.startTime} is not a valid date`);
+            throw new Error(`${newSettings.startTime} is not a valid date`);
         }
         newSettings.startTime = new Date(newSettings.startTime);
     }
@@ -190,11 +189,3 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
     }
 };
 export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings };
-
-interface UnpopulatedGame extends Omit<Game, 'scorecards'> {
-    scorecards:
-    {
-        user: string,
-        scores: number[]
-    }[]
-}

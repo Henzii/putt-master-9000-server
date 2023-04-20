@@ -6,8 +6,9 @@ import pushNotificationsService from "../services/pushNotificationsService";
 import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
-import { ApolloError, UserInputError } from "apollo-server";
 import jwt from "jsonwebtoken";
+import { SUB_TRIGGERS, pubsub } from "./subscriptions";
+import { requireAuth } from "./permissions";
 
 export const mutations = {
     Mutation: {
@@ -34,8 +35,10 @@ export const mutations = {
             });
             return game;
         },
-        setScore: async (_root: unknown, args: SetScoreArgs) => {
-            return await gameService.setScore(args);
+        setScore: async (_root: unknown, args: SetScoreArgs, context: ContextWithUser) => {
+            requireAuth(context);
+            const updatedGame = await gameService.setScore(args);
+            pubsub.publish(SUB_TRIGGERS.GAME, {[SUB_TRIGGERS.GAME]: updatedGame});
         },
         changeGameSettings: async (_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
             return await gameService.changeGameSettings(args.gameId, args.settings, context.user.id);
@@ -93,8 +96,8 @@ export const mutations = {
                 return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
-                if (viesti.includes('to be unique')) throw new UserInputError(`Name ${args.name} is already taken!`);
-                throw new UserInputError(`Error when creating accoount! (${(e as mongoose.Error).name})`);
+                if (viesti.includes('to be unique')) throw new Error(`Name ${args.name} is already taken!`);
+                throw new Error(`Error when creating accoount! (${(e as mongoose.Error).name})`);
             }
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
@@ -123,7 +126,7 @@ export const mutations = {
             }
             const user = await userService.getUser(args.user);
             if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
-                throw new UserInputError('Wrong username or password');
+                throw new Error('Wrong username or password');
             } else {
                 const payload = {
                     id: user.id,
@@ -148,7 +151,7 @@ export const mutations = {
             const { name, password, restoreCode } = args;
             // Jos argumentteja tulee oudosti
             if (!name || (password && !restoreCode || !password && restoreCode)) {
-                throw new ApolloError('Invalid argument count');
+                throw new Error('Invalid argument count');
             }
             const user = await userService.getUser(name) as User;
 

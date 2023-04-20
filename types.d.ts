@@ -47,7 +47,7 @@ export type User = {
     id: string | number,
     name: string,
     passwordHash: string,
-    email: string,
+    email?: string,
     friends: (ID | User)[],
     blockFriendRequests: boolean,
     pushToken?: string,
@@ -68,7 +68,7 @@ export type SafeUser = Pick<User, 'id' | 'name', 'accountType'>
 
 export type ID = string | number
 
-export type ContextWithUser = {
+export interface ContextWithUser {
     user: SafeUser
 }
 
