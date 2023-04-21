@@ -15,6 +15,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { log } from './utils/log';
 
+const SERVER_PATH = '/';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -23,7 +24,7 @@ const schema = makeExecutableSchema({typeDefs, resolvers});
 
 const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/graphql',
+    path: SERVER_PATH,
 });
 
 const cleanup = useServer({
@@ -72,7 +73,7 @@ const validateToken = (authorization?: string): ContextWithUser => {
 export const startServer = async() => {
     await server.start();
     app.use(
-        '/graphql',
+        SERVER_PATH,
         cors<cors.CorsRequest>(),
         json(),
         expressMiddleware(server, {
