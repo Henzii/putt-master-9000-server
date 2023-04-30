@@ -8,6 +8,7 @@ export const typeDefs = gql`
     type TriggeredScorecard {
         game: Game
         updatedScorecardPlayerId: ID
+        updaterId: ID
     }
     type GetCoursesResponse {
         courses: [Course]!

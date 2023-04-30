@@ -39,7 +39,11 @@ export const mutations = {
             requireAuth(context);
             const updatedGame = await gameService.setScore(args);
             pubsub.publish(SUB_TRIGGERS.SCORECARD, {
-                [SUB_TRIGGERS.SCORECARD]: { game: updatedGame, updatedScorecardPlayerId: args.playerId }
+                [SUB_TRIGGERS.SCORECARD]: {
+                    game: updatedGame,
+                    updatedScorecardPlayerId: args.playerId,
+                    updaterId: context.user.id
+                }
             });
             return updatedGame;
         },
