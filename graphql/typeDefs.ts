@@ -3,7 +3,11 @@ import { gql } from "graphql-tag";
 export const typeDefs = gql`
     type Subscription {
         test: String
-        gameUpdated(gameId: ID): Game
+        scorecardUpdated(gameId: ID!): TriggeredScorecard
+    }
+    type TriggeredScorecard {
+        game: Game
+        updatedScorecardPlayerId: ID
     }
     type GetCoursesResponse {
         courses: [Course]!
@@ -187,7 +191,7 @@ export const typeDefs = gql`
 
         createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
-        setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game
+        setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game!
         abandonGame(gameId: ID!): Boolean
         closeGame(gameId: ID!, reopen: Boolean): Game
         setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
