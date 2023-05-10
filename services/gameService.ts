@@ -113,17 +113,17 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
         console.log(e);
     }
 };
+
 export const setScore = async (args: SetScoreArgs) => {
-    const game = await GameModel.findById(args.gameId) as Document & Game;
-    game.scorecards = game.scorecards.map(s => {
-        if (s.user.toString() === args.playerId) {
-            s.scores[args.hole] = args.value;
-            return s;
-        }
-        return s;
-    });
+    const game = await GameModel.findById<Game & Document>(args.gameId).populate('scorecards.user');
+    if (!game) throw new Error('Game not found');
+
+    const scorecard = game.scorecards.find(sc => sc?.user?.id === args.playerId);
+    if (!scorecard) throw new Error('Player\'s scorecard was not found');
+
+    scorecard.scores[args.hole] = args.value;
     await game.save();
-    return game.populate('scorecards.user');
+    return game;
 };
 export const closeGame = async (gameId: ID, isOpen = false) => {
     const game = await GameModel.findById(gameId) as Document & Game;

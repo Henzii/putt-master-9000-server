@@ -4,7 +4,7 @@ export const pubsub = new PubSub();
 
 export enum SUB_TRIGGERS {
     TEST = 'test',
-    GAME = 'gameUpdated'
+    SCORECARD = 'scorecardUpdated'
 }
 
 export const subscriptions = {
@@ -12,11 +12,11 @@ export const subscriptions = {
         test: {
             subscribe: () => pubsub.asyncIterator(SUB_TRIGGERS.TEST)
         },
-        [SUB_TRIGGERS.GAME]: {
+        [SUB_TRIGGERS.SCORECARD]: {
             subscribe: withFilter(
-                () => pubsub.asyncIterator(SUB_TRIGGERS.GAME),
+                () => pubsub.asyncIterator(SUB_TRIGGERS.SCORECARD),
                 (payload, variables) => {
-                    return payload[SUB_TRIGGERS.GAME]?.id === variables?.gameId;
+                    return payload[SUB_TRIGGERS.SCORECARD].game.id === variables.gameId;
                 }
             )
         }
