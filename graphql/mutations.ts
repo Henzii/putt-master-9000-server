@@ -82,6 +82,12 @@ export const mutations = {
                         body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
                     });
                     achievementService.checkAchievements(game);
+
+                    pubsub.publish(SUB_TRIGGERS.SCORECARD, {
+                        [SUB_TRIGGERS.SCORECARD]: {
+                            game: game,
+                        }
+                    });
                     return game;
                 } catch (e) {
                     // eslint-disable-next-line no-console
