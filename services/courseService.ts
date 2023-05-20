@@ -47,7 +47,7 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
                 if (lo.creator?.toString() !== layout.creator && course.creator?.toString() !== layout.creator) {
                     throw new Error('Error, layout not created by you!');
                 }
-                else return layout;
+                else return {...layout, _id: layout.id};
             }
             return lo;
 

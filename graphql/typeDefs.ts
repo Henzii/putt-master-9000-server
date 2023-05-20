@@ -49,6 +49,7 @@ export const typeDefs = gql`
         name: String
         pars: [Int]
         holes: Int
+        names: [String]!
         par: Int
         canEdit: Boolean!
     }
@@ -105,6 +106,7 @@ export const typeDefs = gql`
         name: String!
         pars: [Int]!
         holes: Int!
+        names: [String]
         id: ID
     }
     input GameSettings {
