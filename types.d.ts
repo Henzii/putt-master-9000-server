@@ -14,10 +14,11 @@ export type Layout = {
     holes: number,
     pars: number[],
     creator?: ID,
+    names?: string[],
     courseCreator?: ID
 }
 
-export type NewLayoutArgs = Layout & { creator: ID }
+export type NewLayoutArgs = Layout & { creator: ID, _id?: ID }
 
 export type Game = {
     id: string | number,

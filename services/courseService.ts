@@ -10,6 +10,11 @@ type getCoursesArgs = {
     maxDistance?: number
 }
 
+export async function getLayout(layoutId: ID) {
+    const course = await CourseModel.findOne<Course>({ 'layouts._id': layoutId });
+    return course?.layouts.find(c => c.id === layoutId) ?? null;
+}
+
 export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance }: getCoursesArgs) {
     const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
@@ -47,7 +52,7 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
                 if (lo.creator?.toString() !== layout.creator && course.creator?.toString() !== layout.creator) {
                     throw new Error('Error, layout not created by you!');
                 }
-                else return layout;
+                else return {...layout, _id: layout.id};
             }
             return lo;
 

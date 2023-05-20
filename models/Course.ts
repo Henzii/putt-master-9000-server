@@ -26,6 +26,7 @@ const skeema = new mongoose.Schema({
             },
             holes: Number,
             pars: [],
+            names: [String],
             creator: mongoose.Types.ObjectId,
         }
     ],
