@@ -49,6 +49,7 @@ export const typeDefs = gql`
         name: String
         pars: [Int]
         holes: Int
+        names: [String]!
         par: Int
         canEdit: Boolean!
     }
@@ -105,6 +106,7 @@ export const typeDefs = gql`
         name: String!
         pars: [Int]!
         holes: Int!
+        names: [String]
         id: ID
     }
     input GameSettings {
@@ -150,6 +152,7 @@ export const typeDefs = gql`
         Tuloksia voi rajata antamalla search tai maxDistance argumentin.
         """
         getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
+        getLayout(layoutId: ID!): Layout
         """
         Hakee yhden pelin.
         """
