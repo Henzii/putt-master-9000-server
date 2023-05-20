@@ -152,6 +152,7 @@ export const typeDefs = gql`
         Tuloksia voi rajata antamalla search tai maxDistance argumentin.
         """
         getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
+        getLayout(layoutId: ID!): Layout
         """
         Hakee yhden pelin.
         """

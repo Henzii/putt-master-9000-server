@@ -1,4 +1,4 @@
-import { getCourses } from "../services/courseService";
+import { getCourses, getLayout } from "../services/courseService";
 import { getGames, getGame, getMyAndFriendsGames } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
@@ -40,6 +40,10 @@ export const queries = {
                 // eslint-disable-next-line no-console
                 console.log(e, args);
             }
+        },
+        getLayout: (_root: unknown, args: {layoutId: ID}, context: ContextWithUser) => {
+            requireAuth(context);
+            return getLayout(args.layoutId);
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
             if (!context?.user?.id) return null;
