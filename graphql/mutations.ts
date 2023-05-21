@@ -32,6 +32,9 @@ export const mutations = {
                 title: 'New game',
                 body: `${context.user.name} created a new game`,
                 sound: 'default',
+                data: {
+                    gameId: args.gameId
+                }
             });
             return game;
         },
