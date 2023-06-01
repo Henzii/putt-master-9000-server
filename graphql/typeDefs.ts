@@ -64,6 +64,7 @@ export const typeDefs = gql`
         blockFriendRequests: Boolean
         blockStatsSharing: Boolean
         achievements: [Achievement]!
+        accountType: String
     }
     type Achievement {
         id: String!
@@ -205,7 +206,7 @@ export const typeDefs = gql`
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean): User
+        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID): User
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
 

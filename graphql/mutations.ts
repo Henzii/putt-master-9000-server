@@ -16,7 +16,8 @@ export const mutations = {
             return addCourse(args.name, args.coordinates, context.user.id);
         },
         addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
-            return addLayout(args.courseId, { ...args.layout, creator: context.user.id });
+            requireAuth(context);
+            return addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
         },
         // Game mutations
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
@@ -32,6 +33,9 @@ export const mutations = {
                 title: 'New game',
                 body: `${context.user.name} created a new game`,
                 sound: 'default',
+                data: {
+                    gameId: args.gameId
+                }
             });
             return game;
         },
@@ -153,8 +157,18 @@ export const mutations = {
             }
         },
         changeSettings: async (_root: unknown, rawargs: ChangeSettingsArgs, context: ContextWithUser) => {
-            const { password, ...args } = rawargs;
+            requireAuth(context);
+            const { password, userId, ...args } = rawargs;
+            const updateUserId = userId ?? context.user.id;
+
+            if (userId && !userService.isAdmin(context.user.id)) {
+                // eslint-disable-next-line no-console
+                console.error(`${context.user.id} failed admin check`);
+                throw new Error('Unauthorized');
+            }
+
             const finalArgs = args as UserSettingsArgs;
+
             if (password) {
                 finalArgs['passwordHash'] = await bcrypt.hash(password, 10);
             }
@@ -208,6 +222,7 @@ type GameSettingsArgs = {
 }
 interface SettingsArgs {
     blockFriendRequests?: boolean,
+    userId?: ID
 }
 interface ChangeSettingsArgs extends SettingsArgs {
     password?: string,
