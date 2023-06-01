@@ -65,7 +65,7 @@ export type Achievement = {
 
 export type AccountType = 'user' | 'admin' | 'god'
 
-export type SafeUser = Pick<User, 'id' | 'name', 'accountType'>
+export type SafeUser = Pick<User, 'id' | 'name' | 'accountType'>
 
 export type ID = string | number
 

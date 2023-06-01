@@ -66,7 +66,7 @@ const validateToken = (authorization?: string): ContextWithUser => {
             }
         };
     } catch {
-        return { user: null };
+        return ({ user: null } as unknown as ContextWithUser);
     }
 };
 

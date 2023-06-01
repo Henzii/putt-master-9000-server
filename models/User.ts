@@ -13,7 +13,10 @@ const skeema = new mongoose.Schema({
         required: true,
     },
     pushToken: String,
-    accountType: String,
+    accountType: {
+        type: String,
+        default: 'pleb',
+    },
     email: String,
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
