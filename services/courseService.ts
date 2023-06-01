@@ -1,6 +1,7 @@
 import { Document } from "mongoose";
 import CourseModel from "../models/Course";
 import { Course, ID, NewLayoutArgs } from "../types";
+import userService from "./userService";
 
 type getCoursesArgs = {
     limit: number,
@@ -43,16 +44,17 @@ export async function addCourse(name: string, coordinates: { lat: number, lon: n
     await newCourse.save();
     return newCourse;
 }
-export async function addLayout(courseId: number | string, layout: NewLayoutArgs) {
+export async function addLayout(courseId: number | string, layout: NewLayoutArgs, userId: ID) {
     const course = await CourseModel.findById(courseId) as Document & Course;
+    const isAdmin = await userService.isAdmin(userId);
     // Jos layoutilla on jo id, kyseessä muokkaus, ei lisäys...
     if (layout.id) {
         course.layouts = course.layouts.map(lo => {
             if (lo.id === layout.id) {
-                if (lo.creator?.toString() !== layout.creator && course.creator?.toString() !== layout.creator) {
-                    throw new Error('Error, layout not created by you!');
+                if (lo.creator?.toString() === layout.creator || course.creator?.toString() === layout.creator || isAdmin) {
+                    return {...layout, _id: layout.id};
                 }
-                else return {...layout, _id: layout.id};
+                throw new Error('Error, layout not created by you!');
             }
             return lo;
 

@@ -1,7 +1,7 @@
 import { ID, SafeUser, User } from "../types";
 import Users from '../models/User';
 import Game from '../models/Game';
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { UserSettingsArgs } from "../graphql/mutations";
 
 const getUsers = async (): Promise<(Document & User)[]> => {
@@ -9,6 +9,12 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     if (users.length === 0) return [];
     return users;
 };
+
+const isAdmin = async (userId: ID) => {
+    const user = await Users.findById({_id: userId});
+    return user?.accountType === 'admin'|| user?.accountType === 'god';
+};
+
 const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean}> => {
     const users = await Users.find<User & Document>({
         name: { $regex: searchString, $options: 'i' },
@@ -167,5 +173,5 @@ type makeFriendsArg = {
 export default {
     getUsers, addUser, getUser, makeFriends, updateSettings,
     removeFriend, deleteAccount, getUsersPushTokens,
-    removePushToken, searchUser,
+    removePushToken, searchUser, isAdmin
 };
