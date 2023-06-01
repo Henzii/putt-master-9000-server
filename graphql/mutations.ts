@@ -172,7 +172,7 @@ export const mutations = {
             if (password) {
                 finalArgs['passwordHash'] = await bcrypt.hash(password, 10);
             }
-            return await userService.updateSettings(context.user.id, finalArgs);
+            return await userService.updateSettings(updateUserId, finalArgs);
         },
         restoreAccount: async (_root: unknown, args: RestoreAccountArgs) => {
             const { name, password, restoreCode } = args;
