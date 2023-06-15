@@ -1,4 +1,7 @@
 import { median } from "./median";
+
+const SCORES_REQUIRED_FOR_HC = 10;
+
 /**
  * ### Funktio ratakohtaisen tasoituksen laskemiseen
  *
@@ -10,7 +13,7 @@ import { median } from "./median";
  * ```
  */
 export const calculateHc = (pars: number[], scores: number[]): number => {
-    if (pars.length === 0 || scores.length === 0) return 0;
+    if (pars.length === 0 || scores.length < SCORES_REQUIRED_FOR_HC) return 0;
     const par = pars.reduce((p,c) => p+c, 0);
     const median10 = median(scores);
     return median10-par;
