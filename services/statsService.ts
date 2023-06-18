@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import GameModel from '../models/Game';
 import { ID } from '../types';
 import { holestats } from '../utils/calculators';
+import { strToObjectId } from '../utils/validators';
 
 const mapPlayerIds = (ids: ID[]) => ids.map(p => new mongoose.Types.ObjectId(p));
 
@@ -51,15 +52,14 @@ export const getStatsForLayoyt = async (layoutId: ID, playerIds: ID[]) => {
     return obj;
 };
 
-export const getPlayersScores = async (course: string, layout: string, playerIds: ID[]) => {
+export const getPlayersScores = async (layoutId: ID, playerIds: ID[]) => {
     const playerIdObjects = mapPlayerIds(playerIds);
     return GameModel.aggregate([
         // Otetaan kaikki pelit joilla playerIds listalla olevat pelaajat ovat pelanneet
         // ja jotka vastaavat tiettyä rataa
         {
             $match: {
-                course: course,
-                layout: layout,
+                layout_id: strToObjectId(layoutId),
                 isOpen: false,
                 'scorecards.user': { '$in': playerIdObjects }
             }

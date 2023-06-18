@@ -176,7 +176,7 @@ export const typeDefs = gql`
         """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
-        getHc (course: String!, layout: String!, userIds: [String]): [GetHcResponse]!
+        getHc (layoutId: ID!, userIds: [String]): [GetHcResponse]!
         """
         Hakee search hakusanalla käyttäjiä ja palauttaa listan (max 10) SafeUsereita (vain id ja nimi) sekä
         booleanin siitä onko hakutuloksia mahdollisesti lisää -> tuleeko hakua tarkentaa.

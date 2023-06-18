@@ -6,8 +6,23 @@ import { startServer } from './server';
 
 dotenv.config();
 
+const ENV = process.env.NODE_ENV === 'development' && !process.argv.includes('--use-production-data') ? 'dev' : 'prod';
+
 // Yhteys mongoDB:hen
-const db_uri = ((process.env.NODE_ENV === 'development') ? process.env.MONGO_URI_DEV : process.env.MONGO_URI) as string;
+const db_uri = ENV === 'dev' ? process.env.MONGO_URI_DEV : process.env.MONGO_URI as string;
+
+if (!db_uri) {
+    console.log('Database uri undefined!');
+    process.exit();
+}
+
+if (ENV === 'prod') {
+    console.log('----------------\n' +
+                '| !PRODUCTION! |\n' +
+                '----------------'
+    );
+}
+
 console.log('Connecting to MongoDb...');
 mongoose.connect(db_uri).then(() => {
     console.log('Connected to MongoDB!');
