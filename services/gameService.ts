@@ -59,7 +59,7 @@ export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0,
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     // Haetaan tasoitukset
     const peli = await GameModel.findById(gameId) as Document & Game;
-    const scoresTable = await getPlayersScores(peli.course, peli.layout, playerIds);
+    const scoresTable = await getPlayersScores(peli.layout_id, playerIds);
     try {
         const game = await GameModel.findOneAndUpdate(
             { _id: gameId },
