@@ -19,7 +19,6 @@ jobs:
       - name: Test
         run: npm run test
   Deploy:
-  name: Deploy app
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
   runs-on: ubuntu-latest
