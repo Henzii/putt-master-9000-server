@@ -33,7 +33,7 @@ describe('Achievements are added correctly', () => {
         (getUser as jest.Mock).mockImplementation(() => clone);
         await addAchievement(checkWinAllHoles(game2), 'winAllHoles');
         expect(clone.achievements).toHaveLength(0);
-    })
+    });
     it('100 malmis is not added if count < 100', async () => {
         const clone = clonedUser();
         //clone2.achievements = []

@@ -1,18 +1,18 @@
 const stats = [
   {
-    playerId: 'player1',
+    playerId: 'a00000000000000000000001',
     games: 99,
   },
   {
-    playerId: 'player2',
+    playerId: 'a00000000000000000000002',
     games: 1,
   },
   {
-    playerId: 'player3',
+    playerId: 'a00000000000000000000003',
     games: 0,
   },
   {
-    playerId: 'player4',
+    playerId: 'a00000000000000000000004',
     games: 54
   }
 

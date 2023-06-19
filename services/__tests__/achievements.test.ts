@@ -37,11 +37,11 @@ describe('Achievements', () => {
     describe('Win/Lose all holes', () => {
         it('winner is found', () => {
             const winner = checkWinAllHoles(game);
-            expect(winner?.userId).toBe('player1');
+            expect(winner?.userId).toBe('a00000000000000000000001');
         });
         it('loser is found', () => {
             const loser = checkWinAllHoles(game, false);
-            expect(loser?.userId).toBe('player2');
+            expect(loser?.userId).toBe('a00000000000000000000002');
         });
         it('returns undefined if even one hole is tied', () => {
             const games2 = game;
@@ -63,7 +63,7 @@ describe('Achievements', () => {
             (getStatsForLayoyt as jest.Mock).mockReturnValue(stats2);
             const res = await checkSadasMalmis(game);
             expect(res).toHaveLength(1);
-            expect(res[0].userId).toEqual('player2');
+            expect(res[0].userId).toEqual('a00000000000000000000002');
         });
 
     });
