@@ -1,3 +1,3 @@
 export default {
-    latestVersion: 61
+    latestVersion: 66
 };
