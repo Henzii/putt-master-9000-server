@@ -69,8 +69,14 @@ export const queries = {
             pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
             return 'pong';
         },
-        getUsers: async () => {
-            return await userService.getUsers();
+        getUsers: async (_root: unknown, _args: unknown, context: ContextWithUser) => {
+            requireAuth(context);
+            if (!userService.isAdmin(context.user.id)) {
+                throw new Error('Unauthorized');
+            } else {
+                return await userService.getUsers();
+            }
+            return null;
         },
         getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);

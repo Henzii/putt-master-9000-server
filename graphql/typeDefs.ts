@@ -168,6 +168,9 @@ export const typeDefs = gql`
         Kirjautunut käyttäjä
         """
         getMe: User
+        """
+        Palauttaa kaikki käyttäjät. Admin only.
+        """
         getUsers: [User]!
         """
         Palauttaa väyläkohtaista tilastoa
