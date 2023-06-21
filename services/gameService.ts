@@ -5,6 +5,7 @@ import { Document } from "mongoose";
 import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
+import userService from "./userService";
 
 type GetGamesArgs = {
     userId: ID,
@@ -31,6 +32,18 @@ export const getMyAndFriendsGames = async (minCount: number, friendList: ID[], f
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
 };
+export const getLiveGames = async(userId: ID) => {
+    const me = await userService.getUser(undefined, userId);
+    if (!me) throw new Error('User not found');
+
+    return GameModel.find({
+        isOpen: true,
+        $or: [
+            {'scorecards.user': userId },
+            {'scorecards.user': { $in: me.friends }},
+        ]
+    });
+}
 export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0, search}: GetGamesArgs) => {
     const searchString:GamesSearchString = {
 
@@ -188,4 +201,4 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
         return false;
     }
 };
-export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings };
+export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings, getLiveGames };
