@@ -6,12 +6,12 @@ type MockedGame = Partial<Game> & {
 
 const game: MockedGame =
     {
-        id: 'mockedGame',
+        id: 'b00000000000000000000001',
         pars: [3,3,3,3,3,3,3,3,3],
         layout_id: '61ffbbc9dc4b6f65e2514ee9',
         scorecards: [
             {
-                id: 'card1',
+                id: 'c00000000000000000000001',
                 scores: [3,3,3,3,3,3,3,3,3],
                 plusminus: 0,
                 beers: 0,
@@ -19,7 +19,7 @@ const game: MockedGame =
                 pars: [],
                 median10: 0,
                 user: {
-                    id: 'player1',
+                    id: 'a00000000000000000000001',
                     name: 'User1',
                     passwordHash: '',
                     email: '',
@@ -28,7 +28,7 @@ const game: MockedGame =
                 }
             },
             {
-                id: 'card2',
+                id: 'c00000000000000000000002',
                 scores: [4,4,4,4,4,4,4,4,4],
                 plusminus: 0,
                 beers: 0,
@@ -36,7 +36,7 @@ const game: MockedGame =
                 pars: [],
                 median10: 0,
                 user: {
-                    id: 'player2',
+                    id: 'a00000000000000000000002',
                     name: 'User2',
                     passwordHash: '',
                     email: '',
@@ -45,7 +45,7 @@ const game: MockedGame =
                 }
             }
         ]
-    }
+    };
 
 
 export default game as Game;

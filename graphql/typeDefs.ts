@@ -168,6 +168,9 @@ export const typeDefs = gql`
         Kirjautunut käyttäjä
         """
         getMe: User
+        """
+        Palauttaa kaikki käyttäjät. Admin only.
+        """
         getUsers: [User]!
         """
         Palauttaa väyläkohtaista tilastoa
@@ -176,7 +179,7 @@ export const typeDefs = gql`
         """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
-        getHc (course: String!, layout: String!, userIds: [String]): [GetHcResponse]!
+        getHc (layoutId: ID!, userIds: [String]): [GetHcResponse]!
         """
         Hakee search hakusanalla käyttäjiä ja palauttaa listan (max 10) SafeUsereita (vain id ja nimi) sekä
         booleanin siitä onko hakutuloksia mahdollisesti lisää -> tuleeko hakua tarkentaa.

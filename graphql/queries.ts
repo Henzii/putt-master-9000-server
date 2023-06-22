@@ -69,15 +69,21 @@ export const queries = {
             pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
             return 'pong';
         },
-        getUsers: async () => {
-            return await userService.getUsers();
+        getUsers: async (_root: unknown, _args: unknown, context: ContextWithUser) => {
+            requireAuth(context);
+            if (!userService.isAdmin(context.user.id)) {
+                throw new Error('Unauthorized');
+            } else {
+                return await userService.getUsers();
+            }
+            return null;
         },
         getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
             return res;
         },
-        getHc: async (_root: unknown, args: { course: string, layout: string, userIds: ID[] }, context: ContextWithUser) => {
-            const res = await getPlayersScores(args.course, args.layout, args.userIds || [context.user.id]);
+        getHc: async (_root: unknown, args: {layoutId: ID, userIds: ID[] }, context: ContextWithUser) => {
+            const res = await getPlayersScores(args.layoutId, args.userIds || [context.user.id]);
             return res.map(user => {
                 return {
                     id: user._id,
