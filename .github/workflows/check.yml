@@ -10,8 +10,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 18.15.0
-      - name: Talk
-        run: echo "Checking ${{ github.ref }}. Merged? ${{ github.event.pull_request.merged }}"
       - name: Install
         run: npm install
       - name: Lint
@@ -21,7 +19,7 @@ jobs:
       - name: Test
         run: echo "npm run test -- SKIP"
   Deploy:
-    if: github.event.pull_request.merged == true
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
