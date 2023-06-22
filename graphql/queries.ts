@@ -1,5 +1,5 @@
 import { getCourses, getLayout } from "../services/courseService";
-import { getGames, getGame, getMyAndFriendsGames } from "../services/gameService";
+import gameService, { getGames, getGame, getMyAndFriendsGames } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
@@ -51,6 +51,10 @@ export const queries = {
         },
         getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {
             return await getGames({ userId: context.user.id, ...args});
+        },
+        getLiveGames: (root: unknown, args: unknown, context: ContextWithUser) => {
+            requireAuth(context);
+            return gameService.getLiveGames(context.user.id);
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
             if (!args.gameId) throw new Error('Not enough parameters');

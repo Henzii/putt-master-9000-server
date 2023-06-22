@@ -160,6 +160,10 @@ export const typeDefs = gql`
         getGame(gameId: ID!): Game 
         getLiveGame(gameId: ID!): Game
         """
+        Palautaa avoimet pelit joissa pelaa vähintään yksi kaveri
+        """
+        getLiveGames: [Game!]!
+        """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
         getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String): GetGamesResponse!
