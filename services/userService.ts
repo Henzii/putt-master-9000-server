@@ -165,6 +165,13 @@ const updateSettings = async (userId: ID, settings: UserSettingsArgs) => {
     );
     return user;
 };
+const getGroupUsers = async (groupName: string) => {
+    const users = await Users.find<Document & User>({
+        groupName
+    });
+    return users;
+};
+
 type makeFriendsArg = {
     name?: string,
     id?: ID,
@@ -173,5 +180,5 @@ type makeFriendsArg = {
 export default {
     getUsers, addUser, getUser, makeFriends, updateSettings,
     removeFriend, deleteAccount, getUsersPushTokens,
-    removePushToken, searchUser, isAdmin
+    removePushToken, searchUser, isAdmin, getGroupUsers,
 };

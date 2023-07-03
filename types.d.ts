@@ -51,6 +51,7 @@ export type User = {
     email?: string,
     friends: (ID | User)[],
     blockFriendRequests: boolean,
+    groupName: string,
     pushToken?: string,
     restoreCode?: string,
     accountType?: AccountType,

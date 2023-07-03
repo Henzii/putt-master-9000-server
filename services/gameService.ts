@@ -19,16 +19,17 @@ type GamesSearchString = {
     $or: { isOpen: boolean }[]
     course?: { $regex: string, $options: string }
 }
-export const getMyAndFriendsGames = async (minCount: number, friendList: ID[], filterYear: number) => {
+export const getGamesWithUser = async (minUserCount: number, userIds: ID[], filterYear: number) => {
     return await GameModel.find({
-        [`scorecards.${minCount-1}`]: { $exists: true },
+        [`scorecards.${minUserCount-1}`]: { $exists: true },
         startTime: {
             $gt: `${filterYear}-01-01`,
             $lt: `${filterYear}-12-31`
         },
-        'scorecards.user': { $in: friendList }
+        'scorecards.user': { $in: userIds }
     }) as (Document & Game)[];
 };
+
 export const getGame = async (id: ID) => {
     return await GameModel.findById(id) as Document & Game;
 };
@@ -43,7 +44,7 @@ export const getLiveGames = async(userId: ID) => {
             {'scorecards.user': { $in: me.friends }},
         ]
     });
-}
+};
 export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0, search}: GetGamesArgs) => {
     const searchString:GamesSearchString = {
 

@@ -65,6 +65,7 @@ export const typeDefs = gql`
         blockStatsSharing: Boolean
         achievements: [Achievement]!
         accountType: String
+        groupName: String
     }
     type Achievement {
         id: String!
@@ -74,6 +75,7 @@ export const typeDefs = gql`
     type SafeUser {
         id: ID!
         name: String!
+        groupName: String
     }
     type Game {
         id: ID!
@@ -195,6 +197,7 @@ export const typeDefs = gql`
         Hakee omat ja kavereiden pelit joissa annettu pelaajamäärä ylittyy, rajataan vuoden mukaan
         """
         getAllGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
+        getGroupGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
     }
 
     type Mutation {
@@ -213,7 +216,7 @@ export const typeDefs = gql`
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID): User
+        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String): User
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
 
