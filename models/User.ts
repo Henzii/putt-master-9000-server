@@ -12,6 +12,7 @@ const skeema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    groupName: String,
     pushToken: String,
     accountType: {
         type: String,

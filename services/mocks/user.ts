@@ -8,5 +8,6 @@ export const user: User = {
     friends: [],
     blockFriendRequests: false,
     achievements: [],
+    groupName: undefined
 };
 

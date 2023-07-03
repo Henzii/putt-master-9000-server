@@ -223,6 +223,7 @@ type GameSettingsArgs = {
 interface SettingsArgs {
     blockFriendRequests?: boolean,
     userId?: ID
+    groupName?: string
 }
 interface ChangeSettingsArgs extends SettingsArgs {
     password?: string,

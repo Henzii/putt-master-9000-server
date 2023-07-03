@@ -31,11 +31,12 @@ export type Game = {
     scorecards: Scorecard[],
     isOpen: boolean,
     startTime: Date,
-    endTime: Date,
+    endTime?: Date,
 }
 
 export type Scorecard = {
-    user: User,
+    id: ID,
+    user: SafeUser,
     scores: number[],
     beers: number,
     plusminus: number,
@@ -51,6 +52,7 @@ export type User = {
     email?: string,
     friends: (ID | User)[],
     blockFriendRequests: boolean,
+    groupName?: string,
     pushToken?: string,
     restoreCode?: string,
     accountType?: AccountType,

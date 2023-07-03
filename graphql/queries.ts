@@ -1,5 +1,5 @@
 import { getCourses, getLayout } from "../services/courseService";
-import gameService, { getGames, getGame, getMyAndFriendsGames } from "../services/gameService";
+import gameService, { getGames, getGame, getGamesWithUser } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
@@ -65,6 +65,7 @@ export const queries = {
             const game = await getGame(args.gameId);
             if (game.isOpen) return game;
             // Kauanko peli on ollut suljettuna (tuntia)
+            if (!game.endTime) throw new Error('Error, endTime not set');
             const diff = ((new Date(Date.now()).getTime() - new Date(game.endTime).getTime()) / 1000 / 60 / 60);
             if (diff > 24) throw new Error('Game is no longer available on live feed');
             return game;
@@ -112,7 +113,7 @@ export const queries = {
 
             if (!friendList?.length) return [];
 
-            const games = (await getMyAndFriendsGames(args.minPlayerCount, me?.friends as ID[], args.filterYear))
+            const games = (await getGamesWithUser(args.minPlayerCount, me?.friends as ID[], args.filterYear))
                 .map(game => {
                     game.scorecards = game.scorecards.filter(sc => {
                         return sc.user.toString() === context.user.id || friendList.includes(sc.user.toString());
@@ -122,6 +123,17 @@ export const queries = {
                 .filter(game => game.scorecards.length >= args.minPlayerCount);
 
             return games || [];
+        },
+        getGroupGames: async(_root: unknown, args: {minPlayerCount: number, filterYear: number}, context: ContextWithUser) => {
+            requireAuth(context);
+            const me = await userService.getUser(undefined, context.user.id);
+            if (!me?.groupName) return [];
+            const userIds = (await userService.getGroupUsers(me.groupName)).map(user => user.id.toString());
+            const games = (await getGamesWithUser(args.minPlayerCount, userIds, args.filterYear)).filter(game => {
+                const countedGroupPlayers = game.scorecards.reduce((acc, sc) => acc + (userIds.includes(sc.user.id) ? 1 : 0) , 0);
+                return countedGroupPlayers >= args.minPlayerCount;
+            });
+            return games;
         }
     }
 };
