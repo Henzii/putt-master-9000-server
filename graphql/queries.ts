@@ -65,6 +65,7 @@ export const queries = {
             const game = await getGame(args.gameId);
             if (game.isOpen) return game;
             // Kauanko peli on ollut suljettuna (tuntia)
+            if (!game.endTime) throw new Error('Error, endTime not set');
             const diff = ((new Date(Date.now()).getTime() - new Date(game.endTime).getTime()) / 1000 / 60 / 60);
             if (diff > 24) throw new Error('Game is no longer available on live feed');
             return game;
