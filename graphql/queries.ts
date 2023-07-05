@@ -128,9 +128,9 @@ export const queries = {
             requireAuth(context);
             const me = await userService.getUser(undefined, context.user.id);
             if (!me?.groupName) return [];
-            const userIds = (await userService.getGroupUsers(me.groupName)).map(user => user.id.toString());
+            const userIds = (await userService.getGroupUsers(me.groupName)).map(user => user.id.toString()) as string[];
             const games = (await getGamesWithUser(args.minPlayerCount, userIds, args.filterYear)).filter(game => {
-                const countedGroupPlayers = game.scorecards.reduce((acc, sc) => acc + (userIds.includes(sc.user.id) ? 1 : 0) , 0);
+                const countedGroupPlayers = game.scorecards.reduce((acc, sc) => acc + (userIds.includes(sc.user.toString()) ? 1 : 0) , 0);
                 return countedGroupPlayers >= args.minPlayerCount;
             });
             return games;
