@@ -1,3 +1,5 @@
+import type { Types } from "mongoose";
+
 export type Course = {
     name: string,
     id: number | string,
@@ -44,6 +46,9 @@ export type Scorecard = {
     median10: number,
     pars: number[] // plusminuksen laskemiseen,
 }
+
+export type UnpopulatedScorecard = Omit<Scorecard, 'user'> & { user: Types.ObjectId }
+export type GameWithUnpopulatedScorecard = Omit<Game, 'scorecards'> & { scorecards: UnpopulatedScorecard[] }
 
 export type User = {
     id: string | number,

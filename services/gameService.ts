@@ -1,4 +1,4 @@
-import { Game, ID, Course } from "../types";
+import { Game, ID, Course, GameWithUnpopulatedScorecard } from "../types";
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
@@ -27,7 +27,7 @@ export const getGamesWithUser = async (minUserCount: number, userIds: ID[], filt
             $lt: `${filterYear}-12-31`
         },
         'scorecards.user': { $in: userIds }
-    }) as (Document & Game)[];
+    }) as (Document & GameWithUnpopulatedScorecard)[];
 };
 
 export const getGame = async (id: ID) => {
