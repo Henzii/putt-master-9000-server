@@ -129,10 +129,12 @@ export const queries = {
             const me = await userService.getUser(undefined, context.user.id);
             if (!me?.groupName) return [];
             const userIds = (await userService.getGroupUsers(me.groupName)).map(user => user.id.toString()) as string[];
-            const games = (await getGamesWithUser(args.minPlayerCount, userIds, args.filterYear)).filter(game => {
-                const countedGroupPlayers = game.scorecards.reduce((acc, sc) => acc + (userIds.includes(sc.user.toString()) ? 1 : 0) , 0);
-                return countedGroupPlayers >= args.minPlayerCount;
-            });
+            const games = (await getGamesWithUser(args.minPlayerCount, userIds, args.filterYear))
+                .map(game => {
+                    game.scorecards = game.scorecards.filter(sc => userIds.includes(sc.user.toString()));
+                    return game;
+                })
+                .filter(game => game.scorecards.length >= args.minPlayerCount);
             return games;
         }
     }
