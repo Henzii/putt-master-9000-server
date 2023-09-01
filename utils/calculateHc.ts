@@ -1,6 +1,6 @@
 import { median } from "./median";
 
-const SCORES_REQUIRED_FOR_HC = 10;
+const SCORES_REQUIRED_FOR_HC = 5;
 
 /**
  * ### Funktio ratakohtaisen tasoituksen laskemiseen
