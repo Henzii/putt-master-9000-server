@@ -6,6 +6,7 @@ import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
 import userService from "./userService";
+import { GraphQLError } from "graphql";
 
 type GetGamesArgs = {
     userId: ID,
@@ -35,7 +36,7 @@ export const getGame = async (id: ID) => {
 };
 export const getLiveGames = async(userId: ID) => {
     const me = await userService.getUser(undefined, userId);
-    if (!me) throw new Error('User not found');
+    if (!me) throw new Error();
 
     return GameModel.find({
         isOpen: true,
@@ -95,18 +96,18 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e);
-        throw new Error('Error while adding players');
+        throw new GraphQLError('Error while adding players');
     }
 };
 export const createGame = async (courseId: ID, layoutId: ID) => {
     try {
         const course = await CourseModel.findById(courseId) as Document & Course;
         if (!course) {
-            throw new Error('Course not found!!');
+            throw new GraphQLError('Course not found!!');
         }
         const layout = course.layouts.find(l => l.id === layoutId);
         if (!layout) {
-            throw new Error('Layout not found!!');
+            throw new GraphQLError('Layout not found!!');
         }
         const newGame = new GameModel({
             date: new Date(),
@@ -130,10 +131,10 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
 
 export const setScore = async (args: SetScoreArgs) => {
     const game = await GameModel.findById<Game & Document>(args.gameId).populate('scorecards.user');
-    if (!game) throw new Error('Game not found');
+    if (!game) throw new GraphQLError('Game not found');
 
     const scorecard = game.scorecards.find(sc => sc?.user?.id === args.playerId);
-    if (!scorecard) throw new Error('Player\'s scorecard was not found');
+    if (!scorecard) throw new GraphQLError('Player\'s scorecard was not found');
 
     scorecard.scores[args.hole] = args.value;
     await game.save();
@@ -150,7 +151,7 @@ export const closeGame = async (gameId: ID, isOpen = false) => {
 export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => {
     const game = await GameModel.findById(gameId) as Document & Game;
     const scorecard = game.scorecards.find(sc => sc.user.toString() === playerId);
-    if (!scorecard) throw new Error('Scorecard not found!');
+    if (!scorecard) throw new GraphQLError('Scorecard not found!');
     scorecard['beers'] = beers;
     await game.save();
     return {
@@ -162,7 +163,7 @@ export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolea
     const newSettings = { ...settings };
     if (newSettings.startTime) {
         if (isNaN(Date.parse(newSettings.startTime as string))) {
-            throw new Error(`${newSettings.startTime} is not a valid date`);
+            throw new GraphQLError(`${newSettings.startTime} is not a valid date`);
         }
         newSettings.startTime = new Date(newSettings.startTime);
     }
@@ -177,7 +178,7 @@ export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolea
         }
     ).populate('scorecards.user');
     if (!game) {
-        throw new Error('Game for settings change not found. Illeagal parameters?');
+        throw new GraphQLError('Game for settings change not found. Illeagal parameters?');
     }
     return game;
 };

@@ -2,6 +2,7 @@ import { Document } from "mongoose";
 import CourseModel from "../models/Course";
 import { Course, ID, NewLayoutArgs } from "../types";
 import userService from "./userService";
+import { GraphQLError } from "graphql";
 
 type getCoursesArgs = {
     limit: number,
@@ -54,7 +55,7 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
                 if (lo.creator?.toString() === layout.creator || course.creator?.toString() === layout.creator || isAdmin) {
                     return {...layout, _id: layout.id};
                 }
-                throw new Error('Error, layout not created by you!');
+                throw new GraphQLError('Error, layout not created by you!');
             }
             return lo;
 
