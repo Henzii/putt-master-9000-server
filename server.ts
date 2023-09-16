@@ -14,13 +14,16 @@ import { ContextWithUser, SafeUser } from './types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { log } from './utils/log';
+import { applyMiddleware } from 'graphql-middleware';
+import { permissions } from './graphql/permissions';
+import { GraphQLError } from 'graphql';
 
 const SERVER_PATH = '/';
 
 const app = express();
 const httpServer = http.createServer(app);
 
-const schema = makeExecutableSchema({typeDefs, resolvers});
+const schema = applyMiddleware(makeExecutableSchema({typeDefs, resolvers}), permissions);
 
 const wsServer = new WebSocketServer({
     server: httpServer,
@@ -55,7 +58,7 @@ const server = new ApolloServer<ContextWithUser>({
 const validateToken = (authorization?: string): ContextWithUser => {
     try {
         if (!authorization || !process.env.TOKEN_KEY) {
-            throw new Error('Missing authorization header or token key');
+            throw new GraphQLError('Missing authorization header or token key');
         }
         const token = authorization?.slice(7);
         const decodedUser = jwt.verify(token, process.env.TOKEN_KEY) as SafeUser;

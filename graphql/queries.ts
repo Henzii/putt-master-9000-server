@@ -6,8 +6,8 @@ import userService from "../services/userService";
 import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 
 import appInfo from "../utils/appInfo";
-import { requireAuth } from "./permissions";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
+import { GraphQLError } from "graphql";
 
 interface GetArgs {
     limit: number,
@@ -26,8 +26,7 @@ export const queries = {
                 ...appInfo
             };
         },
-        getCourses: async (_root: unknown, args: GetArgs, context: ContextWithUser) => {
-            requireAuth(context);
+        getCourses: async (_root: unknown, args: GetArgs) => {
             try {
                 const { data: courses, count, hasMore } = await getCourses(args);
                 return {
@@ -41,8 +40,7 @@ export const queries = {
                 console.log(e, args);
             }
         },
-        getLayout: (_root: unknown, args: {layoutId: ID}, context: ContextWithUser) => {
-            requireAuth(context);
+        getLayout: (_root: unknown, args: {layoutId: ID}) => {
             return getLayout(args.layoutId);
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
@@ -53,35 +51,28 @@ export const queries = {
             return await getGames({ userId: context.user.id, ...args});
         },
         getLiveGames: (root: unknown, args: unknown, context: ContextWithUser) => {
-            requireAuth(context);
             return gameService.getLiveGames(context.user.id);
         },
         getGame: async (_root: unknown, args: { gameId: ID }) => {
-            if (!args.gameId) throw new Error('Not enough parameters');
+            if (!args.gameId) throw new GraphQLError('Not enough parameters');
             return await getGame(args.gameId);
         },
         getLiveGame: async (_root: unknown, args: { gameId: ID }) => {
-            if (!args.gameId) throw new Error('Params error');
+            if (!args.gameId) throw new GraphQLError('GameId missing from parameters');
             const game = await getGame(args.gameId);
             if (game.isOpen) return game;
             // Kauanko peli on ollut suljettuna (tuntia)
-            if (!game.endTime) throw new Error('Error, endTime not set');
+            if (!game.endTime) throw new GraphQLError('Error, endTime not set');
             const diff = ((new Date(Date.now()).getTime() - new Date(game.endTime).getTime()) / 1000 / 60 / 60);
-            if (diff > 24) throw new Error('Game is no longer available on live feed');
+            if (diff > 24) throw new GraphQLError('Game is no longer available on live feed');
             return game;
         },
         ping: () => {
             pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
             return 'pong';
         },
-        getUsers: async (_root: unknown, _args: unknown, context: ContextWithUser) => {
-            requireAuth(context);
-            if (!userService.isAdmin(context.user.id)) {
-                throw new Error('Unauthorized');
-            } else {
-                return await userService.getUsers();
-            }
-            return null;
+        getUsers: async () => {
+            return userService.getUsers();
         },
         getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
@@ -125,7 +116,6 @@ export const queries = {
             return games || [];
         },
         getGroupGames: async(_root: unknown, args: {minPlayerCount: number, filterYear: number}, context: ContextWithUser) => {
-            requireAuth(context);
             const me = await userService.getUser(undefined, context.user.id);
             if (!me?.groupName) return [];
             const userIds = (await userService.getGroupUsers(me.groupName)).map(user => user.id.toString()) as string[];

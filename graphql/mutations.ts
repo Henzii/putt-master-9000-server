@@ -8,7 +8,7 @@ import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
-import { requireAuth } from "./permissions";
+import { GraphQLError } from "graphql";
 
 export const mutations = {
     Mutation: {
@@ -16,7 +16,6 @@ export const mutations = {
             return addCourse(args.name, args.coordinates, context.user.id);
         },
         addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
-            requireAuth(context);
             return addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
         },
         // Game mutations
@@ -40,7 +39,6 @@ export const mutations = {
             return game;
         },
         setScore: async (_root: unknown, args: SetScoreArgs, context: ContextWithUser) => {
-            requireAuth(context);
             const updatedGame = await gameService.setScore(args);
             pubsub.publish(SUB_TRIGGERS.SCORECARD, {
                 [SUB_TRIGGERS.SCORECARD]: {
@@ -113,8 +111,8 @@ export const mutations = {
                 return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
-                if (viesti.includes('to be unique')) throw new Error(`Name ${args.name} is already taken!`);
-                throw new Error(`Error when creating accoount! (${(e as mongoose.Error).name})`);
+                if (viesti.includes('to be unique')) throw new GraphQLError(`Name ${args.name} is already taken!`);
+                throw new GraphQLError(`Error when creating accoount! (${(e as mongoose.Error).name})`);
             }
         },
         addFriend: async (_root: unknown, args: { friendId?: ID, friendName?: string }, context: ContextWithUser) => {
@@ -143,7 +141,7 @@ export const mutations = {
             }
             const user = await userService.getUser(args.user);
             if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
-                throw new Error('Wrong username or password');
+                throw new GraphQLError('Wrong username or password');
             } else {
                 const payload = {
                     id: user.id,
@@ -157,14 +155,13 @@ export const mutations = {
             }
         },
         changeSettings: async (_root: unknown, rawargs: ChangeSettingsArgs, context: ContextWithUser) => {
-            requireAuth(context);
             const { password, userId, ...args } = rawargs;
             const updateUserId = userId ?? context.user.id;
 
             if (userId && !userService.isAdmin(context.user.id)) {
                 // eslint-disable-next-line no-console
                 console.error(`${context.user.id} failed admin check`);
-                throw new Error('Unauthorized');
+                throw new GraphQLError('Unauthorized');
             }
 
             const finalArgs = args as UserSettingsArgs;
@@ -178,7 +175,7 @@ export const mutations = {
             const { name, password, restoreCode } = args;
             // Jos argumentteja tulee oudosti
             if (!name || (password && !restoreCode || !password && restoreCode)) {
-                throw new Error('Invalid argument count');
+                throw new GraphQLError('Invalid argument count');
             }
             const user = await userService.getUser(name) as User;
 
