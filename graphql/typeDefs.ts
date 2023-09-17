@@ -149,6 +149,14 @@ export const typeDefs = gql`
         users: [SafeUser]!
         hasMore: Boolean!
     }
+
+    type BestPoolForLayoutResponse {
+        game: Game!
+        totalPar: Int!
+        totalScore: Int!
+        gamesCount: Int!
+    }
+
     type Query {
         """
         Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
@@ -198,6 +206,7 @@ export const typeDefs = gql`
         """
         getAllGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
         getGroupGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
+        getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse
     }
 
     type Mutation {

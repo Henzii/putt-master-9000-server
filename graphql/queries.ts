@@ -3,7 +3,7 @@ import gameService, { getGames, getGame, getGamesWithUser } from "../services/ga
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
-import { getPlayersScores, getStatsForLayoyt } from "../services/statsService";
+import { getBestPoolGame, getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 
 import appInfo from "../utils/appInfo";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
@@ -126,6 +126,22 @@ export const queries = {
                 })
                 .filter(game => game.scorecards.length >= args.minPlayerCount);
             return games;
+        },
+        getBestPoolForLayout: async (_root: unknown, args: {players: number, layoutId: ID}) => {
+            if (!args.players || ! args.layoutId) throw new GraphQLError('Not enough parameters');
+            try {
+                const result = await getBestPoolGame(args.players, args.layoutId);
+                if (!result.length) return null;
+                const game = await gameService.getGame(result[0]._id);
+                return {
+                    game,
+                    totalScore: result[0].scores,
+                    totalPar: result[0].pars.reduce((acc, par) => acc + par, 0) * args.players,
+                    gamesCount: result.length
+                };
+            } catch {
+                return null;
+            }
         }
     }
 };

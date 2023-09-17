@@ -101,6 +101,44 @@ export const getPlayersScores = async (layoutId: ID, playerIds: ID[]) => {
     ]);
 };
 
+type GetBestPoolsAggregate = {
+    _id: ID,
+    pars: number[],
+    scores: number,
+    games: number
+}
+
+export const getBestPoolGame = (numberOfPlayers: number, layoutId: ID) => {
+    return GameModel.aggregate<GetBestPoolsAggregate>([
+        {
+            $match: {
+                layout_id: strToObjectId(layoutId),
+                isOpen: false,
+                scorecards: { $size: numberOfPlayers },
+            }
+        },
+        { $unwind: '$scorecards' },
+        {
+            $group: {
+                _id: '$_id',
+                pars: {$first: '$pars'},
+                scores: {
+                  $sum: {
+                    $reduce: {
+                      input: '$scorecards.scores',
+                      initialValue: 0,
+                      in: {
+                        $add: ['$$value', '$$this']
+                      }
+                    }
+                  }
+                },
+            }
+        },
+        { $sort: { 'scores': 1 }},
+    ]);
+};
+
 export default {
     getStatsForLayoyt,
 };
