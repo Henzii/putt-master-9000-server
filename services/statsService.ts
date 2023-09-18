@@ -135,7 +135,7 @@ export const getBestPoolGame = (numberOfPlayers: number, layoutId: ID) => {
                 },
             }
         },
-        { $sort: { 'scores': 1 }},
+        { $sort: { 'scores': 1, 'startTime': 1 }},
     ]);
 };
 
