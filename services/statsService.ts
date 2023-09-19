@@ -105,7 +105,8 @@ type GetBestPoolsAggregate = {
     _id: ID,
     pars: number[],
     scores: number,
-    games: number
+    games: number,
+    startTime: number
 }
 
 export const getBestPoolGame = (numberOfPlayers: number, layoutId: ID) => {
@@ -122,6 +123,7 @@ export const getBestPoolGame = (numberOfPlayers: number, layoutId: ID) => {
             $group: {
                 _id: '$_id',
                 pars: {$first: '$pars'},
+                startTime: {$first: '$startTime'},
                 scores: {
                   $sum: {
                     $reduce: {
