@@ -146,7 +146,7 @@ export const getUser = async (name?: string, id?: ID): Promise<Document & User |
         if (id) {
             user = await Users.findById(id) as Document & User;
         } else if (name) {
-            user = await Users.findOne({ name }) as Document & User;
+            user = await Users.findOne({ name: name.toLowerCase() }) as Document & User;
         } else {
             return null;
         }

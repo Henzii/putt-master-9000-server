@@ -7,6 +7,7 @@ const skeema = new mongoose.Schema({
         required: true,
         minlength: 3,
         unique: true,
+        lowercase: true,
     },
     passwordHash: {
         type: String,
@@ -45,7 +46,6 @@ const skeema = new mongoose.Schema({
 }, { timestamps: true });
 
 skeema.plugin(validator);
-
 skeema.set('toJSON', {
     transform: (document, returnedObj) => {
         returnedObj.id = returnedObj._id.toString();

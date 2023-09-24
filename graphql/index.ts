@@ -54,6 +54,7 @@ export const resolvers = {
         }
     },
     User: {
+        name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1),
         friends: async (root: Document & User) => {
             await root.populate('friends');
             return root.friends;
