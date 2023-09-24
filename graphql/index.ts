@@ -65,6 +65,9 @@ export const resolvers = {
             return root.achievements;
         }
     },
+    SafeUser: {
+        name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1)
+    },
     Scorecard: {
         total: (root: Scorecard) => {
             return total(root.scores);
