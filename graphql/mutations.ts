@@ -108,7 +108,17 @@ export const mutations = {
             return await gameService.abandonGame(args.gameId, context.user.id);
         },
         setBeersDrank: async (_root: unknown, args: { gameId: ID, playerId: ID, beers: number }) => {
-            return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
+            const {game, scorecard, user} = await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
+            pubsub.publish(SUB_TRIGGERS.SCORECARD, {
+                [SUB_TRIGGERS.SCORECARD]: {
+                    game: game,
+                    updatedScorecardPlayerId: args.playerId,
+                }
+            });
+            return {
+                user,
+                scorecard
+            };
         },
         // User mutations
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string, pushToken?: string }, context?: ContextWithUserOrNull) => {
