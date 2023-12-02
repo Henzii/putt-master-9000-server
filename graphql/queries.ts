@@ -5,7 +5,7 @@ import { ContextWithUser, ID } from "../types";
 import userService from "../services/userService";
 import { getBestPoolGame, getPlayersScores, getStatsForLayoyt } from "../services/statsService";
 
-import appInfo from "../utils/appInfo";
+import appInfo from "../utils/config";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 import { GraphQLError } from "graphql";
 
@@ -23,7 +23,7 @@ export const queries = {
     Query: {
         handShake: async () => {
             return {
-                ...appInfo
+                latestVersion: appInfo.latestVersion
             };
         },
         getCourses: async (_root: unknown, args: GetArgs) => {

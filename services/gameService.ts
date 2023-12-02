@@ -156,7 +156,8 @@ export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => 
     await game.save();
     return {
         user: scorecard.user.toString(),
-        scorecard,
+        game,
+        scorecard
     };
 };
 export const changeGameSettings = async( gameId: ID, settings: { isOpen?: boolean, startTime: string | Date }, userId: ID) => {
