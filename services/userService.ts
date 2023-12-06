@@ -171,6 +171,14 @@ const getGroupUsers = async (groupName: string) => {
     });
     return users;
 };
+const changeUsername = async(userId: ID, newUsername: string) => {
+    const user = await Users.findByIdAndUpdate(
+        {_id: userId},
+        {name: newUsername},
+        {returnDocument: 'after', runValidators: true}
+    );
+    return user;
+};
 
 type makeFriendsArg = {
     name?: string,
@@ -181,4 +189,5 @@ export default {
     getUsers, addUser, getUser, makeFriends, updateSettings,
     removeFriend, deleteAccount, getUsersPushTokens,
     removePushToken, searchUser, isAdmin, getGroupUsers,
+    changeUsername
 };
