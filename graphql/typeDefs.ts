@@ -226,6 +226,7 @@ export const typeDefs = gql`
         removeFriend(friendId: ID!): Boolean
         deleteAccount: Boolean
         changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String): User
+        changeUsername(newUsername: String!): User!
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
 

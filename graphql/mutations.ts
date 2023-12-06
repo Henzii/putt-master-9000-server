@@ -197,6 +197,14 @@ export const mutations = {
 
             return true;
         },
+        changeUsername: async(_root: unknown, args: {newUsername: string}, context: ContextWithUser) => {
+            const username = args.newUsername.toLowerCase();
+            try {
+                return await userService.changeUsername(context.user.id, username);
+            } catch {
+                throw new GraphQLError('Failed to change username. Name is already taken or name validation failed.');
+            }
+        }
     }
 };
 
