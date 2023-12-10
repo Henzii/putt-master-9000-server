@@ -19,6 +19,7 @@ export const permissions= shield({
         getMe: allow,
         getLiveGame: allow,
         ping: allow,
+        searchUser: allow,
 
         getUsers: isAdmin
     },
