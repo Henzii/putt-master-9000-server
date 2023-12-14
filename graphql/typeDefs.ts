@@ -217,7 +217,7 @@ export const typeDefs = gql`
         getGroupGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
         getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse
         """
-        Ei vuosilukua = viimeiset 52 viikkoa.
+        Ei vuosilukua = viimeiset 12 kuukautta.
         """
         getPastActivity(includeFriends: Boolean, year: Int): ActivityResponse!
     }
