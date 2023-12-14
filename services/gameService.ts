@@ -203,4 +203,17 @@ export const abandonGame = async(gameId: ID, playerId: ID) => {
         return false;
     }
 };
-export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame, setBeersDrank, abandonGame, changeGameSettings, getLiveGames };
+
+export const getScorecardsDates = async (userId: ID, from: Date, to: Date) => {
+    const games = await GameModel.find<GameWithUnpopulatedScorecard>({
+        'scorecards.user': userId,
+        'startTime': {
+            $gte: from,
+            $lt: to
+        }
+    });
+    return games.map(game => game.startTime);
+};
+
+export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame,
+    setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates };
