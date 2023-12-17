@@ -1,6 +1,15 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
+    type Activity {
+        month: Int!
+        games: Int!
+    }
+    type ActivityResponse {
+        from: String!
+        to: String!
+        months: [Activity]!
+    }
     type Subscription {
         test: String
         scorecardUpdated(gameId: ID!): TriggeredScorecard
@@ -207,6 +216,10 @@ export const typeDefs = gql`
         getAllGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
         getGroupGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
         getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse
+        """
+        Ei vuosilukua = viimeiset 12 kuukautta.
+        """
+        getPastActivity(includeFriends: Boolean, year: Int): ActivityResponse!
     }
 
     type Mutation {

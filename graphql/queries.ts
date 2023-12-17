@@ -8,17 +8,9 @@ import { getBestPoolGame, getPlayersScores, getStatsForLayoyt } from "../service
 import appInfo from "../utils/appInfo";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 import { GraphQLError } from "graphql";
+import { addMonths, addYears, endOfMonth, format, startOfMonth } from "date-fns";
+import { GetArgs, GetGamesArgs, GetPastActivityArgs } from "./types";
 
-interface GetArgs {
-    limit: number,
-    offset: number,
-    search?: string,
-    maxDistance?: number,
-}
-interface GetGamesArgs extends GetArgs {
-    onlyOpenGames?: boolean,
-    minPlayerCount?: number
-}
 export const queries = {
     Query: {
         handShake: async () => {
@@ -142,6 +134,28 @@ export const queries = {
             } catch {
                 return null;
             }
+        },
+        getPastActivity: async (_root: unknown, args: GetPastActivityArgs, context: ContextWithUser) => {
+            const fromDate = args.year ? new Date(args.year, 0, 1, 0, 0) : startOfMonth(addYears(new Date(), -1));
+            const toDate = args.year ? new Date(args.year, 11, 31, 23, 59) : endOfMonth(addMonths(new Date(), -1));
+            const dates = await gameService.getScorecardsDates(context.user.id, fromDate, toDate);
+            const monthNumbers = dates.map(date => +format(date, 'M'));
+
+            const groupedMonths: {month: number, games: number}[] = [];
+            const startingMonth = +format(toDate, 'M');
+
+            for(let i = 0; i <= 11; i++) {
+                const monthIndex = i >= startingMonth ? startingMonth + 12 - i : startingMonth - i;
+                const count = monthNumbers.reduce((acc, curr) => curr === monthIndex ? acc + 1 : acc, 0);
+                groupedMonths.push({month: monthIndex, games: count});
+            }
+
+            return {
+                from: fromDate.toLocaleDateString(),
+                to: toDate.toLocaleDateString(),
+                months: groupedMonths
+            };
+
         }
     }
 };
