@@ -141,13 +141,14 @@ export const queries = {
             const dates = await gameService.getScorecardsDates(context.user.id, fromDate, toDate);
             const monthNumbers = dates.map(date => +format(date, 'M'));
 
-            const groupedMonths = monthNumbers.reduce((acc, curr) => {
-                const prevMonth = acc.find(month => month.month === curr);
-                if (!prevMonth) return [...acc, {month: curr, games: 1}];
+            const groupedMonths: {month: number, games: number}[] = [];
+            const startingMonth = +format(toDate, 'M');
 
-                return acc.map(month => month.month !== curr ? month : {month: prevMonth.month, games: prevMonth.games + 1} );
-
-            }, [] as {month: number, games: number}[]);
+            for(let i = 0; i <= 11; i++) {
+                const monthIndex = i >= startingMonth ? startingMonth + 12 - i : startingMonth - i;
+                const count = monthNumbers.reduce((acc, curr) => curr === monthIndex ? acc + 1 : acc, 0);
+                groupedMonths.push({month: monthIndex, games: count});
+            }
 
             return {
                 from: fromDate.toLocaleDateString(),
