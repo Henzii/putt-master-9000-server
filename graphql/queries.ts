@@ -142,10 +142,10 @@ export const queries = {
             const monthNumbers = dates.map(date => +format(date, 'M'));
 
             const groupedMonths: {month: number, games: number}[] = [];
-            const startingMonth = +format(toDate, 'M');
+            const startingMonth = +format(fromDate, 'M');
 
             for(let i = 0; i <= 11; i++) {
-                const monthIndex = i >= startingMonth ? startingMonth + 12 - i : startingMonth - i;
+                const monthIndex = startingMonth + i > 12 ? startingMonth - 12 + i : startingMonth + i;
                 const count = monthNumbers.reduce((acc, curr) => curr === monthIndex ? acc + 1 : acc, 0);
                 groupedMonths.push({month: monthIndex, games: count});
             }
