@@ -136,9 +136,18 @@ export const queries = {
             }
         },
         getPastActivity: async (_root: unknown, args: GetPastActivityArgs, context: ContextWithUser) => {
+            if (args.userId) {
+                const me = await userService.getUser(undefined, context.user.id);
+                if (!me?.friends.includes(args.userId)) {
+                    throw new GraphQLError('Unauthorized');
+                }
+            }
+
+            const userId = args.userId ?? context.user.id;
+
             const fromDate = args.year ? new Date(args.year, 0, 1, 0, 0) : startOfMonth(addYears(new Date(), -1));
             const toDate = args.year ? new Date(args.year, 11, 31, 23, 59) : endOfMonth(addMonths(new Date(), -1));
-            const dates = await gameService.getScorecardsDates(context.user.id, fromDate, toDate);
+            const dates = await gameService.getScorecardsDates(userId, fromDate, toDate);
             const monthNumbers = dates.map(date => +format(date, 'M'));
 
             const groupedMonths: {month: number, games: number}[] = [];

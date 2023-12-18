@@ -1,5 +1,8 @@
+import { ID } from "../types";
+
 export type GetPastActivityArgs = {
     year?: number
+    userId?: ID
 }
 
 export type GetArgs = {

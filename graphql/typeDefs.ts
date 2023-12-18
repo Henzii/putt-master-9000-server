@@ -219,7 +219,7 @@ export const typeDefs = gql`
         """
         Ei vuosilukua = viimeiset 12 kuukautta.
         """
-        getPastActivity(includeFriends: Boolean, year: Int): ActivityResponse!
+        getPastActivity(userId: ID, year: Int): ActivityResponse!
     }
 
     type Mutation {
