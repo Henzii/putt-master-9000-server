@@ -52,6 +52,7 @@ export const typeDefs = gql`
         names: [String]!
         par: Int
         canEdit: Boolean!
+        deprecated: Boolean!
     }
     type User {
         id: ID!
@@ -110,6 +111,7 @@ export const typeDefs = gql`
         pars: [Int]!
         holes: Int!
         names: [String]
+        deprecated: Boolean
         id: ID
     }
     input GameSettings {

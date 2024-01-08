@@ -28,6 +28,10 @@ const skeema = new mongoose.Schema({
             pars: [],
             names: [String],
             creator: mongoose.Types.ObjectId,
+            deprecated: {
+                type: Boolean,
+                default: false
+            }
         }
     ],
 
