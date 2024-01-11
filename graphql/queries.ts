@@ -66,6 +66,9 @@ export const queries = {
         getUsers: async () => {
             return userService.getUsers();
         },
+        getUser: async (_root: unknown, args: {userId: ID}) => {
+            return await userService.getUser(undefined, args.userId);
+        },
         getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
             return res;

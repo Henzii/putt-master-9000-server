@@ -21,7 +21,8 @@ export const permissions= shield({
         ping: allow,
         searchUser: allow,
 
-        getUsers: isAdmin
+        getUsers: isAdmin,
+        getUser: isAdmin
     },
 
     Mutation: {
