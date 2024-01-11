@@ -197,6 +197,7 @@ export const typeDefs = gql`
         Palauttaa kaikki käyttäjät. Admin only.
         """
         getUsers: [User]!
+        getUser (userId: ID!): User
         """
         Palauttaa väyläkohtaista tilastoa
         """
