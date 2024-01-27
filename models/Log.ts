@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { User } from "../types";
+import { Document } from "mongoose";
 
 export enum LogType {
     ERROR = "error",
@@ -23,7 +24,7 @@ export type LogEntry = {
     user?: User
 }
 
-type LogEntryDocument = LogEntry & Document
+export type LogEntryDocument = LogEntry & Document
 
 const schema = new mongoose.Schema<LogEntryDocument>({
     message: String,

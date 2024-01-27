@@ -8,6 +8,7 @@ import { calculateHc } from "../utils/calculateHc";
 import { getDistance } from 'geolib';
 import { plusminus, total } from "../utils/calculators";
 import { subscriptions } from "./subscriptions";
+import { LogEntryDocument } from "../models/Log";
 
 export const resolvers = {
     ...queries,
@@ -129,6 +130,12 @@ export const resolvers = {
             }, []);
             const hc = calculateHc(root.pars, sumTable);
             return hc;
+        }
+    },
+    LogEntry: {
+        user: async (root: LogEntryDocument) => {
+            await root.populate('user');
+            return root.user;
         }
     }
 };
