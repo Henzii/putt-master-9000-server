@@ -9,7 +9,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { json } from 'body-parser';
 import { typeDefs} from './graphql/typeDefs';
-import { resolvers } from './graphql/index';
+import { mergedResolvers } from './graphql/index';
 import { ContextWithUser, SafeUser } from './types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
@@ -23,7 +23,7 @@ const SERVER_PATH = '/';
 const app = express();
 const httpServer = http.createServer(app);
 
-const schema = applyMiddleware(makeExecutableSchema({typeDefs, resolvers}), permissions);
+const schema = applyMiddleware(makeExecutableSchema({typeDefs, resolvers: mergedResolvers}), permissions);
 
 const wsServer = new WebSocketServer({
     server: httpServer,

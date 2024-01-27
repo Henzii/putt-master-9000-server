@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
-export const typeDefs = gql`
+import groupTypeDefs from './group/typeDefs';
+
+const oldTypeDefs = gql`
     type Activity {
         month: Int!
         games: Int!
@@ -257,3 +260,5 @@ export const typeDefs = gql`
 
     }
 `;
+
+export const typeDefs = mergeTypeDefs([groupTypeDefs, oldTypeDefs]);

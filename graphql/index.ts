@@ -9,6 +9,8 @@ import { getDistance } from 'geolib';
 import { plusminus, total } from "../utils/calculators";
 import { subscriptions } from "./subscriptions";
 import { LogEntryDocument } from "../models/Log";
+import { mergeResolvers } from "@graphql-tools/merge";
+import groupResolvers from "./group";
 
 export const resolvers = {
     ...queries,
@@ -139,6 +141,8 @@ export const resolvers = {
         }
     }
 };
+
+export const mergedResolvers = mergeResolvers([groupResolvers, resolvers]);
 
 type LayoutStatsRoot = {
     scores: number[][],
