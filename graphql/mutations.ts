@@ -1,6 +1,7 @@
 import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
+import Log from '../services/logServerice';
 import achievementService from "../services/achievementService";
 import pushNotificationsService from "../services/pushNotificationsService";
 import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
@@ -9,14 +10,20 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 import { GraphQLError } from "graphql";
+import { LogContext, LogType } from "../models/Log";
+import { ContextWithUserOrNull } from "./types";
 
 export const mutations = {
     Mutation: {
-        addCourse: (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number } }, context: ContextWithUser) => {
-            return addCourse(args.name, args.coordinates, context.user.id);
+        addCourse: async (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number } }, context: ContextWithUser) => {
+            const course = await addCourse(args.name, args.coordinates, context.user.id);
+            Log(`New course ${course.name} created`, LogType.SUCCESS, LogContext.COURSE, context.user.id);
+            return course;
         },
-        addLayout: (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
-            return addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
+        addLayout: async (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
+            const layout = await addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
+            Log(`New layout ${args.layout.name} created for ${layout.name}`, LogType.SUCCESS, LogContext.LAYOUT, context.user.id);
+            return layout;
         },
         // Game mutations
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
@@ -104,13 +111,15 @@ export const mutations = {
             return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
         },
         // User mutations
-        createUser: async (_root: unknown, args: { name: string, password: string, email?: string, pushToken?: string }) => {
+        createUser: async (_root: unknown, args: { name: string, password: string, email?: string, pushToken?: string }, context?: ContextWithUserOrNull) => {
             const hashedPassword = await bcrypt.hash(args.password, 10);
             try {
                 const user = await userService.addUser(args.name, hashedPassword, args.email, args.pushToken);
+                Log(`User ${user.name} created`, LogType.SUCCESS, LogContext.USER_CREATION, context?.user?.id);
                 return jwt.sign({ id: user.id, name: user.name }, process.env.TOKEN_KEY || 'NoKey?NoProblem!#!#!R1fdsf13rn');
             } catch (e) {
                 const viesti = (e as mongoose.Error).message;
+                Log(`User creation failed, message: ${viesti}`, LogType.ERROR, LogContext.USER_CREATION, context?.user?.id);
                 if (viesti.includes('to be unique')) throw new GraphQLError(`Name ${args.name} is already taken!`);
                 throw new GraphQLError(`Error when creating accoount! (${(e as mongoose.Error).name})`);
             }
@@ -131,7 +140,13 @@ export const mutations = {
             return await userService.removeFriend(context.user.id, args.friendId);
         },
         deleteAccount: async (_root: unknown, _args: unknown, context: ContextWithUser) => {
-            return await userService.deleteAccount(context.user.id);
+            const response = await userService.deleteAccount(context.user.id);
+            if (response) {
+                Log(`Account ${context.user.name} / ${context.user.id} deleted`, LogType.SUCCESS, LogContext.USER_DELETION);
+            } else {
+                Log(`Deleting account ${context.user.name} failed`, LogType.ERROR, LogContext.USER_DELETION);
+            }
+            return response;
         },
         login: async (_root: unknown, args: LoginArgs) => {
             if (!process.env.TOKEN_KEY) {
@@ -200,7 +215,9 @@ export const mutations = {
         changeUsername: async(_root: unknown, args: {newUsername: string}, context: ContextWithUser) => {
             const username = args.newUsername.toLowerCase();
             try {
-                return await userService.changeUsername(context.user.id, username);
+                const user = await userService.changeUsername(context.user.id, username);
+                Log(`User changed their username from ${context.user.name} to ${username}`, LogType.INFO, LogContext.USER, context.user.id);
+                return user;
             } catch {
                 throw new GraphQLError('Failed to change username. Name is already taken or name validation failed.');
             }
