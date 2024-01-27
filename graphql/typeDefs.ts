@@ -173,6 +173,7 @@ export const typeDefs = gql`
         type: String!
         context: String!
         user: User
+        createdAt: String!
     }
 
     type Query {
