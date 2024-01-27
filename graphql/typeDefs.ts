@@ -168,6 +168,13 @@ export const typeDefs = gql`
         gamesCount: Int!
     }
 
+    type LogEntry {
+        message: String!
+        type: String!
+        context: String!
+        user: User
+    }
+
     type Query {
         """
         Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
@@ -223,6 +230,7 @@ export const typeDefs = gql`
         Ei vuosilukua = viimeiset 12 kuukautta.
         """
         getPastActivity(userId: ID, year: Int): ActivityResponse!
+        getLogs: [LogEntry]
     }
 
     type Mutation {

@@ -22,6 +22,7 @@ export const permissions= shield({
         searchUser: allow,
 
         getUsers: isAdmin,
+        getLogs: isAdmin,
         getUser: isAdmin
     },
 

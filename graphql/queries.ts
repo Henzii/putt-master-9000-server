@@ -10,6 +10,7 @@ import { SUB_TRIGGERS, pubsub } from "./subscriptions";
 import { GraphQLError } from "graphql";
 import { addMonths, addYears, endOfMonth, format, startOfMonth } from "date-fns";
 import { GetArgs, GetGamesArgs, GetPastActivityArgs } from "./types";
+import { getLogs } from "../services/logServerice";
 
 export const queries = {
     Query: {
@@ -68,6 +69,9 @@ export const queries = {
         },
         getUser: async (_root: unknown, args: {userId: ID}) => {
             return await userService.getUser(undefined, args.userId);
+        },
+        getLogs: () => {
+            return getLogs();
         },
         getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
             const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
