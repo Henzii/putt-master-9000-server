@@ -1,4 +1,4 @@
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, type Document } from 'mongoose';
 import validator from 'mongoose-unique-validator';
 import makeId from '../utils/makeId';
 import { Group } from '../types/Group';
@@ -10,7 +10,7 @@ export type GroupModel = Model<GroupDocument> & {
     createGroup: (name: string, creatorId: ID) => Promise<GroupDocument>
 }
 
-const schema = new mongoose.Schema<Group>({
+const schema = new mongoose.Schema<Omit<Group, 'id'>>({
     name: String,
     users: [{
         type: mongoose.Types.ObjectId,
@@ -32,11 +32,21 @@ const schema = new mongoose.Schema<Group>({
         type: mongoose.Types.ObjectId,
         ref: 'Game',
         default: []
-    }]
+    }],
+    minNumberOfPlayers: {
+        type: Number,
+        default: 5
+    }
 });
 
+schema.set('toJSON', {
+    transform: (document, returnedObj) => {
+        returnedObj.id = returnedObj._id.toString();
+        delete returnedObj._id;
+        delete returnedObj._v;
+    }
+});
 schema.plugin(validator);
-
 
 schema.statics.createGroup = async function(name: string, creatorId: ID) {
     let attempts = 0;

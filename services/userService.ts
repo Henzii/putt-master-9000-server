@@ -10,7 +10,7 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     return users;
 };
 
-const isAdmin = async (userId: ID) => {
+export const isAdmin = async (userId: ID) => {
     const user = await Users.findById({_id: userId});
     return user?.accountType === 'admin'|| user?.accountType === 'god';
 };

@@ -1,17 +1,21 @@
-import Group from "../../models/Group";
-import { ContextWithUser } from "../../types";
+import { GraphQLError } from "graphql";
+import groupService from "../../services/groupService";
+import { ContextWithUser, ID } from "../../types";
+import { UserContext } from "../../types/Context";
 
-export default {
+export const queries = {
     Query: {
-        // MUTATION!
-        createGroup: (_context: unknown, args: {name: string}, context: ContextWithUser) => {
-            return Group.createGroup(args.name, context.user.id);
+        getMyGroups: (_context: unknown, args: {created?: boolean}, context: ContextWithUser) => {
+            return groupService.getUserGroups(context.user.id, args.created ?? false);
         },
-
-        getMyGroups: (_context: unknown, args: {created: boolean}, context: ContextWithUser) => {
-            return Group.find({
-                users: context.user.id
-            }).populate(['users', 'games']);
+        getGroup: async (_context: unknown, args: {groupId: ID}, context: UserContext) => {
+            const group = await groupService.getGroup(args.groupId);
+            if (!group?.users.includes(context.user.id)) {
+                throw new GraphQLError('Not your group');
+            }
+            return group;
         }
     }
 };
+
+export default queries;
