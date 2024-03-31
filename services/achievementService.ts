@@ -5,7 +5,7 @@ const MIN_PLAYER_COUNT = 3;
 const MALMIS_ID = '61ffbbc9dc4b6f65e2514ee9';
 // Testaukseen '63135c3519500ea7ed409c1b';
 
-import config from "../utils/config";
+import achievements from "../utils/achievements";
 import pushNotificationsService from "./pushNotificationsService";
 
 type UserAndGame = {
@@ -35,7 +35,7 @@ export const addAchievement = async ({userId, game}: UserAndGame, id: Achievemen
         layout_id: game.layout_id
     });
     await user.save();
-    pushNotificationsService.sendNotification([userId], config.achievements[id].notification);
+    pushNotificationsService.sendNotification([userId], achievements.achievements[id].notification);
 };
 
 export const checkAchievements = async (game: Game) => {

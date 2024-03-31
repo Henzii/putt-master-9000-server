@@ -7,8 +7,14 @@ import { calculateHc } from "../utils/calculateHc";
 
 import { getDistance } from 'geolib';
 import { plusminus, total } from "../utils/calculators";
-import { subscriptions } from "./subscriptions";
+import { subscriptions } from "./subscriptions/subscriptions";
 import { LogEntryDocument } from "../models/Log";
+import { mergeTypeDefs } from '@graphql-tools/merge';
+
+import { typeDefs as mixedTypeDefs } from './typeDefs';
+import subscriptionsTypeDefs from './subscriptions/typeDefs';
+
+export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs]);
 
 export const resolvers = {
     ...queries,
@@ -64,6 +70,9 @@ export const resolvers = {
             await root.populate('achievements.game');
             return root.achievements;
         }
+    },
+    SafeUser: {
+        name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1)
     },
     Scorecard: {
         total: (root: Scorecard) => {

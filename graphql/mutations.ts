@@ -8,10 +8,11 @@ import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import { SUB_TRIGGERS, pubsub } from "./subscriptions";
+import { pubsub } from "./subscriptions/subscriptions";
 import { GraphQLError } from "graphql";
 import { LogContext, LogType } from "../models/Log";
 import { ContextWithUserOrNull } from "./types";
+import { publishGameChanges } from "./publish";
 
 export const mutations = {
     Mutation: {
@@ -47,13 +48,8 @@ export const mutations = {
         },
         setScore: async (_root: unknown, args: SetScoreArgs, context: ContextWithUser) => {
             const updatedGame = await gameService.setScore(args);
-            pubsub.publish(SUB_TRIGGERS.SCORECARD, {
-                [SUB_TRIGGERS.SCORECARD]: {
-                    game: updatedGame,
-                    updatedScorecardPlayerId: args.playerId,
-                    updaterId: context.user.id
-                }
-            });
+            publishGameChanges(updatedGame, context.user.id, pubsub);
+
             return updatedGame;
         },
         changeGameSettings: async (_root: unknown, args: GameSettingsArgs, context: ContextWithUser) => {
@@ -91,12 +87,8 @@ export const mutations = {
                         body: `${context.user.name} closed the game.\nThe winner was ${winner.name} (${winner.score - coursePar})`,
                     });
                     achievementService.checkAchievements(game);
+                    publishGameChanges(game, context.user.id, pubsub);
 
-                    pubsub.publish(SUB_TRIGGERS.SCORECARD, {
-                        [SUB_TRIGGERS.SCORECARD]: {
-                            game: game,
-                        }
-                    });
                     return game;
                 } catch (e) {
                     // eslint-disable-next-line no-console
@@ -107,8 +99,14 @@ export const mutations = {
         abandonGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
             return await gameService.abandonGame(args.gameId, context.user.id);
         },
-        setBeersDrank: async (_root: unknown, args: { gameId: ID, playerId: ID, beers: number }) => {
-            return await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
+        setBeersDrank: async (_root: unknown, args: { gameId: ID, playerId: ID, beers: number }, context: ContextWithUser) => {
+            const {game, scorecard, user} = await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
+            publishGameChanges(game, context.user.id, pubsub);
+
+            return {
+                user,
+                scorecard
+            };
         },
         // User mutations
         createUser: async (_root: unknown, args: { name: string, password: string, email?: string, pushToken?: string }, context?: ContextWithUserOrNull) => {

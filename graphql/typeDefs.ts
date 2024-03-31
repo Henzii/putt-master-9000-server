@@ -10,16 +10,7 @@ export const typeDefs = gql`
         to: String!
         months: [Activity]!
     }
-    type Subscription {
-        test: String
-        scorecardUpdated(gameId: ID!): TriggeredScorecard
-    }
-    type TriggeredScorecard {
-        game: Game
-        updatedScorecardPlayerId: ID
-        updaterId: ID
-    }
-    type GetCoursesResponse {
+     type GetCoursesResponse {
         courses: [Course]!
         hasMore: Boolean!
         nextOffset: Int

@@ -8,7 +8,7 @@ import http from 'http';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { json } from 'body-parser';
-import { typeDefs} from './graphql/typeDefs';
+import { typeDefs } from './graphql';
 import { resolvers } from './graphql/index';
 import { ContextWithUser, SafeUser } from './types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
