@@ -1,15 +1,14 @@
-import { getCourses, getLayout } from "../services/courseService";
 import gameService, { getGames, getGame, getGamesWithUser } from "../services/gameService";
 import { ContextWithUser, ID } from "../types";
 
 import userService from "../services/userService";
-import { getBestPoolGame, getPlayersScores, getStatsForLayoyt } from "../services/statsService";
+import { getBestPoolGame, getPlayersScores } from "../services/statsService";
 
 import appInfo from "../utils/config";
 import { pubsub } from "./subscriptions/subscriptions";
 import { GraphQLError } from "graphql";
 import { addMonths, addYears, endOfMonth, format, startOfMonth } from "date-fns";
-import { GetArgs, GetGamesArgs, GetPastActivityArgs } from "./types";
+import { GetGamesArgs, GetPastActivityArgs } from "./types";
 import { getLogs } from "../services/logServerice";
 import { SUB_TRIGGERS } from "./subscriptions/types";
 
@@ -19,23 +18,6 @@ export const queries = {
             return {
                 latestVersion: appInfo.latestVersion
             };
-        },
-        getCourses: async (_root: unknown, args: GetArgs) => {
-            try {
-                const { data: courses, count, hasMore } = await getCourses(args);
-                return {
-                    courses,
-                    hasMore,
-                    count,
-                    nextOffset: hasMore ? (args.offset + args.limit) : null
-                };
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.log(e, args);
-            }
-        },
-        getLayout: (_root: unknown, args: {layoutId: ID}) => {
-            return getLayout(args.layoutId);
         },
         getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
             if (!context?.user?.id) return null;
@@ -73,10 +55,6 @@ export const queries = {
         },
         getLogs: () => {
             return getLogs();
-        },
-        getLayoutStats: async (_root: unknown, args: { layoutId: ID, playersIds: ID[]}, context: ContextWithUser) => {
-            const res = await getStatsForLayoyt(args.layoutId, args.playersIds || [context.user.id]);
-            return res;
         },
         getHc: async (_root: unknown, args: {layoutId: ID, userIds: ID[] }, context: ContextWithUser) => {
             const res = await getPlayersScores(args.layoutId, args.userIds || [context.user.id]);

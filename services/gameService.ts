@@ -216,5 +216,21 @@ export const getScorecardsDates = async (userId: ID, from: Date, to: Date) => {
     return games.map(game => game.startTime);
 };
 
+export const countGamesPlayedOnLayouts = async (layoutIds: ID[]) => {
+    const count = await GameModel.count({
+        layout_id: { $in: layoutIds }
+    });
+    return count;
+};
+
+export const deleteCourse = async (courseId: ID) => {
+    try {
+        await GameModel.findByIdAndDelete(courseId);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
 export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame,
-    setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates };
+    setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates, countGamesPlayedOnLayouts };

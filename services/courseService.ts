@@ -17,6 +17,11 @@ export async function getLayout(layoutId: ID) {
     return course?.layouts.find(c => c.id === layoutId) ?? null;
 }
 
+export async function getCourse(courseId: ID){
+    const course = await CourseModel.findById(courseId) as Document & Course;
+    return course;
+}
+
 export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance }: getCoursesArgs) {
     const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
