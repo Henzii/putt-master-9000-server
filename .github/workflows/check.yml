@@ -19,6 +19,7 @@ jobs:
       - name: Test
         run: echo "npm run test -- SKIP"
   Deploy:
+    needs: Check
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
