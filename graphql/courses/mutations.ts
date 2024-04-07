@@ -1,17 +1,39 @@
 import Log from '../../services/logServerice';
 import { LogContext, LogType } from "../../models/Log";
-import { addCourse, addLayout, getCourse } from "../../services/courseService";
+import { addCourse, addLayout, deleteCourse, getCourse, updateCourse } from "../../services/courseService";
 import { ContextWithUser, ID, NewLayoutArgs } from "../../types";
 import { GraphQLError } from 'graphql';
 import userService from '../../services/userService';
-import { countGamesPlayedOnLayouts, deleteCourse } from '../../services/gameService';
+import { countGamesPlayedOnLayouts } from '../../services/gameService';
 
+type AddCourseArgs = {
+    name: string
+    coordinates?: {
+        lat: number
+        lon: number
+    }
+    courseId?: ID
+}
 
 export default {
     Mutation: {
-        addCourse: async (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number } }, context: ContextWithUser) => {
-            const course = await addCourse(args.name, args.coordinates, context.user.id);
-            Log(`New course ${course.name} created`, LogType.SUCCESS, LogContext.COURSE, context.user.id);
+        addCourse: async (_root: unknown, args: AddCourseArgs, context: ContextWithUser) => {
+            const {name, coordinates, courseId} = args;
+            if (courseId) {
+                const course = await getCourse(courseId);
+                if (!course) throw new GraphQLError('Course not found');
+                if (course.creator?.toString() !== context.user.id || !(userService.isAdmin(context.user.id))) {
+                    Log(`${context.user.name} (${context.user.id}) tried to edit course (${name}, ${courseId}) but was denied (not the owner)`, LogType.WAGNING, LogContext.COURSE);
+                    throw new GraphQLError('You can only edit courses you have created');
+                }
+
+                const updatedCourse = await updateCourse(name, coordinates, courseId);
+                if (!updatedCourse) throw new GraphQLError('Course update failed for some reason');
+                Log(`${context.user.name} (${context.user.id}) updated course ${courseId}`, LogType.SUCCESS, LogContext.COURSE);
+                return updatedCourse;
+            }
+            const course = await addCourse(name, coordinates, context.user.id);
+            Log(`New course ${name} created`, LogType.SUCCESS, LogContext.COURSE, context.user.id);
             return course;
         },
         addLayout: async (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
@@ -22,7 +44,7 @@ export default {
         deleteCourse: async(_root: unknown, args: { courseId: ID }, context: ContextWithUser) => {
             const course = await getCourse(args.courseId);
             if (!course) throw new GraphQLError('Course not found');
-            if (context.user.id !== course.creator && !(await userService.isAdmin(context.user.id))) {
+            if (context.user.id !== course.creator?.toString() && !(await userService.isAdmin(context.user.id))) {
                 throw new GraphQLError('Course was not created by you');
             }
 

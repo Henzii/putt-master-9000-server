@@ -18,8 +18,12 @@ export async function getLayout(layoutId: ID) {
 }
 
 export async function getCourse(courseId: ID){
-    const course = await CourseModel.findById(courseId) as Document & Course;
-    return course;
+    try {
+        const course = await CourseModel.findById(courseId) as Document & Course;
+        return course;
+    } catch {
+        return null;
+    }
 }
 
 export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance }: getCoursesArgs) {
@@ -38,12 +42,23 @@ export async function getCourses({ limit, offset, search, coordinates = [0, 0], 
     return { data: kurssit, count: documents, hasMore: (offset + limit < documents) };
 
 }
-export async function addCourse(name: string, coordinates: { lat: number, lon: number }, creator: ID) {
+
+export async function updateCourse(name: string, coordinates: {lat: number, lon: number} | undefined, courseId: ID) {
+    try {
+        return await CourseModel.findByIdAndUpdate(courseId, {
+            name,
+            location: coordinates ? {type: 'Point', coordinates: [coordinates?.lon || 0, coordinates?.lat || 0]} : undefined
+        }, {returnDocument: 'after'});
+    } catch (e) {
+        return null;
+    }
+}
+export async function addCourse(name: string, coordinates: { lat: number, lon: number } | undefined, creator: ID) {
     const newCourse = new CourseModel({
         name,
         layouts: [],
         location: {
-            coordinates: [coordinates.lon, coordinates.lat]
+            coordinates: [coordinates?.lon || 0, coordinates?.lat || 0]
         },
         creator,
     });
@@ -71,3 +86,13 @@ export async function addLayout(courseId: number | string, layout: NewLayoutArgs
     await course.save();
     return course;
 }
+
+export const deleteCourse = async (courseId: ID) => {
+    try {
+        await CourseModel.findByIdAndRemove(courseId);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+

@@ -224,10 +224,12 @@ export const countGamesPlayedOnLayouts = async (layoutIds: ID[]) => {
 };
 
 export const deleteCourse = async (courseId: ID) => {
+    console.log('Poista', courseId);
     try {
-        await GameModel.findByIdAndDelete(courseId);
+        await GameModel.findByIdAndRemove(courseId.toString());
         return true;
-    } catch {
+    } catch (e) {
+        console.log(e);
         return false;
     }
 };

@@ -71,7 +71,7 @@ export default gql`
     }
 
     type Mutation {
-        addCourse(name: String!, coordinates: InputLocation): Course!
+        addCourse(name: String!, coordinates: InputLocation, courseId: ID): Course!
         addLayout(courseId: ID!, layout: NewLayout!): Course!
         deleteCourse(courseId: ID!): Boolean!
     }
