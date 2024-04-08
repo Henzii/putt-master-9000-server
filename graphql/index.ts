@@ -1,65 +1,26 @@
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { ContextWithUser, Game, Layout, RawStatsDataHC, Scorecard, User, Course } from "../types";
+import { ContextWithUser, Game, RawStatsDataHC, Scorecard, User } from "../types";
 import { Document } from "mongoose";
 import { calculateHc } from "../utils/calculateHc";
 
-import { getDistance } from 'geolib';
 import { plusminus, total } from "../utils/calculators";
 import { subscriptions } from "./subscriptions/subscriptions";
 import { LogEntryDocument } from "../models/Log";
-import { mergeTypeDefs } from '@graphql-tools/merge';
+import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 
 import { typeDefs as mixedTypeDefs } from './typeDefs';
 import subscriptionsTypeDefs from './subscriptions/typeDefs';
+import coursesTypeDefs from './courses/typeDefs';
 
-export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs]);
+import coursesResolvers from './courses/resolvers';
 
-export const resolvers = {
+const mixedResolvers = {
     ...queries,
     ...mutations,
     ...subscriptions,
 
-    Layout: {
-        par: (root: Layout) => {
-            return root.pars.reduce((p, c) => (p + c), 0);
-        },
-        canEdit: (root: Layout, args: unknown, context: ContextWithUser) => {
-            return context.user.id === root.creator?.toString() || context.user.id == root.courseCreator?.toString();
-        }
-    },
-    Course: {
-        layouts: (root: Course) => {
-            return root.layouts.map(layout => {
-                layout.courseCreator = root.creator;
-                return layout;
-            });
-        },
-        canEdit: (root: Course, args: unknown, context: ContextWithUser) => {
-            return context.user.id === root.creator?.toString();
-        },
-        distance: (root: Course, args: unknown, context: unknown, info: InfoWithCoordinates) => {
-            try {
-                const [lon1, lat1] = root.location.coordinates;
-                const [lon2, lat2] = info.variableValues.coordinates;
-                const distance = getDistance(
-                    { latitude: lat1, longitude: lon1 },
-                    { latitude: lat2, longitude: lon2 }
-                );
-                return {
-                    meters: distance,
-                    string: (distance > 10000)
-                        ? Math.floor(distance / 1000) + ' km'
-                        : (distance < 1000)
-                            ? distance + ' m'
-                            : Math.round(distance / 1000 * 10) / 10 + ' km'
-                };
-            } catch (e) {
-                return { meters: 0, string: '' };
-            }
-        }
-    },
     User: {
         name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1),
         friends: async (root: Document & User) => {
@@ -125,22 +86,6 @@ export const resolvers = {
             return calculateHc(root.pars, root.scores.slice(-10));
         }
     },
-    LayoutStats: {
-        best: (root: LayoutStatsRoot) => {
-            return root.scores.reduce((p, c) => {
-                const total = c.reduce((sum, score) => sum + score, 0);
-                if (!p || total < p) return total;
-                return p;
-            }, 0);
-        },
-        hc: (root: LayoutStatsRoot) => {
-            const sumTable = root.scores.slice(-10).reduce((p, c) => {
-                return [...p, c.reduce((sum, score) => sum + score, 0)];
-            }, []);
-            const hc = calculateHc(root.pars, sumTable);
-            return hc;
-        }
-    },
     LogEntry: {
         user: async (root: LogEntryDocument) => {
             await root.populate('user');
@@ -149,13 +94,6 @@ export const resolvers = {
     }
 };
 
-type LayoutStatsRoot = {
-    scores: number[][],
-    pars: number[]
-}
+export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers]);
+export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs]);
 
-type InfoWithCoordinates = {
-    variableValues: {
-        coordinates: [number, number]
-    }
-}

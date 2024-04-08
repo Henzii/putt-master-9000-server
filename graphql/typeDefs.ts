@@ -10,12 +10,6 @@ export const typeDefs = gql`
         to: String!
         months: [Activity]!
     }
-     type GetCoursesResponse {
-        courses: [Course]!
-        hasMore: Boolean!
-        nextOffset: Int
-        count: Int!
-    }
     type GetGamesResponse {
         games: [Game]!
         hasMore: Boolean!
@@ -24,35 +18,6 @@ export const typeDefs = gql`
     }
     type HandshakeResponse {
         latestVersion: Int!
-    }
-    type Location {
-        coordinates: [Float!]!
-    }
-    input InputLocation {
-        lat: Float!
-        lon: Float!
-    }
-    type Distance {
-        meters: Int!
-        string: String!
-    }
-    type Course {
-        id: ID!
-        name: String!
-        location: Location
-        layouts: [Layout]!
-        distance: Distance
-        canEdit: Boolean!
-    }
-    type Layout {
-        id: ID!
-        name: String
-        pars: [Int]
-        holes: Int
-        names: [String]!
-        par: Int
-        canEdit: Boolean!
-        deprecated: Boolean!
     }
     type User {
         id: ID!
@@ -106,14 +71,6 @@ export const typeDefs = gql`
         hcTotal: Float
         hcPlusminus: Float
     }
-    input NewLayout {
-        name: String!
-        pars: [Int]!
-        holes: Int!
-        names: [String]
-        deprecated: Boolean
-        id: ID
-    }
     input GameSettings {
         isOpen: Boolean,
         startTime: String
@@ -127,25 +84,6 @@ export const typeDefs = gql`
         games: Int
         scores: [Int]
         hc: Float
-    }
-    type HoleStats {
-        index: Int!
-        total: Int!
-        count: Int!
-        best: Int!
-        eagle: Int!
-        birdie: Int!
-        par: Int!
-        bogey: Int!
-        doubleBogey: Int!
-        average: Float!
-    }
-    type LayoutStats {
-        playerId: ID
-        games: Int
-        best: Int
-        hc: Float
-        holes: [HoleStats]
     }
     type SearchUserResponse {
         users: [SafeUser]!
@@ -169,12 +107,6 @@ export const typeDefs = gql`
 
     type Query {
         """
-        Palauttaa limit:n verran tietokannassa olevista radoista alkaen kohdasta offset.
-        Tuloksia voi rajata antamalla search tai maxDistance argumentin.
-        """
-        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
-        getLayout(layoutId: ID!): Layout
-        """
         Hakee yhden pelin.
         """
         getGame(gameId: ID!): Game 
@@ -197,10 +129,6 @@ export const typeDefs = gql`
         """
         getUsers: [User]!
         getUser (userId: ID!): User
-        """
-        Palauttaa väyläkohtaista tilastoa
-        """
-        getLayoutStats(layoutId: ID!, playersIds: [ID!]): [LayoutStats!]!
         """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
@@ -226,9 +154,6 @@ export const typeDefs = gql`
     }
 
     type Mutation {
-        addCourse(name: String!, coordinates: InputLocation): Course!
-        addLayout(courseId: ID!, layout: NewLayout!): Course!
-
         createGame(courseId: ID!, layoutId: ID!): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game!

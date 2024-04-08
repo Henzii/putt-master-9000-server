@@ -1,10 +1,9 @@
-import { addCourse, addLayout } from "../services/courseService";
 import gameService from "../services/gameService";
 import userService from "../services/userService";
 import Log from '../services/logServerice';
 import achievementService from "../services/achievementService";
 import pushNotificationsService from "../services/pushNotificationsService";
-import { ContextWithUser, Game, ID, NewLayoutArgs, User } from "../types";
+import { ContextWithUser, Game, ID, User } from "../types";
 import bcrypt from 'bcrypt';
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -16,16 +15,6 @@ import { publishGameChanges } from "./publish";
 
 export const mutations = {
     Mutation: {
-        addCourse: async (_root: unknown, args: { name: string, coordinates: { lat: number, lon: number } }, context: ContextWithUser) => {
-            const course = await addCourse(args.name, args.coordinates, context.user.id);
-            Log(`New course ${course.name} created`, LogType.SUCCESS, LogContext.COURSE, context.user.id);
-            return course;
-        },
-        addLayout: async (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
-            const layout = await addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
-            Log(`New layout ${args.layout.name} created for ${layout.name}`, LogType.SUCCESS, LogContext.LAYOUT, context.user.id);
-            return layout;
-        },
         // Game mutations
         createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
             return gameService.createGame(args.courseId, args.layoutId);

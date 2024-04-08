@@ -216,5 +216,12 @@ export const getScorecardsDates = async (userId: ID, from: Date, to: Date) => {
     return games.map(game => game.startTime);
 };
 
+export const countGamesPlayedOnLayouts = async (layoutIds: ID[]) => {
+    const count = await GameModel.count({
+        layout_id: { $in: layoutIds }
+    });
+    return count;
+};
+
 export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame,
-    setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates };
+    setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates, countGamesPlayedOnLayouts };
