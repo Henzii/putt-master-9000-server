@@ -22,6 +22,7 @@ export default {
             if (courseId) {
                 const course = await getCourse(courseId);
                 if (!course) throw new GraphQLError('Course not found');
+
                 if (course.creator?.toString() !== context.user.id || !(userService.isAdmin(context.user.id))) {
                     Log(`${context.user.name} (${context.user.id}) tried to edit course (${name}, ${courseId}) but was denied (not the owner)`, LogType.WAGNING, LogContext.COURSE);
                     throw new GraphQLError('You can only edit courses you have created');

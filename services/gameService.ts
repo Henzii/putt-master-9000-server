@@ -223,16 +223,5 @@ export const countGamesPlayedOnLayouts = async (layoutIds: ID[]) => {
     return count;
 };
 
-export const deleteCourse = async (courseId: ID) => {
-    console.log('Poista', courseId);
-    try {
-        await GameModel.findByIdAndRemove(courseId.toString());
-        return true;
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
-};
-
 export default { getGame, getGames, createGame, addPlayersToGame, setScore, closeGame,
     setBeersDrank, abandonGame, changeGameSettings, getLiveGames, getScorecardsDates, countGamesPlayedOnLayouts };
