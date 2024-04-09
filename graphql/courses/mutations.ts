@@ -23,14 +23,17 @@ export default {
                 const course = await getCourse(courseId);
                 if (!course) throw new GraphQLError('Course not found');
 
-                if (course.creator?.toString() !== context.user.id || !(await userService.isAdmin(context.user.id))) {
-                    Log(`${context.user.name} (${context.user.id}) tried to edit course (${name}, ${courseId}) but was denied (not the owner)`, LogType.WAGNING, LogContext.COURSE);
+                if (course.creator?.toString() !== context.user.id && !(await userService.isAdmin(context.user.id))) {
+                    Log(
+                        `Course (${name}, ${courseId}) change denied (not the owner)`,
+                        LogType.WAGNING, LogContext.COURSE, context.user.id
+                    );
                     throw new GraphQLError('You can only edit courses you have created');
                 }
 
                 const updatedCourse = await updateCourse(name, coordinates, courseId);
                 if (!updatedCourse) throw new GraphQLError('Course update failed for some reason');
-                Log(`${context.user.name} (${context.user.id}) updated course ${courseId}`, LogType.SUCCESS, LogContext.COURSE);
+                Log(`Course ${courseId} updated`, LogType.SUCCESS, LogContext.COURSE, context.user.id);
                 return updatedCourse;
             }
             const course = await addCourse(name, coordinates, context.user.id);
