@@ -13,8 +13,10 @@ import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 import { typeDefs as mixedTypeDefs } from './typeDefs';
 import subscriptionsTypeDefs from './subscriptions/typeDefs';
 import coursesTypeDefs from './courses/typeDefs';
+import userTypeDefs from './users/typeDefs';
 
 import coursesResolvers from './courses/resolvers';
+import userResolvers from './users/resolvers';
 
 const mixedResolvers = {
     ...queries,
@@ -94,6 +96,6 @@ const mixedResolvers = {
     }
 };
 
-export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers]);
-export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs]);
+export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers, userResolvers]);
+export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs, userTypeDefs]);
 
