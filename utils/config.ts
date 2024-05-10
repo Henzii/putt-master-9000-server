@@ -1,4 +1,4 @@
 export default {
-    latestVersion: 87,
+    latestVersion: 93,
     scoresRequiredForHC: 5
 };
