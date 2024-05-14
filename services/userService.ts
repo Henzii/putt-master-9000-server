@@ -17,7 +17,7 @@ const getUsersWithoutGames = async (): Promise<(Document & User)[]> => {
         }
     });
     return users;
-}
+};
 
 const isAdmin = async (userId: ID) => {
     const user = await Users.findById({_id: userId});

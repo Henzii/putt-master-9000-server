@@ -62,8 +62,7 @@ export type User = {
     restoreCode?: string,
     accountType?: AccountType,
     achievements?: Achievement[],
-    createdAt: Date,
-    updatedAt: Date
+    createdAt?: Date,
 }
 
 export type Achievement = {
