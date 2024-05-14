@@ -10,6 +10,15 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     return users;
 };
 
+const getUsersWithoutGames = async (): Promise<(Document & User)[]> => {
+    const users = await Users.find<Document & User>({
+        _id: {
+            $nin: await Game.distinct('scorecards.user')
+        }
+    });
+    return users;
+};
+
 const isAdmin = async (userId: ID) => {
     const user = await Users.findById({_id: userId});
     return user?.accountType === 'admin'|| user?.accountType === 'god';
@@ -189,5 +198,5 @@ export default {
     getUsers, addUser, getUser, makeFriends, updateSettings,
     removeFriend, deleteAccount, getUsersPushTokens,
     removePushToken, searchUser, isAdmin, getGroupUsers,
-    changeUsername
+    changeUsername, getUsersWithoutGames
 };

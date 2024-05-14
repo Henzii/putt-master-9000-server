@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "build": "tsc",
     "dev": "set NODE_ENV=development&&ts-node-dev index.ts",
-    "lint": "eslint .",
+    "lint": "eslint .&&tsc --noemit",
     "test": "jest .",
     "jest": "jest"
   },

@@ -61,7 +61,8 @@ export type User = {
     pushToken?: string,
     restoreCode?: string,
     accountType?: AccountType,
-    achievements?: Achievement[]
+    achievements?: Achievement[],
+    createdAt?: Date,
 }
 
 export type Achievement = {
