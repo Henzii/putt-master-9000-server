@@ -2,7 +2,7 @@
 // import { server } from './graphql/index';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { startServer } from './server';
+import { startServer } from './server/server';
 
 dotenv.config();
 
