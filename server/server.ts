@@ -8,17 +8,19 @@ import http from 'http';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { json } from 'body-parser';
-import { typeDefs } from './graphql';
-import { resolvers } from './graphql/index';
-import { ContextWithUser, SafeUser } from './types';
+import { typeDefs } from '../graphql';
+import { resolvers } from '../graphql/index';
+import { ContextWithUser, SafeUser } from '../types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
-import { log } from './utils/log';
+import { log } from '../utils/log';
 import { applyMiddleware } from 'graphql-middleware';
-import { permissions } from './graphql/permissions';
+import { permissions } from '../graphql/permissions';
 import { GraphQLError } from 'graphql';
+import { gameExportApi } from './games-export-api';
 
 const SERVER_PATH = '/';
+const EXPORT_GAMES_PARH = '/export';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -75,6 +77,7 @@ const validateToken = (authorization?: string): ContextWithUser => {
 
 export const startServer = async() => {
     await server.start();
+    app.use(EXPORT_GAMES_PARH, json(), gameExportApi);
     app.use(
         SERVER_PATH,
         cors<cors.CorsRequest>(),

@@ -1,4 +1,4 @@
-import { Game, ID, Course, GameWithUnpopulatedScorecard } from "../types";
+import { Game, ID, Course, GameWithUnpopulatedScorecard, Scorecard } from "../types";
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
@@ -150,7 +150,7 @@ export const closeGame = async (gameId: ID, isOpen = false) => {
 };
 export const setBeersDrank = async (gameId: ID, playerId: ID, beers: number) => {
     const game = await GameModel.findById(gameId) as Document & Game;
-    const scorecard = game.scorecards.find(sc => sc.user.toString() === playerId);
+    const scorecard = game.scorecards.find(sc => sc.user.toString() === playerId) as Scorecard;
     if (!scorecard) throw new GraphQLError('Scorecard not found!');
     scorecard['beers'] = beers;
     await game.save();
