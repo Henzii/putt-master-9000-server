@@ -23,15 +23,11 @@ const makeHeader = (query: Request['query']) => {
     return Object.values(FIELDS).filter(field => field in query).map(field => field.charAt(0).toUpperCase() + field.slice(1)).join(',') ?? '';
 };
 
-const getTokenFromCookie = (request: Request) => {
-    const serverCookie = request.headers.cookie?.split('; ').find(cookie => cookie.startsWith('serverToken='));
-    const [, value] = serverCookie?.split('=') ?? [];
-    return value;
-};
-
 export const gameExportApi = async (req: Request, res: Response) => {
-    const token = getTokenFromCookie(req);
     try {
+        const token = req.query?.token?.toString();
+        if (!token) throw new Error();
+
         const decodedUser = jwt.verify(token, process.env.TOKEN_KEY ?? '') as { name: string, id: string };
 
         if (!decodedUser) {
@@ -64,7 +60,7 @@ export const gameExportApi = async (req: Request, res: Response) => {
         res.setHeader('content-type', 'text/csv');
         const header = makeHeader(query);
         res.send(`${header}\n${csvData}`);
-    } catch {
+    } catch (e) {
         res.sendStatus(401);
     }
 };
