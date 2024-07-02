@@ -241,6 +241,7 @@ interface ChangeSettingsArgs extends SettingsArgs {
 export interface UserSettingsArgs extends SettingsArgs {
     passwordHash?: string,
     restoreCode?: string,
+    pushToken?: string
 }
 export type SetScoreArgs = {
     gameId: ID,

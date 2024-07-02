@@ -139,7 +139,7 @@ export const typeDefs = gql`
         Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
         """
         searchUser(search: String!): SearchUserResponse!
-        handShake: HandshakeResponse!
+        handShake(pushToken: String): HandshakeResponse!
         """
         Hakee omat ja kavereiden pelit joissa annettu pelaajamäärä ylittyy, rajataan vuoden mukaan
         """
