@@ -9,6 +9,7 @@ const addEntry = (message: string, type: LogType, context: LogContext, userId?: 
             context,
             user: userId
         });
+        console.log(message, type, context, userId);
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log('Error while logging', e);
