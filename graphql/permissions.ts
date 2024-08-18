@@ -32,6 +32,7 @@ export const permissions= shield({
         login: allow,
         createUser: allow,
         restoreAccount: allow,
+        sendFeedback: allow,
     },
 }, {
     async fallbackError(thrownThing) {
