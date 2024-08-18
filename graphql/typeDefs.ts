@@ -170,6 +170,6 @@ export const typeDefs = gql`
         changeUsername(newUsername: String!): User!
 
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
-
+        sendFeedback(subject: String!, text: String!): Boolean
     }
 `;
