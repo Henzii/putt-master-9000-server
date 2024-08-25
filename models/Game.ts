@@ -27,6 +27,11 @@ const skeema = new mongoose.Schema({
         }
     ],
     isOpen: Boolean,
+    groupName: String,
+    bHcMultiplier: {
+        type: Number,
+        default: 1
+    }
 });
 
 export default mongoose.model('Game', skeema);

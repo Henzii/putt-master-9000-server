@@ -99,7 +99,7 @@ export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
         throw new GraphQLError('Error while adding players');
     }
 };
-export const createGame = async (courseId: ID, layoutId: ID) => {
+export const createGame = async (courseId: ID, layoutId: ID, groupName?: string, bHcMultiplier?: number) => {
     try {
         const course = await CourseModel.findById(courseId) as Document & Course;
         if (!course) {
@@ -119,6 +119,8 @@ export const createGame = async (courseId: ID, layoutId: ID) => {
             holes: layout?.holes,
             isOpen: true,
             scorecards: [],
+            groupName,
+            bHcMultiplier
         });
         await newGame.save();
         return newGame.id;
