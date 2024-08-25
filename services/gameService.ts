@@ -11,15 +11,12 @@ import { GraphQLError } from "graphql";
 type GetGamesArgs = {
     userId: ID,
     onlyOpenGames?: boolean,
+    onlyGroupGames?: boolean
     limit: number,
     offset: number,
     search?: string,
 }
-type GamesSearchString = {
-    'scorecards.user': ID
-    $or: { isOpen: boolean }[]
-    course?: { $regex: string, $options: string }
-}
+
 export const getGamesWithUser = async (minUserCount: number, userIds: ID[], filterYear: number) => {
     return await GameModel.find({
         [`scorecards.${minUserCount-1}`]: { $exists: true },
@@ -46,17 +43,15 @@ export const getLiveGames = async(userId: ID) => {
         ]
     });
 };
-export const getGames = async ({userId, onlyOpenGames=false, limit=10, offset=0, search}: GetGamesArgs) => {
-    const searchString:GamesSearchString = {
+export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, search, onlyGroupGames}: GetGamesArgs) => {
+    const groupName = onlyGroupGames ? (await userService.getUser(undefined, userId))?.groupName : null;
 
-        'scorecards.user': userId,
-        $or: [
-            { isOpen: true },
-            { isOpen: onlyOpenGames },
-        ],
+    const searchString = {
+        ...(onlyOpenGames ? {isOpen: onlyOpenGames} : null),
+        ...(search ? {course: { $regex: search, $options: 'i'}} : null),
+        ...(!groupName ? {'scorecards.user': userId} : null),
+        ...(groupName ? {groupName} : null)
     };
-
-    if (search) searchString['course'] = { $regex: search, $options: 'i' };
 
     const count = await GameModel.count(searchString);
     const games = await GameModel.find(searchString)

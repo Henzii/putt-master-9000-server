@@ -120,7 +120,7 @@ export const typeDefs = gql`
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
-        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String): GetGamesResponse!
+        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String, onlyGroupGames: Boolean): GetGamesResponse!
         ping: String
         """
         Kirjautunut käyttäjä
