@@ -57,6 +57,8 @@ export const typeDefs = gql`
         myScorecard: Scorecard
         scorecards: [Scorecard!]!
         isOpen: Boolean
+        groupName: String
+        bHcMultiplier: Float!
     }
     type Scorecard {
         id: ID!
@@ -118,7 +120,7 @@ export const typeDefs = gql`
         """
         Listaa kirjautuneen käyttäjän pelaamat pelit
         """
-        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String): GetGamesResponse!
+        getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String, onlyGroupGames: Boolean): GetGamesResponse!
         ping: String
         """
         Kirjautunut käyttäjä
@@ -154,7 +156,7 @@ export const typeDefs = gql`
     }
 
     type Mutation {
-        createGame(courseId: ID!, layoutId: ID!): ID!
+        createGame(courseId: ID!, layoutId: ID!, isGroupGame: Boolean, bHcMultiplier: Float): ID!
         addPlayersToGame(gameId: ID!, playerIds: [ID!]!): Game
         setScore(gameId: ID!, playerId: ID!, hole: Int!, value: Int!): Game!
         abandonGame(gameId: ID!): Boolean

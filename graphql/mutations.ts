@@ -19,8 +19,15 @@ import { feedbackRateLimiter } from "./rateLimiter";
 export const mutations = {
     Mutation: {
         // Game mutations
-        createGame: (_root: unknown, args: { layoutId: ID, courseId: ID }) => {
-            return gameService.createGame(args.courseId, args.layoutId);
+        createGame: async (_root: unknown, args: { layoutId: ID, courseId: ID, isGroupGame?: boolean, bHcMultiplier?: number }, context: ContextWithUser) => {
+            const {layoutId, courseId, isGroupGame, bHcMultiplier} = args;
+            const groupName = isGroupGame ? (await userService.getUser(undefined, context.user.id))?.groupName : undefined;
+
+            if (isGroupGame && !groupName) {
+                throw new GraphQLError("Cannot create a group game. Creator's group name was not defined.");
+            }
+
+            return gameService.createGame(courseId, layoutId, groupName, bHcMultiplier);
         },
         addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }, context: ContextWithUser): Promise<Game> => {
             const game = await gameService.addPlayersToGame(args.gameId, args.playerIds);

@@ -34,6 +34,8 @@ export type Game = {
     isOpen: boolean,
     startTime: Date,
     endTime?: Date,
+    groupName?: string,
+    bHcMultiplier?: number
 }
 
 export type Scorecard = {
