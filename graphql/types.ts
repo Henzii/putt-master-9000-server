@@ -18,4 +18,6 @@ export type GetArgs = {
 export type GetGamesArgs = GetArgs & {
     onlyOpenGames?: boolean,
     minPlayerCount?: number
+    from?: string
+    to?: string
 }
