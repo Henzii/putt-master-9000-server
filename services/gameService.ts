@@ -8,13 +8,15 @@ import { calculateHc } from "../utils/calculateHc";
 import userService from "./userService";
 import { GraphQLError } from "graphql";
 
-type GetGamesArgs = {
+export type GetGamesArgs = {
     userId: ID,
     onlyOpenGames?: boolean,
     onlyGroupGames?: boolean
     limit: number,
     offset: number,
     search?: string,
+    from?: string,
+    to?: string
 }
 
 export const getGamesWithUser = async (minUserCount: number, userIds: ID[], filterYear: number) => {
@@ -43,14 +45,16 @@ export const getLiveGames = async(userId: ID) => {
         ]
     });
 };
-export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, search, onlyGroupGames}: GetGamesArgs) => {
+export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, search, onlyGroupGames, from, to}: GetGamesArgs) => {
     const groupName = onlyGroupGames ? (await userService.getUser(undefined, userId))?.groupName : null;
 
     const searchString = {
         ...(onlyOpenGames ? {isOpen: onlyOpenGames} : null),
         ...(search ? {course: { $regex: search, $options: 'i'}} : null),
         ...(!groupName ? {'scorecards.user': userId} : null),
-        ...(groupName ? {groupName} : null)
+        ...(groupName ? {groupName} : null),
+        ...(from ? {startTime: {$gt: from}} : null),
+        ...(to ? {startTime: {$lt: to}} : null)
     };
 
     const count = await GameModel.count(searchString);
