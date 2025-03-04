@@ -49,12 +49,18 @@ export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, searc
     const groupName = onlyGroupGames ? (await userService.getUser(undefined, userId))?.groupName : null;
 
     const searchString = {
-        ...(onlyOpenGames ? {isOpen: onlyOpenGames} : null),
-        ...(search ? {course: { $regex: search, $options: 'i'}} : null),
-        ...(!groupName ? {'scorecards.user': userId} : null),
-        ...(groupName ? {groupName} : null),
-        ...(from ? {startTime: {$gt: from}} : null),
-        ...(to ? {startTime: {$lt: to}} : null)
+        ...(onlyOpenGames ? { isOpen: onlyOpenGames } : {}),
+        ...(search ? { course: { $regex: search, $options: 'i' } } : {}),
+        ...(!groupName ? { 'scorecards.user': userId } : {}),
+        ...(groupName ? { groupName } : {}),
+        ...(from || to
+            ? {
+                  startTime: {
+                      ...(from ? { $gte: from } : {}),
+                      ...(to ? { $lte: to } : {}),
+                  },
+              }
+            : {}),
     };
 
     const count = await GameModel.count(searchString);
