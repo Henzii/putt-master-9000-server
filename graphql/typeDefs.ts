@@ -19,30 +19,6 @@ export const typeDefs = gql`
     type HandshakeResponse {
         latestVersion: Int!
     }
-    type User {
-        id: ID!
-        """
-        Username
-        """
-        name: String!
-        email: String
-        friends: [User!]
-        blockFriendRequests: Boolean
-        blockStatsSharing: Boolean
-        achievements: [Achievement]!
-        accountType: String
-        groupName: String
-    }
-    type Achievement {
-        id: String!
-        layout_id: String!
-        game: Game
-    }
-    type SafeUser {
-        id: ID!
-        name: String!
-        groupName: String
-    }
     type Game {
         id: ID!
         course: String!
@@ -87,11 +63,6 @@ export const typeDefs = gql`
         scores: [Int]
         hc: Float
     }
-    type SearchUserResponse {
-        users: [SafeUser]!
-        hasMore: Boolean!
-    }
-
     type BestPoolForLayoutResponse {
         game: Game!
         totalPar: Int!
@@ -123,24 +94,9 @@ export const typeDefs = gql`
         getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String, onlyGroupGames: Boolean, from: String, to: String): GetGamesResponse!
         ping: String
         """
-        Kirjautunut käyttäjä
-        """
-        getMe: User
-        """
-        Palauttaa kaikki käyttäjät. Admin only.
-        """
-        getUsers: [User]!
-        getUser (userId: ID!): User
-        """
         Palauttaa ratakohtaista tilastoatietoa kirjautuneeesta käyttäjästä.
         """
         getHc (layoutId: ID!, userIds: [String]): [GetHcResponse]!
-        """
-        Hakee search hakusanalla käyttäjiä ja palauttaa listan (max 10) SafeUsereita (vain id ja nimi) sekä
-        booleanin siitä onko hakutuloksia mahdollisesti lisää -> tuleeko hakua tarkentaa.
-        Mikäli käyttäjä on blokannut kaveripyynnöt, ei häntä näy hakutuloksissa
-        """
-        searchUser(search: String!): SearchUserResponse!
         handShake(pushToken: String): HandshakeResponse!
         """
         Hakee omat ja kavereiden pelit joissa annettu pelaajamäärä ylittyy, rajataan vuoden mukaan
@@ -163,15 +119,6 @@ export const typeDefs = gql`
         closeGame(gameId: ID!, reopen: Boolean): Game
         setBeersDrank(gameId: ID!, playerId: ID!, beers: Int!): UpdatedScorecard
         changeGameSettings(gameId: ID!, settings: GameSettings!): Game
-        createUser(name: String!, password: String!, email: String, pushToken: String): String
-        login(user: String!, password: String!, pushToken: String): String!
-        addFriend(friendId: ID, friendName: String): Boolean
-        removeFriend(friendId: ID!): Boolean
-        deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String, email: String): User
-        changeUsername(newUsername: String!): User!
-
-        restoreAccount(name: String, restoreCode: String, password: String): Boolean
         sendFeedback(email: String, subject: String!, text: String!): Boolean
     }
 `;

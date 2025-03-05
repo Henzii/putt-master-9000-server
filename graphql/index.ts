@@ -1,7 +1,7 @@
 import { queries } from "./queries";
 import { mutations } from "./mutations";
 
-import { ContextWithUser, Game, RawStatsDataHC, Scorecard, User } from "../types";
+import { ContextWithUser, Game, RawStatsDataHC, Scorecard } from "../types";
 import { Document } from "mongoose";
 import { calculateHc } from "../utils/calculateHc";
 
@@ -23,20 +23,6 @@ const mixedResolvers = {
     ...mutations,
     ...subscriptions,
 
-    User: {
-        name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1),
-        friends: async (root: Document & User) => {
-            await root.populate('friends');
-            return root.friends;
-        },
-        achievements: async (root: Document & User) => {
-            await root.populate('achievements.game');
-            return root.achievements;
-        }
-    },
-    SafeUser: {
-        name: (root: User) => root.name.charAt(0).toUpperCase() + root.name.slice(1)
-    },
     Scorecard: {
         total: (root: Scorecard) => {
             return total(root.scores);

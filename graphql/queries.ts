@@ -26,10 +26,6 @@ export const queries = {
                 latestVersion: appInfo.latestVersion
             };
         },
-        getMe: async (_root: unknown, args: unknown, context: ContextWithUser) => {
-            if (!context?.user?.id) return null;
-            return await userService.getUser(undefined, context.user?.id);
-        },
         getGames: async (root: unknown, args: GetGamesArgs, context: ContextWithUser) => {
             return await getGames({ userId: context.user.id, ...args});
         },
@@ -54,12 +50,6 @@ export const queries = {
             pubsub.publish(SUB_TRIGGERS.TEST, {test: 'Ping pong'});
             return 'pong';
         },
-        getUsers: async () => {
-            return userService.getUsers();
-        },
-        getUser: async (_root: unknown, args: {userId: ID}) => {
-            return await userService.getUser(undefined, args.userId);
-        },
         getLogs: () => {
             return getLogs();
         },
@@ -73,15 +63,6 @@ export const queries = {
                     pars: user.pars,
                 };
             });
-        },
-        searchUser: async (_root: unknown, args: { search: string }, context: ContextWithUser) => {
-            const res = await userService.searchUser(args.search);
-            if (!context.user?.id) {
-                res.users = res.users.map(user => {
-                    return {...user, id: 'null'};
-                });
-            }
-            return res;
         },
         getAllGames: async (_root: unknown, args: { minPlayerCount: number, filterYear: number}, context: ContextWithUser) => {
             const me = await userService.getUser(undefined, context.user.id);
