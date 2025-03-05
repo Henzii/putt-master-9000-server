@@ -26,3 +26,8 @@ export type UserSettingsArgs = SettingsArgs & {
     restoreCode?: string,
     pushToken?: string
 }
+
+export type GetPastActivityArgs = {
+    year?: number
+    userId?: ID
+}

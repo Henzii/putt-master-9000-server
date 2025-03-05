@@ -1,12 +1,7 @@
-import { ID, SafeUser } from "../types";
+import { SafeUser } from "../types";
 
 export type ContextWithUserOrNull = {
     user: SafeUser | null
-}
-
-export type GetPastActivityArgs = {
-    year?: number
-    userId?: ID
 }
 
 export type GetArgs = {
