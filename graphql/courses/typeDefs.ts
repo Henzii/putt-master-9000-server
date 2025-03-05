@@ -1,6 +1,12 @@
 import gql from "graphql-tag";
 
 export default gql`
+    type BestPoolForLayoutResponse {
+        game: Game!
+        totalPar: Int!
+        totalScore: Int!
+        gamesCount: Int!
+    }
     type Location {
         coordinates: [Float!]!
     }
@@ -68,6 +74,8 @@ export default gql`
         getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
         getLayout(layoutId: ID!): Layout
         getLayoutStats(layoutId: ID!, playersIds: [ID!]): [LayoutStats!]!
+        getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse
+
     }
 
     type Mutation {

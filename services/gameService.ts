@@ -2,11 +2,11 @@ import { Game, ID, Course, GameWithUnpopulatedScorecard, Scorecard } from "../ty
 import GameModel from '../models/Game';
 import CourseModel from "../models/Course";
 import { Document } from "mongoose";
-import { SetScoreArgs } from "../graphql/mutations";
 import { getPlayersScores } from "./statsService";
 import { calculateHc } from "../utils/calculateHc";
 import userService from "./userService";
 import { GraphQLError } from "graphql";
+import { SetScoreArgs } from "../graphql/games/types";
 
 export type GetGamesArgs = {
     userId: ID,

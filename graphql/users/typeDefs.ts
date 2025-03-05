@@ -1,6 +1,21 @@
 import gql from "graphql-tag";
 
 export default gql`
+    type GetHcResponse {
+        id: ID
+        games: Int
+        scores: [Int]
+        hc: Float
+    }
+    type Activity {
+        month: Int!
+        games: Int!
+    }
+    type ActivityResponse {
+        from: String!
+        to: String!
+        months: [Activity]!
+    }
     type User {
         id: ID!
         """
@@ -41,6 +56,8 @@ export default gql`
         getUsers: [User]!
         getUser (userId: ID!): User
         searchUser(search: String!): SearchUserResponse!
+        getPastActivity(userId: ID, year: Int): ActivityResponse!
+        getHc (layoutId: ID!, userIds: [String]): [GetHcResponse]!
     }
 
     type Mutation {
