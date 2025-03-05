@@ -2,7 +2,7 @@ import { ID, SafeUser, User } from "../types";
 import Users from '../models/User';
 import Game from '../models/Game';
 import mongoose, { Document } from "mongoose";
-import { UserSettingsArgs } from "../graphql/mutations";
+import { UserSettingsArgs } from "../graphql/users/types";
 
 const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
