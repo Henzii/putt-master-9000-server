@@ -1,4 +1,4 @@
-import { checkWinAllHoles, checkSadasMalmis, checkZeroPars, checkHoleInOnes } from "../achievementService";
+import { checkWinAllHoles, checkSadasMalmis, checkZeroPars, checkHoleInOnes, checkGoldenBox } from "../achievementService";
 import game from "../mocks/game";
 import stats from "../mocks/stats";
 
@@ -110,6 +110,43 @@ describe('Achievements', () => {
                 game: expect.objectContaining({layout_id: game.layout_id})
             })]));
 
+        });
+    });
+    describe.only('Golden box', () => {
+        it('should return nothing when nobody has a golden box', () => {
+            const games2 = clonedGame();
+            games2.scorecards[0].scores = [3,3,3,2,3,3,4,3,2,3];
+            games2.scorecards[1].scores = [3,2,3,3,2,3,3,2,3,3];
+            const goldenBox = checkGoldenBox(games2);
+            expect(goldenBox.userId).toBeUndefined();
+        });
+        it('should return undefined when just ties', () => {
+            const games2 = clonedGame();
+            games2.scorecards[0].scores = [2,2,2,3,3,3,2,3,2];
+            games2.scorecards[1].scores = [2,2,2,3,3,3,2,3,2];
+            const goldenBox = checkGoldenBox(games2);
+            expect(goldenBox.userId).toBeUndefined();
+        });
+        it ('tying the first hole and winning the rest is not enough', () => {
+            const games2 = clonedGame();
+            games2.scorecards[0].scores = [2,2,2,3,3,3,2,3,2];
+            games2.scorecards[1].scores = [2,1,1,1,1,1,1,1,1];
+            const goldenBox = checkGoldenBox(games2);
+            expect(goldenBox.userId).toBeUndefined();
+        });
+        it('losing even one hole is enough to lose the golden box', () => {
+            const games2 = clonedGame();
+            games2.scorecards[0].scores = [1,1,1,1,1,1,3,1,1];
+            games2.scorecards[1].scores = [2,2,2,2,2,2,2,2,2];
+            const goldenBox = checkGoldenBox(games2);
+            expect(goldenBox.userId).toBeUndefined();
+        })
+        it ('should return the golden box winner', () => {
+            const games2 = clonedGame();
+            games2.scorecards[0].scores = [2,2,2,3,3,3,2,3,2];
+            games2.scorecards[1].scores = [3,2,2,3,3,3,2,3,2];
+            const goldenBox = checkGoldenBox(games2);
+            expect(goldenBox.userId).toBe(games2.scorecards[0].user.id);
         });
     });
 });
