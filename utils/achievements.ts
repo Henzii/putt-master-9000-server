@@ -33,8 +33,15 @@ export default {
                 title: 'Achievement unlocked',
                 body: 'Hole in one!'
             },
-            isMultiple: false,  // Voiko ansaita useammin?
+            isMultiple: true,  // Voiko ansaita useammin?
 
+        },
+        GoldenBox: {
+            notification: {
+                title: 'Achievement unlocked',
+                body: 'You got the golden box ahcievement!'
+            },
+            isMultiple: false
         }
     }
 };

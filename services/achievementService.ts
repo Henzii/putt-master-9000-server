@@ -13,7 +13,7 @@ type UserAndGame = {
     game?: Game
 }
 
-type AchievementID = 'winAllHoles' | 'loseAllHoles' | '100Malmis' | '0Pars' | 'HoleInOne'
+type AchievementID = 'winAllHoles' | 'loseAllHoles' | '100Malmis' | '0Pars' | 'HoleInOne' | 'GoldenBox';
 
 export const addAchievement = async ({userId, game}: UserAndGame, id: AchievementID, multiple = false) => {
     if (!userId || !game) return;
@@ -42,6 +42,7 @@ export const checkAchievements = async (game: Game) => {
     if (game.scorecards.length < MIN_PLAYER_COUNT) return;
     addAchievement(checkWinAllHoles(game), 'winAllHoles');
     addAchievement(checkWinAllHoles(game, false), 'loseAllHoles');
+    addAchievement(checkGoldenBox(game), 'GoldenBox');
     (await checkSadasMalmis(game)).forEach(player => {
         addAchievement(player, '100Malmis');
     });
@@ -94,6 +95,20 @@ export const checkWinAllHoles = (game: Game, findWinner=true): UserAndGame => {
         }
     }
     return { userId: winner?.user.id, game };
+};
+
+export const checkGoldenBox = (game: Game): UserAndGame => {
+    const firsrHoleWinner = getBestForHole(game.scorecards, 0, true);
+    if (!firsrHoleWinner) return {}; // You need to win the first hole to get the golden box
+
+    for (let i=1; i<game.pars.length; i++) {
+        const bestScoreForHole = Math.min(...game.scorecards.map(sc => sc.scores[i]))
+        if (bestScoreForHole < firsrHoleWinner.scores[i]) {
+            return {};
+        }
+    }
+
+    return {userId: firsrHoleWinner.user.id, game};
 };
 
 export const getBestForHole = (cards: Scorecard[], hole: number, findWinner: boolean): Scorecard | undefined => {
