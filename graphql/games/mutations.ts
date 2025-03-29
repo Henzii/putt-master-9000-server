@@ -23,8 +23,21 @@ export default {
         addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }, context: ContextWithUser): Promise<Game> => {
             const game = await gameService.addPlayersToGame(args.gameId, args.playerIds);
 
-            // Filtteröidään oma id pois listalta, jotta ei turhaan tule notifikaatiota
             const playerIds = args.playerIds.filter(pid => pid !== context.user.id);
+
+            if (game.groupName) {
+                const groupUsers = (await userService.getGroupUsers(game.groupName)).map(u => u.id.toString());
+                const usersNotParticipating = groupUsers.filter(user => !playerIds.includes(user.id) && user.id !== context.user.id);
+
+                pushNotificationsService.sendNotification(usersNotParticipating, {
+                    title: 'New group competition',
+                    body: `${context.user.name} has started a new group competition! Looks like you're sitting this one out. 😪`,
+                    sound: 'default',
+                    data: {
+                        gameId: args.gameId
+                    }
+                });
+            }
 
             pushNotificationsService.sendNotification(playerIds, {
                 title: 'New game',
@@ -34,6 +47,7 @@ export default {
                     gameId: args.gameId
                 }
             });
+
             return game;
         },
         setScore: async (_root: unknown, args: SetScoreArgs, context: ContextWithUser) => {
