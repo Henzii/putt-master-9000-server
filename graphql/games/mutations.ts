@@ -26,8 +26,10 @@ export default {
             const playerIds = args.playerIds.filter(pid => pid !== context.user.id);
 
             if (game.groupName) {
-                const groupUsers = (await userService.getGroupUsers(game.groupName)).map(u => u.id.toString());
-                const usersNotParticipating = groupUsers.filter(user => !playerIds.includes(user.id) && user.id !== context.user.id);
+                const groupUsers = await userService.getGroupUsers(game.groupName);
+                const groupUserIds = groupUsers.map(user => user._id.toString());
+
+                const usersNotParticipating = groupUserIds.filter(userId => !playerIds.includes(userId) && userId !== context.user.id);
 
                 pushNotificationsService.sendNotification(usersNotParticipating, {
                     title: 'New group competition',
