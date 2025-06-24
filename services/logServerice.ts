@@ -17,7 +17,7 @@ const addEntry = (message: string, type: LogType, context: LogContext, userId?: 
 
 export const getLogs = async () => {
     try {
-        const logs = await Log.find({}).limit(100);
+        const logs = await Log.find({}).sort({ createdAt: -1 }).limit(100);
         return logs;
     } catch (e) {
         // eslint-disable-next-line no-console
