@@ -79,6 +79,24 @@ export default {
                 };
             });
         },
+        getGroupMembers: async (_root: unknown, args: { groupName?: string }, context: ContextWithUser) => {
+            if (args.groupName && !userService.isAdmin(context.user.id)) {
+                throw new GraphQLError('Unauthorized, only admins can specify group name');
+            }
+
+            const groupName = args.groupName || (await userService.getUser(undefined, context.user.id))?.groupName;
+
+            if (!groupName) {
+                return []; // If no group name is specified, return empty array
+            }
+
+            const groupUsers = await userService.getGroupUsers(groupName);
+            return groupUsers.map(user => ({
+                id: user.id,
+                name: user.name,
+                groupName: user.groupName
+            }));
+        }
 
     }
 };
