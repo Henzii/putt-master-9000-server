@@ -58,6 +58,10 @@ export default gql`
         searchUser(search: String!): SearchUserResponse!
         getPastActivity(userId: ID, year: Int): ActivityResponse!
         getHc (layoutId: ID!, userIds: [String]): [GetHcResponse]!
+        """
+        Return the members of user's group. Admins can specify a group name to get members of that group.
+        """
+        getGroupMembers(groupName: String): [SafeUser]!
     }
 
     type Mutation {
