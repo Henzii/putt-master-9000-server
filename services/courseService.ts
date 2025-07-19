@@ -4,11 +4,12 @@ import { Course, ID, NewLayoutArgs } from "../types";
 import userService from "./userService";
 import { GraphQLError } from "graphql";
 
-type getCoursesArgs = {
+type GetCoursesArgs = {
     limit: number,
     offset: number,
     search?: string,
-    coordinates?: [number, number],
+    coordinates?: [number, number], // Player coordinates for distance calculation
+    searchCoordinates?: [number, number] // Coordinates from which to search courses up to maxDistance
     maxDistance?: number
 }
 
@@ -26,14 +27,14 @@ export async function getCourse(courseId: ID){
     }
 }
 
-export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance }: getCoursesArgs) {
+export async function getCourses({ limit, offset, search, coordinates = [0, 0], maxDistance, searchCoordinates }: GetCoursesArgs) {
     const params = (search) ? { name: { $regex: search, $options: 'i' } } : {};
     const documents = await CourseModel.count(params);
     const kurssit = await CourseModel.find({
         ...params,
         location: {
             $near: {
-                $geometry: { type: 'Point', coordinates: coordinates },
+                $geometry: { type: 'Point', coordinates: searchCoordinates ?? coordinates },
                 ...(maxDistance ? { $maxDistance: maxDistance } : null)
             }
         }
