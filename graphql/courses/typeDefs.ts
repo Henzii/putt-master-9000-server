@@ -71,7 +71,7 @@ export default gql`
     }
 
     type Query {
-        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int): GetCoursesResponse
+        getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int, searchCoordinates: [Float]): GetCoursesResponse
         getLayout(layoutId: ID!): Layout
         getLayoutStats(layoutId: ID!, playersIds: [ID!]): [LayoutStats!]!
         getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse

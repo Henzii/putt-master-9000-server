@@ -6,7 +6,7 @@ import { calculateHc } from '../../utils/calculateHc';
 
 type InfoWithCoordinates = {
     variableValues: {
-        coordinates: [number, number]
+        coordinates: [number, number] // Player coordinates for distance calculation
     }
 }
 
