@@ -15,6 +15,7 @@ type SettingsArgs = {
     blockFriendRequests?: boolean,
     userId?: ID
     groupName?: string,
+    groupJoinedDate?: string,
     email?: string
 }
 export type ChangeSettingsArgs = SettingsArgs & {
@@ -25,6 +26,7 @@ export type UserSettingsArgs = SettingsArgs & {
     passwordHash?: string,
     restoreCode?: string,
     pushToken?: string
+    groupJoinedDate?: string
 }
 
 export type GetPastActivityArgs = {

@@ -74,9 +74,8 @@ export default {
             const { password, userId, ...args } = rawargs;
             const updateUserId = userId ?? context.user.id;
 
-            if (userId && !userService.isAdmin(context.user.id)) {
-                // eslint-disable-next-line no-console
-                console.error(`${context.user.id} failed admin check`);
+            if ((userId || args.groupJoinedDate) && !userService.isAdmin(context.user.id)) {
+                Log(`User ${context.user.name} tried to change settings of user ${updateUserId}`, LogType.WAGNING, LogContext.USER);
                 throw new GraphQLError('Unauthorized');
             }
 

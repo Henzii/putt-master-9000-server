@@ -14,6 +14,10 @@ const skeema = new mongoose.Schema({
         required: true,
     },
     groupName: String,
+    groupJoinedDate: {
+        type: Date,
+        default: null,
+    },
     pushToken: String,
     accountType: {
         type: String,

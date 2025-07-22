@@ -70,7 +70,7 @@ export default gql`
         removeFriend(friendId: ID!): Boolean
         login(user: String!, password: String!, pushToken: String): String!
         deleteAccount: Boolean
-        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String, email: String): User
+        changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String, email: String, groupJoinedDate: String): User
         changeUsername(newUsername: String!): User!
         restoreAccount(name: String, restoreCode: String, password: String): Boolean
     }
