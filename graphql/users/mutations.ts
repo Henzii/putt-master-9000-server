@@ -75,8 +75,12 @@ export default {
             const updateUserId = userId ?? context.user.id;
 
             if ((userId || args.groupJoinedDate) && !userService.isAdmin(context.user.id)) {
-                Log(`User ${context.user.name} tried to change settings of user ${updateUserId}`, LogType.WAGNING, LogContext.USER);
+                Log(`User ${context.user.name} tried to change settings of user ${updateUserId}`, LogType.WARNING, LogContext.USER);
                 throw new GraphQLError('Unauthorized');
+            }
+
+            if (rawargs.groupJoinedDate && isNaN(Date.parse(rawargs.groupJoinedDate))) {
+                throw new GraphQLError('Invalid date format for groupJoinedDate. Please provide a valid date string.');
             }
 
             const finalArgs = args as UserSettingsArgs;
@@ -84,7 +88,8 @@ export default {
             if (password) {
                 finalArgs['passwordHash'] = await bcrypt.hash(password, 10);
             }
-            return await userService.updateSettings(updateUserId, finalArgs);
+
+            return userService.updateSettings(updateUserId, finalArgs);
         },
         restoreAccount: async (_root: unknown, args: RestoreAccountArgs) => {
             const { name, password, restoreCode } = args;

@@ -6,7 +6,7 @@ export enum LogType {
     ERROR = "error",
     INFO = "info",
     SUCCESS = "success",
-    WAGNING = 'warning'
+    WARNING = 'warning'
 }
 
 export enum LogContext {

@@ -26,7 +26,6 @@ export type UserSettingsArgs = SettingsArgs & {
     passwordHash?: string,
     restoreCode?: string,
     pushToken?: string
-    groupJoinedDate?: string
 }
 
 export type GetPastActivityArgs = {
