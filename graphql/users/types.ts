@@ -22,10 +22,11 @@ export type ChangeSettingsArgs = SettingsArgs & {
     password?: string,
 }
 
-export type UserSettingsArgs = SettingsArgs & {
+export type UserSettingsArgs = Omit<SettingsArgs, 'groupJoinedDate'> & {
     passwordHash?: string,
     restoreCode?: string,
-    pushToken?: string
+    pushToken?: string,
+    groupJoinedDate?: Date
 }
 
 export type GetPastActivityArgs = {

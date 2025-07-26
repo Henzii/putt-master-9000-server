@@ -3,7 +3,6 @@ import Users from '../models/User';
 import Game from '../models/Game';
 import mongoose, { Document } from "mongoose";
 import { UserSettingsArgs } from "../graphql/users/types";
-import { group } from "console";
 
 const getUsers = async (): Promise<(Document & User)[]> => {
     const users = await Users.find({}) as (Document & User)[];
@@ -168,24 +167,10 @@ export const getUser = async (name?: string, id?: ID): Promise<Document & User |
     }
 };
 const updateSettings = async (userId: ID, settings: UserSettingsArgs) => {
-    const joinedDate =
-        settings.groupJoinedDate
-            ? new Date(settings.groupJoinedDate)
-            : settings.groupName
-                ? new Date()
-                : null;
-
-    const groupJoinedDate = joinedDate && !isNaN(joinedDate.getTime()) ? {groupJoinedDate: joinedDate.toString()} : null;
-
-    const updateFields: UserSettingsArgs = {
-        ...settings,
-        ...groupJoinedDate
-    };
-
     const user = await Users.findOneAndUpdate(
         { _id: userId },
         {
-            $set: updateFields,
+            $set: settings,
         },
         { returnDocument: 'after' }
     );
