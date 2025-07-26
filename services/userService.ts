@@ -20,21 +20,23 @@ const getUsersWithoutGames = async (): Promise<(Document & User)[]> => {
 };
 
 const isAdmin = async (userId: ID) => {
-    const user = await Users.findById({_id: userId});
-    return user?.accountType === 'admin'|| user?.accountType === 'god';
+    const user = await Users.findById({ _id: userId });
+    return user?.accountType === 'admin' || user?.accountType === 'god';
 };
 
-const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean}> => {
+const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean }> => {
     const users = await Users.find<User & Document>({
         name: { $regex: searchString, $options: 'i' },
         blockFriendRequests: false,
     }).limit(10);
-    return { users: users.map(u => {
-        return {
-            id: u.id,
-            name: u.name
-        };
-    }), hasMore: users.length >= 10};
+    return {
+        users: users.map(u => {
+            return {
+                id: u.id,
+                name: u.name
+            };
+        }), hasMore: users.length >= 10
+    };
 };
 const getUsersPushTokens = async (userIds: ID[]): Promise<string[]> => {
     const users = await Users.find(
@@ -168,7 +170,7 @@ const updateSettings = async (userId: ID, settings: UserSettingsArgs) => {
     const user = await Users.findOneAndUpdate(
         { _id: userId },
         {
-            $set: settings
+            $set: settings,
         },
         { returnDocument: 'after' }
     );
@@ -180,11 +182,11 @@ const getGroupUsers = async (groupName: string) => {
     });
     return users;
 };
-const changeUsername = async(userId: ID, newUsername: string) => {
+const changeUsername = async (userId: ID, newUsername: string) => {
     const user = await Users.findByIdAndUpdate(
-        {_id: userId},
-        {name: newUsername},
-        {returnDocument: 'after', runValidators: true}
+        { _id: userId },
+        { name: newUsername },
+        { returnDocument: 'after', runValidators: true }
     );
     return user;
 };

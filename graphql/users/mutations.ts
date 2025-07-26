@@ -71,21 +71,37 @@ export default {
             }
         },
         changeSettings: async (_root: unknown, rawargs: ChangeSettingsArgs, context: ContextWithUser) => {
-            const { password, userId, ...args } = rawargs;
+            const { password, userId, groupJoinedDate, ...args } = rawargs;
             const updateUserId = userId ?? context.user.id;
 
-            if (userId && !userService.isAdmin(context.user.id)) {
-                // eslint-disable-next-line no-console
-                console.error(`${context.user.id} failed admin check`);
+            if (Boolean(userId || groupJoinedDate) && !(await userService.isAdmin(context.user.id))) {
+                Log(`User ${context.user.name} tried to change settings of user ${updateUserId}`, LogType.WARNING, LogContext.USER);
                 throw new GraphQLError('Unauthorized');
             }
 
-            const finalArgs = args as UserSettingsArgs;
+            const finalArgs: UserSettingsArgs = args;
+
+            if (groupJoinedDate) {
+                const date = new Date(groupJoinedDate);
+                if (isNaN(date.getTime())) {
+                    throw new GraphQLError('Invalid date format for groupJoinedDate');
+                }
+                finalArgs.groupJoinedDate = date;
+            } else if(rawargs.groupName) {
+                finalArgs.groupJoinedDate = new Date();
+            }
+
 
             if (password) {
                 finalArgs['passwordHash'] = await bcrypt.hash(password, 10);
             }
-            return await userService.updateSettings(updateUserId, finalArgs);
+
+            try {
+                const updatedUser = await userService.updateSettings(updateUserId, finalArgs);
+                return updatedUser;
+            } catch {
+                throw new GraphQLError('Failed to change settings.');
+            }
         },
         restoreAccount: async (_root: unknown, args: RestoreAccountArgs) => {
             const { name, password, restoreCode } = args;

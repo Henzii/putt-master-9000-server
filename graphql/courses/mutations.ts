@@ -26,7 +26,7 @@ export default {
                 if (course.creator?.toString() !== context.user.id && !(await userService.isAdmin(context.user.id))) {
                     Log(
                         `Course (${name}, ${courseId}) change denied (not the owner)`,
-                        LogType.WAGNING, LogContext.COURSE, context.user.id
+                        LogType.WARNING, LogContext.COURSE, context.user.id
                     );
                     throw new GraphQLError('You can only edit courses you have created');
                 }
