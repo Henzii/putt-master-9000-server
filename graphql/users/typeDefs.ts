@@ -29,6 +29,7 @@ export default gql`
         achievements: [Achievement]!
         accountType: String
         groupName: String
+        groupJoinedDate: String
     }
     type Achievement {
         id: String!

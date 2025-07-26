@@ -80,7 +80,7 @@ export default {
             });
         },
         getGroupMembers: async (_root: unknown, args: { groupName?: string }, context: ContextWithUser) => {
-            if (args.groupName && !userService.isAdmin(context.user.id)) {
+            if (args.groupName && ! (await userService.isAdmin(context.user.id))) {
                 throw new GraphQLError('Unauthorized, only admins can specify group name');
             }
 

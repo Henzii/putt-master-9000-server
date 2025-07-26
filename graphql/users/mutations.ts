@@ -74,7 +74,7 @@ export default {
             const { password, userId, groupJoinedDate, ...args } = rawargs;
             const updateUserId = userId ?? context.user.id;
 
-            if ((userId || groupJoinedDate) && !userService.isAdmin(context.user.id)) {
+            if (Boolean(userId || groupJoinedDate) && !(await userService.isAdmin(context.user.id))) {
                 Log(`User ${context.user.name} tried to change settings of user ${updateUserId}`, LogType.WARNING, LogContext.USER);
                 throw new GraphQLError('Unauthorized');
             }
