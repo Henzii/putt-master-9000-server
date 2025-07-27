@@ -10,7 +10,7 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     return users;
 };
 
-const getUsersWithoutGames = async (createdBefore?: Date): Promise<(Document & User)[]> => {
+const getUsersWithoutGames = async (createdBefore: Date): Promise<(Document & User)[]> => {
     const users = await Users.find<Document & User>({
         _id: {
             $nin: await Game.distinct('scorecards.user')

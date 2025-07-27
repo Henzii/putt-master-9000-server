@@ -19,13 +19,13 @@ export default {
             }
 
             const users = await userService.getUsersWithoutGames(createdBefore);
-            const mapepdUsers = users.map(user => ({
+            const mappedUsers = users.map(user => ({
                 id: user.id,
                 name: user.name,
                 createdAt: user.createdAt
             }));
 
-            return mapepdUsers;
+            return mappedUsers;
         },
         getUsers: async () => {
             try {
