@@ -47,7 +47,16 @@ export default {
             } else {
                 Log(`Deleting account ${context.user.name} failed`, LogType.ERROR, LogContext.USER_DELETION);
             }
-            return response;
+            return Boolean(response);
+        },
+        deleteAccounts: async (_root: unknown, args: { userIds: ID[] }, context: ContextWithUser) => {
+            const response = await userService.deleteAccount(args.userIds);
+            if (response) {
+                Log(`${response} accounts deleted`, LogType.SUCCESS, LogContext.USER_DELETION, context.user.id);
+            } else {
+                Log(`Deleting multiple account failed!`, LogType.ERROR, LogContext.USER_DELETION, context.user.id);
+            }
+            return Boolean(response);
         },
         login: async (_root: unknown, args: {user: string, password: string, pushToken?: string}) => {
             if (!process.env.TOKEN_KEY) {

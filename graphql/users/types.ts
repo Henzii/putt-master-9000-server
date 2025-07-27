@@ -33,3 +33,7 @@ export type GetPastActivityArgs = {
     year?: number
     userId?: ID
 }
+
+export type GetUsersWithoutGamesArgs = {
+    createdBefore: string
+}

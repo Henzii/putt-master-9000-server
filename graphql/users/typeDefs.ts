@@ -53,7 +53,7 @@ export default gql`
 
     type Query {
         getMe: User
-        getUsersWithoutGames: [UserWithoutGames!]!
+        getUsersWithoutGames(createdBefore: String!): [UserWithoutGames!]!
         getUsers: [User]!
         getUser (userId: ID!): User
         searchUser(search: String!): SearchUserResponse!
@@ -70,7 +70,8 @@ export default gql`
         addFriend(friendId: ID, friendName: String): Boolean
         removeFriend(friendId: ID!): Boolean
         login(user: String!, password: String!, pushToken: String): String!
-        deleteAccount: Boolean
+        deleteAccount: Boolean!
+        deleteAccounts(userIds: [ID!]!): Boolean!
         changeSettings(blockFriendRequests: Boolean, password: String, blockStatsSharing: Boolean, userId: ID, groupName: String, email: String, groupJoinedDate: String): User
         changeUsername(newUsername: String!): User!
         restoreAccount(name: String, restoreCode: String, password: String): Boolean

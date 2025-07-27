@@ -24,7 +24,7 @@ export const permissions= shield({
         getUsers: isAdmin,
         getLogs: isAdmin,
         getUser: isAdmin,
-        getUsersWithoutGames: isAdmin
+        getUsersWithoutGames: isAdmin,
     },
 
     Mutation: {
@@ -33,6 +33,8 @@ export const permissions= shield({
         createUser: allow,
         restoreAccount: allow,
         sendFeedback: allow,
+
+        deleteAccounts: isAdmin
     },
 }, {
     async fallbackError(thrownThing) {

@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import userService from "../../services/userService";
 import { ContextWithUser, ID } from "../../types";
-import { GetPastActivityArgs } from "./types";
+import { GetPastActivityArgs, GetUsersWithoutGamesArgs } from "./types";
 import { addMonths, addYears, endOfMonth, format, startOfMonth } from "date-fns";
 import { getPlayersScores } from "../../services/statsService";
 import gameService from "../../services/gameService";
@@ -12,8 +12,13 @@ export default {
             if (!context?.user?.id) return null;
             return await userService.getUser(undefined, context.user?.id);
         },
-        getUsersWithoutGames: async () => {
-            const users = await userService.getUsersWithoutGames();
+        getUsersWithoutGames: async (_root: unknown, args: GetUsersWithoutGamesArgs) => {
+            const createdBefore = new Date(args.createdBefore);
+            if (isNaN(createdBefore.getTime())) {
+                throw new GraphQLError('Invalid date format');
+            }
+
+            const users = await userService.getUsersWithoutGames(createdBefore);
             const mapepdUsers = users.map(user => ({
                 id: user.id,
                 name: user.name,
@@ -23,7 +28,11 @@ export default {
             return mapepdUsers;
         },
         getUsers: async () => {
-            return userService.getUsers();
+            try {
+                return userService.getUsers();
+            } catch (e: unknown) {
+                throw new GraphQLError('Failed to fetch users: ' + (e instanceof Error ? e.message : 'Unknown error'));
+            }
         },
         getUser: async (_root: unknown, args: {userId: ID}) => {
             return await userService.getUser(undefined, args.userId);
