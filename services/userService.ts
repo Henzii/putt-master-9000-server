@@ -10,11 +10,12 @@ const getUsers = async (): Promise<(Document & User)[]> => {
     return users;
 };
 
-const getUsersWithoutGames = async (): Promise<(Document & User)[]> => {
+const getUsersWithoutGames = async (createdBefore: Date): Promise<(Document & User)[]> => {
     const users = await Users.find<Document & User>({
         _id: {
             $nin: await Game.distinct('scorecards.user')
-        }
+        },
+        createdAt: { $lt: createdBefore }
     });
     return users;
 };
@@ -89,29 +90,31 @@ const removeFriend = async (removeFromUserId: ID, userIdToRemove: ID) => {
         return false;
     }
 };
-const deleteAccount = async (userId: ID) => {
+const deleteAccount = async (userIds: ID | ID[]) => {
+    const ids = Array.isArray(userIds) ? userIds : [userIds];
+
     try {
         // Poistetaan kaikki käyttäjän tuloskortit peleistä
         await Game.updateMany(
             {
-                'scorecards.user': userId
+                'scorecards.user': { $in: ids }
             },
             {
-                $pull: { scorecards: { user: userId } }
+                $pull: { scorecards: { user: { $in: ids } } }
             },
         );
         // Poistetaan kaikki kaveruudet
         await Users.updateMany(
             {
-                'friends': userId
+                'friends': { $in: ids }
             },
             {
-                $pull: { friends: userId }
+                $pull: { friends: { $in: ids } }
             }
         );
         // Poistetaan tunnukset
-        await Users.findByIdAndRemove(userId);
-        return true;
+        await Users.deleteMany({_id: { $in: ids }});
+        return ids.length;
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
