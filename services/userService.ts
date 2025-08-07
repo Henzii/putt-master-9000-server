@@ -28,13 +28,14 @@ const isAdmin = async (userId: ID) => {
 const searchUser = async (searchString: string): Promise<{ users: SafeUser[], hasMore: boolean }> => {
     const users = await Users.find<User & Document>({
         name: { $regex: searchString, $options: 'i' },
-        blockFriendRequests: false,
     }).limit(10);
     return {
         users: users.map(u => {
             return {
                 id: u.id,
-                name: u.name
+                name: u.name,
+                groupName: u.groupName,
+                blockFriendRequests: u.blockFriendRequests || false
             };
         }), hasMore: users.length >= 10
     };
