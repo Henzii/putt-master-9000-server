@@ -40,6 +40,7 @@ export default gql`
         id: ID!
         name: String!
         groupName: String
+        groupJoinedDate: String
         blockFriendRequests: Boolean
     }
     type UserWithoutGames {
