@@ -18,6 +18,11 @@ export async function getLayout(layoutId: ID) {
     return course?.layouts.find(c => c.id === layoutId) ?? null;
 }
 
+export async function getCourseWithLayout(layout: ID) {
+    const course = await CourseModel.findOne<Course>({ 'layouts._id': layout });
+    return course ?? null;
+}
+
 export async function getCourse(courseId: ID){
     try {
         const course = await CourseModel.findById(courseId) as Document & Course;
@@ -96,4 +101,6 @@ export const deleteCourse = async (courseId: ID) => {
         return false;
     }
 };
+
+export const getTeeSignImage = () => {}
 

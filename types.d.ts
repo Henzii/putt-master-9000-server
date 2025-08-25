@@ -18,6 +18,15 @@ export type Layout = {
     creator?: ID,
     names?: string[],
     courseCreator?: ID
+    teeSigns?: [
+        {
+            index: number,
+            publicId: string,
+            url: string,
+            uploadedAt: string,
+            uploadedBy: ID
+        }
+    ]
 }
 
 export type NewLayoutArgs = Layout & { creator: ID, _id?: ID }

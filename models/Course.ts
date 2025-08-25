@@ -31,7 +31,19 @@ const skeema = new mongoose.Schema({
             deprecated: {
                 type: Boolean,
                 default: false
-            }
+            },
+            teeSigns: [
+                {
+                    index: Number,
+                    publicId: String,
+                    url: String,
+                    uploadedAt: Date,
+                    uploadedBy: {
+                        type: mongoose.Types.ObjectId,
+                        ref: 'User'
+                    }
+                }
+            ]
         }
     ],
 

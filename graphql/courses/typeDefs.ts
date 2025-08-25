@@ -49,6 +49,7 @@ export default gql`
         par: Int
         canEdit: Boolean!
         deprecated: Boolean!
+        teeSigns: [TeeSign!]
     }
     type HoleStats {
         index: Int!
@@ -70,17 +71,25 @@ export default gql`
         holes: [HoleStats]
     }
 
+    type TeeSign {
+        index: Int!
+        publicId: String!
+        url: String!
+        uploadedAt: String!
+    }
+
     type Query {
         getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int, searchCoordinates: [Float]): GetCoursesResponse
         getLayout(layoutId: ID!): Layout
         getLayoutStats(layoutId: ID!, playersIds: [ID!]): [LayoutStats!]!
         getBestPoolForLayout(players: Int!, layoutId: ID!): BestPoolForLayoutResponse
-
     }
 
     type Mutation {
         addCourse(name: String!, coordinates: InputLocation, courseId: ID): Course!
         addLayout(courseId: ID!, layout: NewLayout!): Course!
         deleteCourse(courseId: ID!): Boolean!
+
+        getTeeSignUploadSignature(layoutId: ID!, holeNumber: Int!): String
     }
 `;
