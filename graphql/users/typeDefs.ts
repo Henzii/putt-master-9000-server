@@ -56,7 +56,7 @@ export default gql`
 
   type Point {
     coordinates: [Float]
-    acc: Int
+    acc: Float
   }
 
   type MeasuredThrow {
@@ -67,13 +67,13 @@ export default gql`
   }
 
   input PointInput {
-    coordinates: [Float]
-    acc: Int
+    coordinates: [Float!]!
+    acc: Float!
   }
 
   input MeasuredThrowInput {
-    startingPoint: PointInput
-    landingPoint: PointInput
+    startingPoint: PointInput!
+    landingPoint: PointInput!
   }
 
   type Query {
