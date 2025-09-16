@@ -84,6 +84,8 @@ export default gql`
         publicId: String!
         cloudName: String!
         timestamp: Int!
+        overwrite: String!
+        folder: String!
     }
 
     type Query {

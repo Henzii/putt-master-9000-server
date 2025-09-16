@@ -119,7 +119,9 @@ export const getTeeSignUploadSignature = (public_id?: string) => {
     const timestamp = Math.round(Date.now() / 1000);
     const params = {
         public_id: publicId,
-        timestamp
+        timestamp,
+        overwrite: 'true',
+        folder: 'fudisc-tee-signs',
     };
 
     const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET);
@@ -129,6 +131,8 @@ export const getTeeSignUploadSignature = (public_id?: string) => {
         apiKey: process.env.CLOUDINARY_API_KEY,
         publicId: publicId,
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-        timestamp
+        timestamp,
+        overwrite: 'true',
+        folder: 'fudisc-tee-signs',
     };
 };
