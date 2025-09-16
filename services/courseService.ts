@@ -3,6 +3,8 @@ import CourseModel from "../models/Course";
 import { Course, ID, NewLayoutArgs } from "../types";
 import userService from "./userService";
 import { GraphQLError } from "graphql";
+import { v2 as cloudinary } from 'cloudinary';
+import { randomUUID } from "crypto";
 
 type GetCoursesArgs = {
     limit: number,
@@ -102,5 +104,31 @@ export const deleteCourse = async (courseId: ID) => {
     }
 };
 
-export const getTeeSignImage = () => {}
+export const getTeeSignUploadSignature = (public_id?: string) => {
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+        throw new Error('Environment variables for Cloudinary are not set');
+    }
 
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    const publicId = public_id ?? randomUUID();
+    const timestamp = Math.round(Date.now() / 1000);
+    const params = {
+        public_id: publicId,
+        timestamp
+    };
+
+    const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET);
+
+    return {
+        signature,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        publicId: publicId,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        timestamp
+    };
+};

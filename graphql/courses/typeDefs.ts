@@ -78,6 +78,14 @@ export default gql`
         uploadedAt: String!
     }
 
+    type TeeSignUploadSignature {
+        signature: String!
+        apiKey: String!
+        publicId: String!
+        cloudName: String!
+        timestamp: Int!
+    }
+
     type Query {
         getCourses(limit: Int!, offset: Int!, search: String, coordinates: [Float], maxDistance: Int, searchCoordinates: [Float]): GetCoursesResponse
         getLayout(layoutId: ID!): Layout
@@ -90,6 +98,6 @@ export default gql`
         addLayout(courseId: ID!, layout: NewLayout!): Course!
         deleteCourse(courseId: ID!): Boolean!
 
-        getTeeSignUploadSignature(layoutId: ID!, holeNumber: Int!): String
+        getTeeSignUploadSignature(layoutId: ID!, holeNumber: Int!): TeeSignUploadSignature!
     }
 `;

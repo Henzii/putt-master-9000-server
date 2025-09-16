@@ -1,6 +1,6 @@
 import Log from '../../services/logServerice';
 import { LogContext, LogType } from "../../models/Log";
-import { addCourse, addLayout, deleteCourse, getCourse, getCourseWithLayout, updateCourse } from "../../services/courseService";
+import { addCourse, addLayout, deleteCourse, getCourse, getCourseWithLayout, getTeeSignUploadSignature, updateCourse } from "../../services/courseService";
 import { ContextWithUser, ID, NewLayoutArgs } from "../../types";
 import { GraphQLError } from 'graphql';
 import userService from '../../services/userService';
@@ -84,7 +84,7 @@ export default {
 
             const canUpload =
                 !teeSign || // If tee sign does not exist, anyone can upload
-                wasUploadedByUser || // If tee sign exists, only the uploader can re-upload
+                wasUploadedByUser || // If tee sign exists, the original uploader can re-upload
                 course.creator?.toString() === userId || // Course creator can always upload
                 layout.creator?.toString() === userId || // Layout creator can always upload
                 await userService.isAdmin(userId); // Admins do what they want
@@ -95,6 +95,16 @@ export default {
                     LogType.WARNING, LogContext.COURSE, userId
                 );
                 throw new GraphQLError('You can only re-upload tee signs that you uploaded, or if you are the course/layout creator.');
+            }
+
+            const public_id = layout.teeSigns?.find(ts => ts.index === holeNumber)?.publicId;
+
+            try {
+                const signature = getTeeSignUploadSignature(public_id);
+                // @TODO Save public_id to database if not already there
+                return signature;
+            } catch {
+                throw new GraphQLError('Could not get upload signature, please try again later');
             }
         }
     }
