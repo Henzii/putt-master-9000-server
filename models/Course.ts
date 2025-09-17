@@ -36,7 +36,6 @@ const skeema = new mongoose.Schema({
                 {
                     index: Number,
                     publicId: String,
-                    url: String,
                     uploadedAt: Date,
                     uploadedBy: {
                         type: mongoose.Types.ObjectId,

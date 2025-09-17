@@ -1,7 +1,7 @@
 import Log from '../../services/logServerice';
 import { LogContext, LogType } from "../../models/Log";
 import { addCourse, addLayout, deleteCourse, getCourse, getCourseWithLayout, getTeeSignUploadSignature, updateCourse } from "../../services/courseService";
-import { ContextWithUser, ID, NewLayoutArgs } from "../../types";
+import { ContextWithUser, ID, Layout, NewLayoutArgs } from "../../types";
 import { GraphQLError } from 'graphql';
 import userService from '../../services/userService';
 import { countGamesPlayedOnLayouts } from '../../services/gameService';
@@ -79,7 +79,7 @@ export default {
                 throw new GraphQLError('Layout not found');
             }
 
-            const teeSign = layout.teeSigns?.find(teeSign => teeSign.index === holeNumber);
+            const teeSign = layout.teeSigns.find(teeSign => teeSign.index === holeNumber);
             const wasUploadedByUser = teeSign?.uploadedBy?.toString() === userId;
 
             const canUpload =
@@ -97,11 +97,23 @@ export default {
                 throw new GraphQLError('You can only re-upload tee signs that you uploaded, or if you are the course/layout creator.');
             }
 
-            const public_id = layout.teeSigns?.find(ts => ts.index === holeNumber)?.publicId;
-
             try {
-                const signature = getTeeSignUploadSignature(public_id);
-                // @TODO Save public_id to database if not already there
+                const signature = getTeeSignUploadSignature(teeSign?.publicId);
+                const updatedTeeSign: Layout['teeSigns'][number] = {
+                    index: holeNumber,
+                    publicId: signature.publicId,
+                    uploadedAt: signature.timestamp.toString(),
+                    uploadedBy: userId
+                };
+
+                if (!teeSign) {
+                    layout.teeSigns.push(updatedTeeSign);
+                } else {
+                    layout.teeSigns = layout.teeSigns.map(ts => ts.index === holeNumber ? updatedTeeSign : ts);
+                }
+
+                course.save();
+
                 return signature;
             } catch {
                 throw new GraphQLError('Could not get upload signature, please try again later');

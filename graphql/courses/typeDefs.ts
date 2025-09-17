@@ -76,6 +76,7 @@ export default gql`
         publicId: String!
         url: String!
         uploadedAt: String!
+        uploadedBy: SafeUser!
     }
 
     type TeeSignUploadSignature {
@@ -86,6 +87,7 @@ export default gql`
         timestamp: Int!
         overwrite: String!
         folder: String!
+        invalidate: String!
     }
 
     type Query {
