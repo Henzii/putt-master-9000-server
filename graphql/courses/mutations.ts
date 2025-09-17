@@ -74,9 +74,13 @@ export default {
             if (!course) {
                 throw new GraphQLError('Course not found');
             }
-            const layout = course?.layouts.find(l => l.id === layoutId);
+            const layout = course?.layouts.find(l => l.id?.toString() === layoutId.toString());
             if (!layout) {
                 throw new GraphQLError('Layout not found');
+            }
+
+            if (holeNumber < 0 || holeNumber >= layout.holes) {
+                throw new GraphQLError('holeNumber out of bounds');
             }
 
             const teeSign = layout.teeSigns.find(teeSign => teeSign.index === holeNumber);
@@ -112,7 +116,7 @@ export default {
                     layout.teeSigns = layout.teeSigns.map(ts => ts.index === holeNumber ? updatedTeeSign : ts);
                 }
 
-                course.save();
+                await course.save();
 
                 return signature;
             } catch {
