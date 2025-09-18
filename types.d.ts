@@ -10,6 +10,13 @@ export type Course = {
     creator?: ID
 }
 
+type TeeSign = {
+    index: number,
+    publicId: string,
+    uploadedAt: string,
+    uploadedBy: ID | SafeUser
+}
+
 export type Layout = {
     id?: number | string,
     name: string,
@@ -18,6 +25,7 @@ export type Layout = {
     creator?: ID,
     names?: string[],
     courseCreator?: ID
+    teeSigns: TeeSign[]
 }
 
 export type NewLayoutArgs = Layout & { creator: ID, _id?: ID }

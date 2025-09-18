@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 import validator from 'mongoose-unique-validator';
 
+const teeSignSchema = new mongoose.Schema({
+    index: Number,
+    publicId: String,
+    uploadedAt: Date,
+    uploadedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }
+});
+
 const skeema = new mongoose.Schema({
     name: {
         type: String,
@@ -31,6 +41,10 @@ const skeema = new mongoose.Schema({
             deprecated: {
                 type: Boolean,
                 default: false
+            },
+            teeSigns: {
+                type: [teeSignSchema],
+                default: []
             }
         }
     ],

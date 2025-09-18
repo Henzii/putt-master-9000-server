@@ -1,7 +1,7 @@
 import Log from '../../services/logServerice';
 import { LogContext, LogType } from "../../models/Log";
-import { addCourse, addLayout, deleteCourse, getCourse, updateCourse } from "../../services/courseService";
-import { ContextWithUser, ID, NewLayoutArgs } from "../../types";
+import { addCourse, addLayout, deleteCourse, getCourse, getCourseWithLayout, getTeeSignUploadSignature, updateCourse } from "../../services/courseService";
+import { ContextWithUser, ID, Layout, NewLayoutArgs } from "../../types";
 import { GraphQLError } from 'graphql';
 import userService from '../../services/userService';
 import { countGamesPlayedOnLayouts } from '../../services/gameService';
@@ -64,6 +64,60 @@ export default {
             } else {
                 Log(`${context.user.name} (${context.user.id}) tried to delete course ${course.name} but it failed`, LogType.ERROR, LogContext.COURSE);
                 return false;
+            }
+        },
+        getTeeSignUploadSignature: async (_root: unknown, args: { layoutId: ID, holeNumber: number }, context: ContextWithUser) => {
+            const { layoutId, holeNumber } = args;
+            const userId = context.user.id;
+
+            const course = await getCourseWithLayout(layoutId);
+            if (!course) {
+                throw new GraphQLError('Course not found');
+            }
+            const layout = course?.layouts.find(l => l.id?.toString() === layoutId.toString());
+            if (!layout) {
+                throw new GraphQLError('Layout not found');
+            }
+
+            if (holeNumber < 0 || holeNumber >= layout.holes) {
+                throw new GraphQLError('holeNumber out of bounds');
+            }
+
+            const teeSign = layout.teeSigns.find(teeSign => teeSign.index === holeNumber);
+            const wasUploadedByUser = teeSign?.uploadedBy?.toString() === userId;
+
+            const canUpload =
+                !teeSign || // If tee sign does not exist, anyone can upload
+                wasUploadedByUser || // If tee sign exists, the original uploader can re-upload
+                course.creator?.toString() === userId || // Course creator can always upload
+                layout.creator?.toString() === userId || // Layout creator can always upload
+                await userService.isAdmin(userId); // Admins do what they want
+
+            if (!canUpload) {
+                Log(
+                    `Tee sign upload denied for layout ${layoutId} (not the owner)`,
+                    LogType.WARNING, LogContext.COURSE, userId
+                );
+                throw new GraphQLError('You can only re-upload tee signs that you uploaded, or if you are the course/layout creator.');
+            }
+
+            try {
+                const signature = getTeeSignUploadSignature(teeSign?.publicId);
+                const updatedTeeSign: Layout['teeSigns'][number] = {
+                    index: holeNumber,
+                    publicId: signature.publicId,
+                    uploadedAt: signature.timestamp.toString(),
+                    uploadedBy: userId
+                };
+
+                const currentTeeSigns = layout.teeSigns || [];
+                layout.teeSigns = [...currentTeeSigns.filter(ts => ts.index !== holeNumber), updatedTeeSign];
+
+                await course.save();
+
+                return signature;
+            } catch {
+                throw new GraphQLError('Could not get upload signature, please try again later');
             }
         }
     }
