@@ -110,11 +110,8 @@ export default {
                     uploadedBy: userId
                 };
 
-                if (!teeSign) {
-                    layout.teeSigns.push(updatedTeeSign);
-                } else {
-                    layout.teeSigns = layout.teeSigns.map(ts => ts.index === holeNumber ? updatedTeeSign : ts);
-                }
+                const currentTeeSigns = layout.teeSigns || [];
+                layout.teeSigns = [...currentTeeSigns.filter(ts => ts.index !== holeNumber), updatedTeeSign];
 
                 await course.save();
 
