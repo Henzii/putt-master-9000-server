@@ -75,23 +75,26 @@ export async function addCourse(name: string, coordinates: { lat: number, lon: n
     await newCourse.save();
     return newCourse;
 }
-export async function addLayout(courseId: number | string, layout: NewLayoutArgs, userId: ID) {
-    const course = await CourseModel.findById(courseId) as Document & Course;
+export async function addLayout(courseId: number | string, newLayout: NewLayoutArgs, userId: ID) {
+    const course = await CourseModel.findById<Course & Document>(courseId);
     const isAdmin = await userService.isAdmin(userId);
-    // Jos layoutilla on jo id, kyseessä muokkaus, ei lisäys...
-    if (layout.id) {
-        course.layouts = course.layouts.map(lo => {
-            if (lo.id === layout.id) {
-                if (lo.creator?.toString() === layout.creator || course.creator?.toString() === layout.creator || isAdmin) {
-                    return {...layout, _id: layout.id};
+    if (!course) {
+        throw new GraphQLError('Course not found');
+    }
+
+    if (newLayout.id) {
+        course.layouts = course.layouts.map(layout => {
+            if (layout.id === newLayout.id) {
+                if (layout.creator?.toString() === newLayout.creator || course.creator?.toString() === newLayout.creator || isAdmin) {
+                    return {...layout, ...newLayout, _id: newLayout.id};
                 }
                 throw new GraphQLError('Error, layout not created by you!');
             }
-            return lo;
+            return layout;
 
         });
     } else {
-        course.layouts.push(layout);
+        course.layouts.push(newLayout);
     }
     await course.save();
     return course;
@@ -119,11 +122,12 @@ export const getTeeSignUploadSignature = (public_id?: string) => {
 
     const publicId = public_id ?? randomUUID();
     const timestamp = Math.round(Date.now() / 1000);
+    const folder = process.env.NODE_ENV === 'development' ? 'fudisc-tee-signs-dev' : 'fudisc-tee-signs';
     const params = {
         public_id: publicId,
         timestamp,
         overwrite: 'true',
-        folder: 'fudisc-tee-signs',
+        folder,
         invalidate: 'true',
     };
 
@@ -136,7 +140,7 @@ export const getTeeSignUploadSignature = (public_id?: string) => {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         timestamp,
         overwrite: 'true',
-        folder: 'fudisc-tee-signs',
+        folder,
         invalidate: 'true',
     };
 };
