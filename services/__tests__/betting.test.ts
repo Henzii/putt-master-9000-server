@@ -1,4 +1,4 @@
-import { createBet, getPoolPot } from "../bettingService";
+import { createBet, getPoolPot, getTotalWinninStakes } from "../bettingService";
 import { mockedPool } from "../mocks/bets";
 
 describe('Betting', () => {
@@ -33,5 +33,13 @@ describe('Betting', () => {
     it('should calculate pot size', () => {
         const total = getPoolPot(mockedPool);
         expect(total).toBe(100);
+    });
+    it('should calculate total winning stakes', () => {
+        const totalWinningStakes = getTotalWinninStakes(mockedPool, [{leg: 1, selection: 1}]);
+        expect(totalWinningStakes).toBe(60);
+
+        const totalWinningStakes2 = getTotalWinninStakes(mockedPool, [{leg: 1, selection: 2}]);
+        expect(totalWinningStakes2).toBe(40);
+
     });
 });
