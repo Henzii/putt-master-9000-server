@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { pool } from './Betting';
 
 const skeema = new mongoose.Schema({
     date: String,
@@ -31,6 +32,16 @@ const skeema = new mongoose.Schema({
     bHcMultiplier: {
         type: Number,
         default: 1
+    },
+    betting: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        pools: [{
+          type: [pool],
+          default: []
+        }]
     }
 });
 

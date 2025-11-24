@@ -1,4 +1,5 @@
 import type { Types } from "mongoose";
+import { Pool } from "./graphql/games/types";
 
 export type Course = {
     name: string,
@@ -44,6 +45,10 @@ export type Game = {
     endTime?: Date,
     groupName?: string,
     bHcMultiplier?: number
+    betting?: {
+        enabled: boolean,
+        pools: Pool[]
+    }
 }
 
 export type Scorecard = {

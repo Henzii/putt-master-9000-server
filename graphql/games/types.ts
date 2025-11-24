@@ -14,3 +14,28 @@ export type SetScoreArgs = {
     hole: number,
     value: number,
 }
+
+export enum PoolType {
+    WINNER = "WINNER",
+}
+
+export type Pool = {
+    type: string,
+    bets: {
+        totalStake: number,
+        user: {
+            id: ID
+        },
+        selections: number[],
+        lines: {
+            stake: number,
+            line: {
+                leg: number,
+                selection: number
+            }[]
+        }[]
+    }[],
+    result: {
+        winningSelection: number[]
+    }
+}
