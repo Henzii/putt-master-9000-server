@@ -15,12 +15,30 @@ export type SetScoreArgs = {
     value: number,
 }
 
-export enum PoolType {
+export type Selection = {
+    id: number,
+    type?: 'Player',
+    value: string
+}
+
+export enum LegType {
     WINNER = "WINNER",
+    WINNER_HC = "WINNER_HC",
+    HOLE_IN_ONE = "HOLE_IN_ONE",
+}
+
+export enum PoolStatus {
+    OPEN = "OPEN",
+    SETTLED = "SETTLED"
+}
+
+export type Leg = {
+    type: LegType,
+    selections: Selection[]
 }
 
 export type Pool = {
-    type: string,
+    status: PoolStatus,
     bets: {
         totalStake: number,
         user: {
@@ -35,7 +53,8 @@ export type Pool = {
             }[]
         }[]
     }[],
+    legs: Leg[],
     result: {
-        winningSelection: number[]
+        winningSelection: number[][]
     }
 }

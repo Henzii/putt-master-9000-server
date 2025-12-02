@@ -1,5 +1,5 @@
-import { createBet, getPoolPot, getTotalWinninStakes } from "../bettingService";
-import { mockedPool } from "../mocks/bets";
+import { createBet, getPoolPot, getPoolResult, getTotalWinningStakes } from "../bettingService";
+import { mockedGameWithBetting, mockedPool } from "../mocks/bets";
 
 describe('Betting', () => {
     it('should create a single selection bet', () => {
@@ -35,11 +35,16 @@ describe('Betting', () => {
         expect(total).toBe(100);
     });
     it('should calculate total winning stakes', () => {
-        const totalWinningStakes = getTotalWinninStakes(mockedPool, [{leg: 1, selection: 1}]);
+        const totalWinningStakes = getTotalWinningStakes(mockedPool, [{leg: 1, selection: 1}]);
         expect(totalWinningStakes).toBe(60);
 
-        const totalWinningStakes2 = getTotalWinninStakes(mockedPool, [{leg: 1, selection: 2}]);
+        const totalWinningStakes2 = getTotalWinningStakes(mockedPool, [{leg: 1, selection: 2}]);
         expect(totalWinningStakes2).toBe(40);
 
+    });
+    it('should get pool result', () => {
+        const poolResult = getPoolResult(mockedGameWithBetting);
+        expect(poolResult[0].result).toEqual({winningSelection: [[3], [2]]});
+        expect(poolResult[1].result).toEqual({winningSelection: [[4]]});
     });
 });

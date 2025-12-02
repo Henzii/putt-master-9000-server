@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
+import type { Pool } from "../graphql/games/types";
 
-export const pool = new mongoose.Schema({
+export const pool = new mongoose.Schema<Pool>({
   status: String,
-  type: String,
   bets: [{
     totalStake: Number,
     user: {
@@ -18,5 +18,13 @@ export const pool = new mongoose.Schema({
   }],
   result: {
     winningSelection: [Number]
-  }
+  },
+  legs: [{
+    type: String,
+    selections: [{
+      id: Number,
+      type: String,
+      value: String
+    }]
+  }]
 });

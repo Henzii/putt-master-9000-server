@@ -1,5 +1,7 @@
-import { Pool } from "../graphql/games/types";
+import { LegType, Pool } from "../graphql/games/types";
+import { Game } from "../types";
 import { cartesianProduct } from "../utils/betting";
+import { total } from "../utils/calculators";
 
 type Selections = {
     leg: number,
@@ -27,7 +29,7 @@ export const createBet = (selections: Selections[], stake: number, userId: strin
 
 export const getPoolPot = (pool: Pool) => pool.bets.reduce((acc, bet) => acc + bet.totalStake, 0);
 
-export const getTotalWinninStakes = (pool: Pool, result: Result) => {
+export const getTotalWinningStakes = (pool: Pool, result: Result) => {
     return pool.bets.reduce((acc, bet) => {
         const winningLines = bet.lines.filter(line =>
             line.line.every(sel =>
@@ -41,11 +43,48 @@ export const getTotalWinninStakes = (pool: Pool, result: Result) => {
 
 const buildLines = (selections: Selections[]) => {
     const expanded = selections.map(leg =>
-      leg.selections.map(sel => ({
-        leg: leg.leg,
-        selection: sel,
-      }))
+        leg.selections.map(sel => ({
+            leg: leg.leg,
+            selection: sel,
+        }))
     );
 
     return cartesianProduct(...expanded);
-  };
+};
+
+export const getPoolResult = (game: Game): Pool[] => {
+    if (!game.betting) {
+        return [];
+    }
+    const getPoolsWithResults = game.betting?.pools.map(pool => {
+        const winningSelection = pool.legs.map(leg => {
+            if ([LegType.WINNER, LegType.WINNER_HC].includes(leg.type)) {
+                const hcMultiplier = leg.type === LegType.WINNER_HC ? 1 : 0;
+
+                const minScore = Math.min(...game.scorecards.map(sc => total(sc.scores) - (hcMultiplier * sc.hc)));
+                const winnerIds = game.scorecards
+                    .filter(sc => total(sc.scores) - (hcMultiplier * sc.hc) <= minScore)
+                    .map(sc => sc.user.id.toString());
+                const winningSelections = leg.selections.filter(sel => winnerIds.includes(sel.value)).map(sel => sel.id);
+                return winningSelections;
+            }
+
+            if (LegType.HOLE_IN_ONE === leg.type) {
+                const holeInOneScorecards = game.scorecards.filter(sc =>
+                    sc.scores.some(score => score === 1)
+                );
+
+                const winningSelections = leg.selections.filter(sel =>
+                    holeInOneScorecards.some(sc => sc.user.id.toString() === sel.value)
+                ).map(sel => sel.id);
+
+                return winningSelections;
+            }
+
+            return [];
+        });
+        return {...pool, result: {winningSelection}};
+    });
+
+    return getPoolsWithResults;
+};
