@@ -10,10 +10,12 @@ import subscriptionsTypeDefs from './subscriptions/typeDefs';
 import coursesTypeDefs from './courses/typeDefs';
 import userTypeDefs from './users/typeDefs';
 import gameTypeDefs from './games/typeDefs';
+import competitionsTypeDefs from './competitions/typeDefs';
 
 import coursesResolvers from './courses/resolvers';
 import userResolvers from './users/resolvers';
 import gameResolvers from './games/resolvers';
+import { competitionsQueries } from './competitions/queries';
 
 const mixedResolvers = {
     ...queries,
@@ -28,6 +30,6 @@ const mixedResolvers = {
     }
 };
 
-export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers, userResolvers, gameResolvers]);
-export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs, userTypeDefs, gameTypeDefs]);
+export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers, userResolvers, gameResolvers, competitionsQueries]);
+export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs, userTypeDefs, gameTypeDefs, competitionsTypeDefs]);
 
