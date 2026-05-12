@@ -165,6 +165,24 @@ const makeFriends = async (
   }
   return null;
 };
+export const getUserByEmail = async (
+  email: string
+): Promise<(Document & User) | null> => {
+  try {
+    return (await Users.findOne({
+      email: email.toLowerCase(),
+    })) as (Document & User) | null;
+  } catch {
+    return null;
+  }
+};
+
+const clearRecovery = async (userId: ID) => {
+  await Users.findByIdAndUpdate(userId, {
+    $unset: { recoveryHash: "", recoveryExpires: "" },
+  });
+};
+
 export const getUser = async (
   name?: string,
   id?: ID
@@ -249,6 +267,8 @@ export default {
   getUsers,
   addUser,
   getUser,
+  getUserByEmail,
+  clearRecovery,
   makeFriends,
   updateSettings,
   removeFriend,

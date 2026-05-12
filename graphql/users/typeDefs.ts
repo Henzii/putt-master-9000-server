@@ -112,7 +112,7 @@ export default gql`
       groupJoinedDate: String
     ): User
     changeUsername(newUsername: String!): User!
-    restoreAccount(name: String, restoreCode: String, password: String): Boolean
+    restoreAccount(email: String): Boolean
     addMeasuredThrow(throw: MeasuredThrowInput): [MeasuredThrow!]!
     deleteMeasuredThrow(throwId: ID!): [MeasuredThrow!]!
   }
