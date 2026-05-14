@@ -6,8 +6,10 @@ import { ContextWithUserOrNull } from "../types";
 import Log from "../../services/logServerice";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { randomBytes } from "crypto";
+import { sendEmail } from "../../services/mailService";
 import pushNotificationsService from "../../services/pushNotificationsService";
-import { ContextWithUser, ID, User } from "../../types";
+import { ContextWithUser, ID } from "../../types";
 import {
   ChangeSettingsArgs,
   MeasuredThrowArgs,
@@ -140,19 +142,32 @@ export default {
         throw new Error();
       }
       const user = await userService.getUser(args.user);
-      if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
+      if (!user) throw new GraphQLError("Wrong username or password");
+
+      const isValidRecovery =
+        !!user.recoveryHash &&
+        !!user.recoveryExpires &&
+        user.recoveryExpires > new Date() &&
+        (await bcrypt.compare(args.password, user.recoveryHash));
+
+      const isValidPassword =
+        !isValidRecovery &&
+        (await bcrypt.compare(args.password, user.passwordHash));
+
+      if (!isValidRecovery && !isValidPassword) {
         throw new GraphQLError("Wrong username or password");
-      } else {
-        const payload = {
-          id: user.id,
-          name: user.name,
-        };
-        if (args.pushToken && args.pushToken !== user.pushToken) {
-          user.pushToken = args.pushToken;
-          await user.save();
-        }
-        return jwt.sign(payload, process.env.TOKEN_KEY);
       }
+
+      if (isValidRecovery) {
+        await userService.clearRecovery(user.id);
+      }
+
+      const payload = { id: user.id, name: user.name };
+      if (args.pushToken && args.pushToken !== user.pushToken) {
+        user.pushToken = args.pushToken;
+        await user.save();
+      }
+      return jwt.sign(payload, process.env.TOKEN_KEY);
     },
     changeSettings: async (
       _root: unknown,
@@ -201,29 +216,27 @@ export default {
       }
     },
     restoreAccount: async (_root: unknown, args: RestoreAccountArgs) => {
-      const { name, password, restoreCode } = args;
-      // Jos argumentteja tulee oudosti
-      if (!name || (password && !restoreCode) || (!password && restoreCode)) {
-        throw new GraphQLError("Invalid argument count");
-      }
-      const user = (await userService.getUser(name)) as User;
+      const { email } = args;
+      if (!email) throw new GraphQLError("Invalid argument count");
 
-      // Jos käyttäjää ei löydy tai käyttäjä ei ole antanut sähköpostiosoitettaan
-      if (!user || !user.email) return true;
+      const user = await userService.getUserByEmail(email);
+      if (!user) return true; // Don't reveal whether account exists
 
-      // Jos ei vielä ole palautuskoodia ja uutta salasanaa, lähetetään sähköpostilla
-      // palautuskoodi ja tallennetaan se käyttäjälle tietokantaan
-      if (!password || !restoreCode) {
-        const code = "ABCD"; // Random ;)
-        await userService.updateSettings(user.id, { restoreCode: code });
-        return true;
-      }
-      // Jos palautuskoodi on oikein, vaihdetaan salasana
-      else if (restoreCode === user.restoreCode) {
-        await userService.updateSettings(user.id, {
-          passwordHash: await bcrypt.hash(password, 10),
+      const tempPassword = randomBytes(9).toString("base64");
+      const recoveryExpires = new Date(Date.now() + 5 * 60 * 1000);
+
+      await userService.updateSettings(user.id, {
+        recoveryHash: await bcrypt.hash(tempPassword, 10),
+        recoveryExpires,
+      });
+
+      if (user.email) {
+        sendEmail({
+          from: process.env.MAIL_USER || "",
+          to: user.email,
+          subject: "FuDisc - Account recovery",
+          text: `Your temporary login password is: ${tempPassword}\n\nYou can only use it once and it expires in 5 minutes. Log in and change your password in settings.`,
         });
-        return true;
       }
 
       return true;

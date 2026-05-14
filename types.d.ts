@@ -70,6 +70,8 @@ export type User = {
     groupName?: string,
     pushToken?: string,
     restoreCode?: string,
+    recoveryHash?: string,
+    recoveryExpires?: Date,
     accountType?: AccountType,
     achievements?: Achievement[],
     createdAt?: Date,

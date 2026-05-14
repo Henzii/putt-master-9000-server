@@ -6,9 +6,7 @@ export type LoginArgs = {
   pushToken?: string;
 };
 export type RestoreAccountArgs = {
-  name?: string;
-  restoreCode?: string;
-  password?: string;
+  email?: string;
 };
 
 type SettingsArgs = {
@@ -27,6 +25,8 @@ export type UserSettingsArgs = Omit<SettingsArgs, "groupJoinedDate"> & {
   restoreCode?: string;
   pushToken?: string;
   groupJoinedDate?: Date;
+  recoveryHash?: string;
+  recoveryExpires?: Date;
 };
 
 export type GetPastActivityArgs = {

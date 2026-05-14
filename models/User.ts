@@ -54,6 +54,8 @@ const skeema = new mongoose.Schema(
       default: false,
     },
     restoreCode: String,
+    recoveryHash: String,
+    recoveryExpires: Date,
     achievements: [
       {
         _id: false,
