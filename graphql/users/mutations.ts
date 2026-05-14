@@ -235,7 +235,7 @@ export default {
           from: process.env.MAIL_USER || "",
           to: user.email,
           subject: "FuDisc - Account recovery",
-          text: `Your temporary login password is: ${tempPassword}\n\nIt expires in 5 minutes. Log in and change your password in settings.`,
+          text: `Your temporary login password is: ${tempPassword}\n\nYou can only use it once and it expires in 5 minutes. Log in and change your password in settings.`,
         });
       }
 
