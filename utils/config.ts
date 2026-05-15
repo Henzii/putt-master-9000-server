@@ -1,5 +1,5 @@
 export default {
-    latestVersion: 121,
+    latestVersion: 127,
     scoresRequiredForHC: 5,
 
     feedbackEmailFrom: 'Fudisc',
