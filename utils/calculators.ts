@@ -6,7 +6,7 @@
  */
 export const plusminus = (scores: number[], pars: number[]): number => {
     return scores.reduce((total: number, current: number, indeksi: number) => {
-        if (!isNaN(current)) return total + current - pars[indeksi];
+        if (current !== null && !isNaN(current)) return total + current - pars[indeksi];
         return total;
     }, 0);
 };
