@@ -3,6 +3,14 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { startServer } from './server/server';
+import dns from 'node:dns';
+
+if (process.env.NODE_ENV === 'development') {
+    dns.setServers([
+        '8.8.8.8',
+        '8.8.4.4',
+        ]);
+}
 
 dotenv.config();
 

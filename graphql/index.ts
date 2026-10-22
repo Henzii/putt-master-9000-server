@@ -11,10 +11,12 @@ import coursesTypeDefs from './courses/typeDefs';
 import userTypeDefs from './users/typeDefs';
 import gameTypeDefs from './games/typeDefs';
 import competitionsTypeDefs from './competitions/typeDefs';
+import ragePuttTypeDefs from './ragePutt/typeDefs';
 
 import coursesResolvers from './courses/resolvers';
 import userResolvers from './users/resolvers';
 import gameResolvers from './games/resolvers';
+import ragePuttResolvers from './ragePutt/resolvers';
 import { competitionsQueries } from './competitions/queries';
 
 const mixedResolvers = {
@@ -30,6 +32,5 @@ const mixedResolvers = {
     }
 };
 
-export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers, userResolvers, gameResolvers, competitionsQueries]);
-export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs, userTypeDefs, gameTypeDefs, competitionsTypeDefs]);
-
+export const resolvers = mergeResolvers([mixedResolvers, coursesResolvers, userResolvers, gameResolvers, competitionsQueries, ragePuttResolvers]);
+export const typeDefs = mergeTypeDefs([mixedTypeDefs, subscriptionsTypeDefs, coursesTypeDefs, userTypeDefs, gameTypeDefs, competitionsTypeDefs, ragePuttTypeDefs]);
