@@ -1,4 +1,6 @@
 import RagePutt from "../models/RagePutt";
+import User from "../models/User";
+import { GraphQLError } from "graphql";
 import { ID } from "../types";
 
 export const getRagePuttGame = async (gameId: ID, userId: ID) => {
@@ -19,6 +21,15 @@ export const getRagePuttGames = async (userId: ID) => {
 };
 
 export const createRagePuttGame = async (mode: string, playerIds: ID[]) => {
+    if (playerIds.length === 0) {
+        throw new GraphQLError("At least one player is required");
+    }
+
+    const users = await User.find({ _id: { $in: playerIds } }).select("_id");
+    if (users.length !== playerIds.length) {
+        throw new GraphQLError("One or more players were not found");
+    }
+
     const scorecards = playerIds.map(playerId => ({
         user: playerId,
         scores: []
@@ -41,21 +52,20 @@ export const updateRagePuttScorecard = async (gameId: ID, playerId: ID, scores: 
         throw new Error("Game not found");
     }
 
-    const roundsInGame = game.mode === 'quick' ? 10 : 20;
-    const isFinishedGame = game.scorecards.every(sc => sc.scores.length >= roundsInGame);
-
-    console.log(isFinishedGame);
-
-    if (isFinishedGame) {
-        game.endTime = new Date();
-    }
-
     const scorecard = game.scorecards.find(sc => sc.user.toString() === playerId);
     if (!scorecard) {
         throw new Error("Scorecard not found");
     }
 
     scorecard.scores = scores;
+
+    const roundsInGame = game.mode === 'quick' ? 10 : 20;
+    const isFinishedGame = game.scorecards.every(sc => sc.scores.length >= roundsInGame);
+    if (isFinishedGame) {
+        game.endTime = new Date();
+    }
+
+    await game.populate('scorecards.user');
     await game.save();
     return scorecard;
 };

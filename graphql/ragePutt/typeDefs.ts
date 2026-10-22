@@ -17,8 +17,8 @@ export default gql`
     }
 
     type Mutation {
-        createRagePuttGame(mode: String = "default", playerIds: [ID!]!): ID!
-        updateRagePuttScorecard(gameId: ID!, playerId: ID!, scores: [Int]): RagePuttScorecard!
+        createRagePuttGame(mode: String! = "default", playerIds: [ID!]!): ID!
+        updateRagePuttScorecard(gameId: ID!, playerId: ID!, scores: [Int!]!): RagePuttScorecard!
         deleteRagePuttGame(gameId: ID!): Boolean!
     }
 
