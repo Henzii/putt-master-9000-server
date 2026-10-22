@@ -4,6 +4,14 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { startServer } from './server/server';
 
+import dns from 'node:dns';
+
+dns.setServers([
+    '8.8.8.8',
+    '8.8.4.4',
+  ]);
+
+
 dotenv.config();
 
 const ENV = process.env.NODE_ENV === 'development' && !process.argv.includes('--use-production-data') ? 'dev' : 'prod';
