@@ -4,8 +4,8 @@ export default gql`
     type RagePuttScorecard {
         id: ID!
         user: SafeUser!
-        scores: [Int]
-        points: Int
+        scores: [Int!]!
+        points: Int!
     }
     type RagePuttGame {
         id: ID!
