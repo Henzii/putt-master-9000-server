@@ -24,6 +24,9 @@ export default {
         },
         getRagePuttGames: async (_: unknown, __: unknown, context: ContextWithUser) => {
             return ragePuttService.getRagePuttGames(context.user.id);
+        },
+        getAllRagePuttGames: async (_: unknown, { limit, offset }: { limit: number, offset: number }) => {
+            return ragePuttService.getAllRagePuttGames(limit, offset);
         }
     },
     Mutation: {

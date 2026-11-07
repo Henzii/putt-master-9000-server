@@ -15,6 +15,12 @@ export default gql`
         isFinished: Boolean!
         mode: String! 
     }
+    type GetAllRagePuttGamesResponse {
+        games: [RagePuttGame!]!
+        hasMore: Boolean!
+        nextOffset: Int
+        count: Int!
+    }
 
     type Mutation {
         createRagePuttGame(mode: String! = "default", playerIds: [ID!]!): ID!
@@ -25,5 +31,6 @@ export default gql`
     type Query {
         getRagePuttGame(gameId: ID!): RagePuttGame
         getRagePuttGames: [RagePuttGame!]!
+        getAllRagePuttGames(limit: Int!, offset: Int!): GetAllRagePuttGamesResponse!
     }
 `;

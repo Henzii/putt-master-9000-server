@@ -20,6 +20,24 @@ export const getRagePuttGames = async (userId: ID) => {
     return games;
 };
 
+export const getAllRagePuttGames = async (limit: number, offset: number) => {
+    const [count, games] = await Promise.all([
+        RagePutt.countDocuments({}),
+        RagePutt.find({})
+            .sort({ startTime: -1, _id: -1 })
+            .skip(offset)
+            .limit(limit)
+            .populate('scorecards.user')
+    ]);
+    const hasMore = count > offset + limit;
+    return {
+        games,
+        count,
+        hasMore,
+        nextOffset: hasMore ? offset + limit : null
+    };
+};
+
 export const createRagePuttGame = async (mode: string, playerIds: ID[]) => {
     if (playerIds.length === 0) {
         throw new GraphQLError("At least one player is required");
@@ -86,6 +104,7 @@ export const deleteRagePuttGame = async (gameId: ID, userId: ID) => {
 export default {
     getRagePuttGame,
     getRagePuttGames,
+    getAllRagePuttGames,
     createRagePuttGame,
     updateRagePuttScorecard,
     deleteRagePuttGame
