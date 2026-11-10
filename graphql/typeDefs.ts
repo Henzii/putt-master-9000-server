@@ -6,18 +6,10 @@ export const typeDefs = gql`
   type HandshakeResponse {
     latestVersion: Int!
   }
-  type LogEntry {
-    message: String!
-    type: String!
-    context: String!
-    user: User
-    createdAt: String!
-  }
 
   type Query {
     ping: String
     handShake(pushToken: String): HandshakeResponse!
-    getLogs: [LogEntry]
   }
 
   type Mutation {
