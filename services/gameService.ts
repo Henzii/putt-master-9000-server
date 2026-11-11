@@ -77,6 +77,7 @@ export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, searc
     };
 };
 export const getAllGames = async ({limit=10, offset=0}: {limit: number, offset: number}) => {
+    if (limit < 1 || offset < 0) throw new GraphQLError('Invalid limit or offset');
     const [count, games] = await Promise.all([
         GameModel.countDocuments({}),
         GameModel.find({})

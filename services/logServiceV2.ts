@@ -19,6 +19,8 @@ const severityNumbers: Record<LogSeverity, number> = {
 };
 
 export const log = (eventName: EventName, message: string, severity: LogSeverity = 'INFO') => {
+    console.log(`[${eventName}]: ${message}`);
+
     const apiKey = process.env.GRAFANA_TOKEN;
     if (!apiKey) {
         console.error('Cannot send log to Grafana: GRAFANA_TOKEN is not set');
@@ -54,8 +56,7 @@ export const log = (eventName: EventName, message: string, severity: LogSeverity
         }]
     };
 
-    console.log(`[${eventName}]: ${message}`);
-    axios.post(url, JSON.stringify(body), { headers }).catch(e => {
+    axios.post(url, JSON.stringify(body), { headers, timeout: 10_000 }).catch(e => {
         console.error('Error sending log to Grafana:', e?.response?.status, e?.response?.data ?? e?.message);
     });
 };

@@ -21,6 +21,7 @@ export const getRagePuttGames = async (userId: ID) => {
 };
 
 export const getAllRagePuttGames = async (limit: number, offset: number) => {
+    if (limit < 1 || offset < 0) throw new GraphQLError('Invalid limit or offset');
     const [count, games] = await Promise.all([
         RagePutt.countDocuments({}),
         RagePutt.find({})
