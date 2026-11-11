@@ -52,7 +52,7 @@ export default gql`
         getLiveGame(gameId: ID!): Game
         getLiveGames: [Game!]!
         getGames(onlyOpenGames: Boolean, limit: Int, offset: Int, search: String, onlyGroupGames: Boolean, from: String, to: String): GetGamesResponse!
-        getAllGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
+        getAllGames(limit: Int!, offset: Int!): GetGamesResponse!
         getGroupGames(minPlayerCount: Int!, filterYear: Int!): [Game]!
     }
     

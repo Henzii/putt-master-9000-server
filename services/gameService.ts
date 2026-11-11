@@ -76,6 +76,24 @@ export const getGames = async ({userId, onlyOpenGames, limit=10, offset=0, searc
         nextOffset: hasMore ? offset+limit : null
     };
 };
+export const getAllGames = async ({limit=10, offset=0}: {limit: number, offset: number}) => {
+    if (limit < 1 || offset < 0) throw new GraphQLError('Invalid limit or offset');
+    const [count, games] = await Promise.all([
+        GameModel.countDocuments({}),
+        GameModel.find({})
+            .sort({ startTime: -1, _id: -1 })
+            .skip(offset)
+            .limit(limit)
+            .populate('scorecards.user')
+    ]);
+    const hasMore = count > offset + limit;
+    return {
+        games,
+        count,
+        hasMore,
+        nextOffset: hasMore ? offset + limit : null
+    };
+};
 export const addPlayersToGame = async (gameId: ID, playerIds: ID[]) => {
     // Haetaan tasoitukset
     const peli = await GameModel.findById(gameId) as Document & Game;

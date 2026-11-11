@@ -1,9 +1,7 @@
 import { GraphQLError } from "graphql";
 import mongoose from "mongoose";
-import { LogContext, LogType } from "../../models/Log";
 import userService from "../../services/userService";
-import { ContextWithUserOrNull } from "../types";
-import Log from "../../services/logServerice";
+import { log as logEvent } from "../../services/logServiceV2";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
@@ -27,7 +25,6 @@ export default {
         email?: string;
         pushToken?: string;
       },
-      context?: ContextWithUserOrNull
     ) => {
       const hashedPassword = await bcrypt.hash(args.password, 10);
       try {
@@ -37,11 +34,9 @@ export default {
           args.email,
           args.pushToken
         );
-        Log(
+        logEvent(
+          "user.create",
           `User ${user.name} created`,
-          LogType.SUCCESS,
-          LogContext.USER_CREATION,
-          context?.user?.id
         );
         return jwt.sign(
           { id: user.id, name: user.name },
@@ -49,11 +44,10 @@ export default {
         );
       } catch (e) {
         const viesti = (e as mongoose.Error).message;
-        Log(
+        logEvent(
+          "user.create",
           `User creation failed, message: ${viesti}`,
-          LogType.ERROR,
-          LogContext.USER_CREATION,
-          context?.user?.id
+          "ERROR"
         );
         if (viesti.includes("to be unique"))
           throw new GraphQLError(`Name ${args.name} is already taken!`);
@@ -95,16 +89,15 @@ export default {
     ) => {
       const response = await userService.deleteAccount(context.user.id);
       if (response) {
-        Log(
+        logEvent(
+          "user.delete",
           `Account ${context.user.name} / ${context.user.id} deleted`,
-          LogType.SUCCESS,
-          LogContext.USER_DELETION
         );
       } else {
-        Log(
+        logEvent(
+          "user.delete",
           `Deleting account ${context.user.name} failed`,
-          LogType.ERROR,
-          LogContext.USER_DELETION
+          "ERROR"
         );
       }
       return Boolean(response);
@@ -112,22 +105,18 @@ export default {
     deleteAccounts: async (
       _root: unknown,
       args: { userIds: ID[] },
-      context: ContextWithUser
     ) => {
       const response = await userService.deleteAccount(args.userIds);
       if (response) {
-        Log(
+        logEvent(
+          "user.delete",
           `${response} accounts deleted`,
-          LogType.SUCCESS,
-          LogContext.USER_DELETION,
-          context.user.id
         );
       } else {
-        Log(
+        logEvent(
+          "user.delete",
           `Deleting multiple account failed!`,
-          LogType.ERROR,
-          LogContext.USER_DELETION,
-          context.user.id
+          "ERROR"
         );
       }
       return Boolean(response);
@@ -139,6 +128,11 @@ export default {
       if (!process.env.TOKEN_KEY) {
         // eslint-disable-next-line no-console
         console.error("TOKEN_KEY is not set!");
+        logEvent(
+          "user.login",
+          "Login failed, TOKEN_KEY is not set!",
+          "FATAL"
+        );
         throw new Error();
       }
       const user = await userService.getUser(args.user);
@@ -181,10 +175,10 @@ export default {
         Boolean(userId || groupJoinedDate) &&
         !(await userService.isAdmin(context.user.id))
       ) {
-        Log(
+        logEvent(
+          "user.update",
           `User ${context.user.name} tried to change settings of user ${updateUserId}`,
-          LogType.WARNING,
-          LogContext.USER
+          "WARN"
         );
         throw new GraphQLError("Unauthorized");
       }
@@ -252,14 +246,17 @@ export default {
           context.user.id,
           username
         );
-        Log(
+        logEvent(
+          "user.update",
           `User changed their username from ${context.user.name} to ${username}`,
-          LogType.INFO,
-          LogContext.USER,
-          context.user.id
         );
         return user;
       } catch {
+        logEvent(
+          "user.update",
+          `User ${context.user.name} failed to change their username to ${username}`,
+          "ERROR"
+        );
         throw new GraphQLError(
           "Failed to change username. Name is already taken or name validation failed."
         );

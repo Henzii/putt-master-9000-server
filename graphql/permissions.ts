@@ -22,9 +22,10 @@ export const permissions= shield({
         searchUser: allow,
 
         getUsers: isAdmin,
-        getLogs: isAdmin,
         getUser: isAdmin,
         getUsersWithoutGames: isAdmin,
+        getAllGames: isAdmin,
+        getAllRagePuttGames: isAdmin,
     },
 
     Mutation: {

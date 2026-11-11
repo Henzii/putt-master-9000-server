@@ -13,11 +13,11 @@ import { resolvers } from '../graphql/index';
 import { ContextWithUser, SafeUser } from '../types';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from 'graphql-ws/lib/use/ws';
-import { log } from '../utils/log';
 import { applyMiddleware } from 'graphql-middleware';
 import { permissions } from '../graphql/permissions';
 import { GraphQLError } from 'graphql';
 import { gameExportApi } from './games-export-api';
+import { log } from '../services/logServiceV2';
 
 const SERVER_PATH = '/';
 const EXPORT_GAMES_PARH = '/export';
@@ -34,8 +34,6 @@ const wsServer = new WebSocketServer({
 
 const cleanup = useServer({
     schema,
-    onConnect: () => log('Sub connected...'),
-    onComplete: (_ctx, message) => log(['Sub completed', message]),
     context: async (context) => {
         return validateToken(context?.connectionParams?.Authorization as string);
     }
@@ -90,5 +88,5 @@ export const startServer = async() => {
     );
     const port = process.env.PORT || 8080;
     await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
-    log(['🚀 Server running on port', port], false);
+    log('server.info', 'Server started on port ' + port);
 };
