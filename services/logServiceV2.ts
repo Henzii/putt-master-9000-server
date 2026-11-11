@@ -33,7 +33,7 @@ export const log = (eventName: EventName, message: string, severity: LogSeverity
         'Authorization': `Basic ${encoded}`,
     };
 
-    const serviceName = process.env.NODE_ENV === 'production' ? 'FuDisc server' : 'Dev FuDisc server';
+    const serviceName = process.env.NODE_ENV === 'development' ? 'Dev FuDisc server' : 'FuDisc server';
 
     const body = {
         resourceLogs: [{
