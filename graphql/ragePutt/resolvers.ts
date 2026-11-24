@@ -1,6 +1,7 @@
 import { RagePuttGame } from "../../models/RagePutt";
 import ragePuttService from "../../services/ragePuttService";
 import { ContextWithUser, ID } from "../../types";
+import { log as logEvent } from "../../services/logServiceV2";
 
 type GetRagePuttGameArgs = {
     gameId: string
@@ -31,13 +32,29 @@ export default {
     },
     Mutation: {
         createRagePuttGame: async (_: unknown, { mode = 'default', playerIds }: CreateRagePuttGameArgs, context: ContextWithUser) => {
-            return ragePuttService.createRagePuttGame(mode, playerIds);
+            try {
+                const gameId = await ragePuttService.createRagePuttGame(mode, playerIds);
+                logEvent('rageputt.create', `RagePutt game ${gameId} created by ${context.user.name} (${context.user.id})`);
+                return gameId;
+            } catch (error) {
+                logEvent('rageputt.create', `RagePutt game creation failed for ${context.user.name} (${context.user.id})`, 'ERROR');
+                throw error;
+            }
         },
         updateRagePuttScorecard: async (_: unknown, { gameId, playerId, scores }: UpdateRagePuttGameArgs, context: ContextWithUser) => {
             return ragePuttService.updateRagePuttScorecard(gameId, playerId, scores, context.user.id);
         },
         deleteRagePuttGame: async (_: unknown, { gameId }: { gameId: string }, context: ContextWithUser) => {
-            return ragePuttService.deleteRagePuttGame(gameId, context.user.id);
+            try {
+                const deleted = await ragePuttService.deleteRagePuttGame(gameId, context.user.id);
+                if (deleted) {
+                    logEvent('rageputt.delete', `RagePutt game ${gameId} deleted by ${context.user.name} (${context.user.id})`);
+                }
+                return deleted;
+            } catch (error) {
+                logEvent('rageputt.delete', `RagePutt game ${gameId} deletion denied or failed for ${context.user.name} (${context.user.id})`, 'WARN');
+                throw error;
+            }
         }
     },
     RagePuttGame: {

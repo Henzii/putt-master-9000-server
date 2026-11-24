@@ -42,7 +42,11 @@ export default {
         },
         addLayout: async (_root: unknown, args: { courseId: string | number, layout: NewLayoutArgs }, context: ContextWithUser) => {
             const layout = await addLayout(args.courseId, { ...args.layout, creator: context.user.id }, context.user.id);
-            logEvent('course.update', `New layout ${args.layout.name} created for ${layout.name} by ${context.user.name} (${context.user.id})`);
+            if (args.layout.id) {
+                logEvent('layout.update', `Layout ${args.layout.name} (${args.layout.id}) updated for course ${layout.name} (${args.courseId}) by ${context.user.name} (${context.user.id})`);
+            } else {
+                logEvent('layout.create', `New layout ${args.layout.name} created for course ${layout.name} (${args.courseId}) by ${context.user.name} (${context.user.id})`);
+            }
             return layout;
         },
         deleteCourse: async(_root: unknown, args: { courseId: ID }, context: ContextWithUser) => {
