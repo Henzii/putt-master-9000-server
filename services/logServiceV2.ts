@@ -5,7 +5,7 @@ import axios from 'axios';
 const INSTANCE_ID = "1916064";
 const url = "https://otlp-gateway-prod-eu-north-0.grafana.net/otlp/v1/logs";
 
-type EventPrefix = 'server' | 'user' | 'course'
+type EventPrefix = 'server' | 'user' | 'course' | 'layout' | 'rageputt' | 'game'
 type EventName = `${EventPrefix}.${string}`
 type LogSeverity = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL'
 

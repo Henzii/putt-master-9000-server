@@ -7,6 +7,7 @@ import { publishGameChanges } from "../publish";
 import { GameSettingsArgs, SetScoreArgs } from "./types";
 import achievementService from "../../services/achievementService";
 import { pubsub } from "../subscriptions/subscriptions";
+import { log as logEvent } from "../../services/logServiceV2";
 
 export default {
     Mutation: {
@@ -18,7 +19,13 @@ export default {
                 throw new GraphQLError("Cannot create a group game. Creator's group name was not defined.");
             }
 
-            return gameService.createGame(courseId, layoutId, groupName, bHcMultiplier);
+            const gameId = await gameService.createGame(courseId, layoutId, groupName, bHcMultiplier);
+            if (gameId) {
+                logEvent('game.create', `Game ${gameId} created for layout ${layoutId} on course ${courseId} by ${context.user.name} (${context.user.id})`);
+            } else {
+                logEvent('game.create', `Game creation failed for layout ${layoutId} on course ${courseId} by ${context.user.name} (${context.user.id})`, 'ERROR');
+            }
+            return gameId;
         },
         addPlayersToGame: async (_root: unknown, args: { gameId: string, playerIds: string[] }, context: ContextWithUser): Promise<Game> => {
             const game = await gameService.addPlayersToGame(args.gameId, args.playerIds);
@@ -103,7 +110,13 @@ export default {
             }
         },
         abandonGame: async (_root: unknown, args: { gameId: ID }, context: ContextWithUser) => {
-            return await gameService.abandonGame(args.gameId, context.user.id);
+            const deleted = await gameService.abandonGame(args.gameId, context.user.id);
+            if (deleted) {
+                logEvent('game.delete', `Game ${args.gameId} abandoned/deleted by ${context.user.name} (${context.user.id})`);
+            } else {
+                logEvent('game.delete', `Game ${args.gameId} could not be abandoned/deleted by ${context.user.name} (${context.user.id})`, 'WARN');
+            }
+            return deleted;
         },
         setBeersDrank: async (_root: unknown, args: { gameId: ID, playerId: ID, beers: number }, context: ContextWithUser) => {
             const {game, scorecard, user} = await gameService.setBeersDrank(args.gameId, args.playerId, args.beers);
